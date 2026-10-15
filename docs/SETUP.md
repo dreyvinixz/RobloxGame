@@ -20,4 +20,21 @@
 - Se scripts sumirem, desconecte Rojo e compare paths com default.project.json; não sobrescreva lugar sem backup.
 - Se comandos MCP não existirem, consulte docs oficiais e registre alternativa na issue FL-003.
 
+## Validação local — 2026-10-14
+- Roblox Studio MCP: sessão `Place1` encontrada em Edit mode; `list_roblox_studios` e `get_studio_state` responderam.
+- Rojo CLI 7.7.1 instalado pelo release oficial para Windows x86_64; SHA-256 conferido contra o digest do release.
+- Plugin Rojo instalado em `%LOCALAPPDATA%\Roblox\Plugins`.
+- `rojo build default.project.json -o <arquivo temporário>`: build concluído.
+- `rojo serve default.project.json`: servidor ativo em `localhost:34872`; Studio conectado em Edit mode.
+- Árvore confirmada via MCP: `ReplicatedStorage.Shared.Config` (ModuleScript), `ServerScriptService.GameServer.Bootstrap` (Script) e `StarterPlayer.StarterPlayerScripts.GameClient.Bootstrap` (LocalScript).
+- Hot sync comprovado no commit `652a59a8908b84ac297b6b85757e78bad52d6978`: o comentário de mapeamento do módulo Config foi lido no Studio após o commit.
+- MCP Play/Stop: `Place1` iniciou em Edit, executou Play e retornou a Edit; console confirmou `[Frontline][server] bootstrap ok | Project Frontline` e `[Frontline][client] bootstrap ok | Project Frontline`.
+- Tentativa de `print('frontline-mcp-ok')` no MCP foi bloqueada pelo cliente: a ferramenta exige aprovação, mas a política desta execução é `never`; nenhum Luau foi executado por essa tentativa.
+- Durante o smoke test, Studio/CorePackages emitiu avisos repetidos `FoundationProvider not found`; não houve erro nos bootstraps do projeto. Revisar esses avisos na issue FL-003 se persistirem em novo teste.
+
+## Repositório GitHub — 2026-10-15
+- `dreyvinixz/RobloxGame` é público; Issues habilitadas; issues `[FL-001]` a `[FL-032]` e milestones S0–S4 publicadas.
+- Proteção de `main` ativa e conferida via GitHub CLI: PR obrigatório, check `verify-planning` obrigatório e estrito, resolução de conversas obrigatória, admins incluídos, force-push e exclusão desativados.
+- Aprovações obrigatórias: 0, para não impedir merge neste projeto solo; revisão de PR continua sendo a convenção de contribuição.
+
 Referências: https://create.roblox.com/docs/studio/mcp e https://rojo.space/docs/v7/
