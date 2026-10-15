@@ -31,6 +31,8 @@ The stack preserves one issue branch/PR and `Closes #N` per issue. The latest me
 
 No full logical playtest was completed for the exact stacked artifact. The StudioTestService previously refused a new multiplayer run because a previous test was still in progress. Current Studio is in Edit mode and inspection showed its `VehicleService` source is the FL-024 version, without the FL-025 lifecycle changes. The current branch was built to a temporary `.rbxlx`, but it was not synced/loaded into that DataModel; running tests against the older source would give misleading evidence. QA-10's ten-minute observation is still required.
 
+A follow-up probe temporarily synchronized the four FL-025 source files into the Studio Edit DataModel and attempted to start Play. The start call stalled; `execute_luau` reported the Server DataModel unavailable because Studio remained in Edit. After stopping the attempt, I restored the previous source for all four scripts and verified that `VehicleService` again begins with the FL-024 implementation and has no `VehicleHealth` attribute code. No runtime pass is claimed and no Studio source changes were left behind.
+
 ## Required next actions
 
 1. Load one exact stacked build into a clean Studio test session, then complete QA-01–QA-11 with two clients (third client for late-join QA-09), including explicit network-latency variation.
