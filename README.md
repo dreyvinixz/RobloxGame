@@ -10,28 +10,24 @@
 - Roadmap: [ROADMAP.md](ROADMAP.md)
 - Backlog canônico: [planning/backlog.json](planning/backlog.json) (32 issues; versões .md e .csv geradas)
 - Sprints: [planning/sprints](planning/sprints)
-- Acordo de trabalho para IA: [AGENTS.md](AGENTS.md)
+- Acordo de trabalho para IA: [.agents/AGENTS.md](.agents/AGENTS.md)
 - Critérios QA: [docs/TEST_PLAN.md](docs/TEST_PLAN.md)
 - Proveniência e segurança: [docs/ASSET_PIPELINE.md](docs/ASSET_PIPELINE.md)
 
 ## Primeiro início no Windows
 1. Instale Git, Python 3.11+, Roblox Studio, Codex, GitHub CLI (`gh`) e Rojo v7. 
-2. Abra o Studio e habilite **Assistant → Manage MCP Servers → Enable Studio as MCP server**; conecte Codex por Quick Connect e valide a conexão (FL-003).
-3. Confirme `rojo --version`, execute `rojo serve` nesta pasta e conecte o plugin Rojo ao Studio com um lugar vazio; preserve objetos visuais criados via Studio (FL-002).
-4. Rode `python scripts/validate_project.py` e `python -m unittest discover -s tests -v`.
-5. Para criar **seu** repositório privado (não criado automaticamente neste pacote):
+2. Clone o repositório existente e entre na pasta:
 
 ```powershell
-git init -b main
-git add .
-git commit -m "chore: bootstrap Project Frontline"
-gh auth login
-gh repo create dreyvinixz/project-frontline-roblox --private --source . --remote origin --push
-python scripts/publish_issues.py --repo dreyvinixz/project-frontline-roblox --dry-run
-python scripts/publish_issues.py --repo dreyvinixz/project-frontline-roblox --apply
+git clone https://github.com/dreyvinixz/RobloxGame.git
+cd RobloxGame
 ```
 
-O importador cria labels, milestones e issues sem duplicar títulos existentes. `--dry-run` é obrigatório como primeiro teste recomendado. **Não publica experiências no Roblox.**
+3. Abra um lugar local no Studio e habilite **Assistant → Manage MCP Servers → Enable Studio as MCP server**; conecte o Codex pelo Quick Connect (FL-003).
+4. Confirme `rojo --version`, execute `rojo serve` nesta pasta e conecte o plugin Rojo ao Studio (FL-002).
+5. Rode `python scripts/validate_project.py` e `python -m unittest discover -s tests -v`.
+
+O repositório GitHub é [dreyvinixz/RobloxGame](https://github.com/dreyvinixz/RobloxGame). As [32 issues](https://github.com/dreyvinixz/RobloxGame/issues) e milestones S0–S4 já estão publicadas. Para importar novas entradas do backlog, autentique `gh`, revise primeiro com `python scripts/publish_issues.py --repo dreyvinixz/RobloxGame --dry-run` e use `--apply` somente para publicar. O importador não publica a experiência Roblox.
 
 ## Regras operacionais
 - Sempre trabalhar a partir de uma `FL-xxx` com escopo claro; uma issue por PR, salvo justificativa.
