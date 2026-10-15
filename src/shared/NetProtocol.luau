@@ -6,6 +6,7 @@ local NetProtocol = {
 	FireWeaponEvent = "FireWeapon",
 	ReloadWeaponEvent = "ReloadWeapon",
 	WeaponStateEvent = "WeaponState",
+	ResetTrainingTargetEvent = "ResetTrainingTarget",
 }
 
 return table.freeze(NetProtocol)
