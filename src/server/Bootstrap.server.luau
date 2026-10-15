@@ -2,12 +2,14 @@
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
 local ArenaBuilder = require(script.Parent:WaitForChild("ArenaBuilder"))
+local TrainingTargetService = require(script.Parent:WaitForChild("TrainingTargetService"))
 local CombatRequestService = require(script.Parent:WaitForChild("CombatRequestService"))
 local DamageService = require(script.Parent:WaitForChild("DamageService"))
 
 ArenaBuilder.Build()
+TrainingTargetService.Start()
 CombatRequestService.Start()
 DamageService.Start(CombatRequestService)
 
--- Arena greybox (FL-007) | contrato de disparo (FL-009) | rifle hitscan (FL-010)
+-- Arena greybox (FL-007) | contrato de disparo (FL-009) | rifle (FL-010) | alvo (FL-011)
 print("[Frontline][server] bootstrap ok | " .. Config.ProjectName)
