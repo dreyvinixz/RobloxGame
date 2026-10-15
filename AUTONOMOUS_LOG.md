@@ -14,7 +14,7 @@ Atualizado em 2026-10-15. Este registro acompanha as issues abertas #13–#32. `
 | #20 FL-020 | Parcial | [#51](https://github.com/dreyvinixz/RobloxGame/pull/51) | Rifle/pistola, troca validada, munição por arma e falloff implementados; validator, 3 testes e Rojo build passaram. TTK é aritmético; teste Studio de equip/munição/falloff e comparação de tempos ainda pendente devido a sync desconectado. |
 | #21 FL-021 | Parcial | [#52](https://github.com/dreyvinixz/RobloxGame/pull/52) | Estado Intact/Damaged/Destroyed, 100 HP, dano somente por tiro validado server-side, visibilidade/colisão em estado quebrado implementados. Validator, 3 testes e Rojo build passaram. Multiplayer, tentativa de destruição client-side e late join ainda sem evidência Studio. |
 | #22 FL-022 | Parcial | [#53](https://github.com/dreyvinixz/RobloxGame/pull/53) | Capturas Studio Device Simulator em iPhone 17 Pro (874×402) e iPhone 7 (667×375) mostram HP, placar, estado e munição no estado Waiting. Corrigi status de rodada truncado e sobreposição da munição com pulo touch; posições confirmadas sem overlap no viewport 666×374. Contagem ativa e painel de resultado capturados em ambos os dispositivos; largura do painel refinada após quebra de linha no iPhone 7. Validator, 3 testes e Rojo build passam. |
-| #23 FL-023 | Pendente | — | Aceite do MVP com dois clientes. |
+| #23 FL-023 | Parcial | [#54](https://github.com/dreyvinixz/RobloxGame/pull/54) | QA-04 passou em burst local de 10 tiros (um hit aceito); QA-11 passou com T, novo dummy e HUD 100/100. QA-03/06/08/09 têm passes direcionados anteriores em multiplayer simulado. A matriz integrada QA-01–QA-11 e QA-10 (10 min) seguem pendentes; NO-GO mantido por latência, integração e aceite humano. Ver `docs/TEST_REPORTS/FL-023.md`. |
 | #24 FL-024 | Pendente | — | Protótipo de veículo após MVP. |
 | #25 FL-025 | Pendente | — | Dano e regra de veículo. |
 | #26 FL-026 | Pendente | — | Profiling posterior aos cenários e veículos. |
@@ -93,6 +93,15 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - `WeaponController` mantém munição/reload/arma atual com layout relativo à viewport; dano confirmado pelo servidor aciona hit marker, sem feedback de hit decidido pelo cliente.
 - Validator, 3 testes Python, Rojo build e diff check passaram. Falta validar legibilidade visual e salvar capturas em duas resoluções no Studio.
 - Evidência e limitação em `docs/TEST_REPORTS/FL-022.md`; PR draft #53 empilhado sobre FL-021.
+
+## FL-023 — evidência atualizada e decisão de gate — 2026-10-15
+
+- `docs/TEST_PLAN.md` contém 11 casos QA-01–QA-11, embora a issue diga “10”; matriz preserva os 11.
+- Studio local: 10 requests imediatos de rifle resultaram em um hit (HP 100→75); após três tiros válidos espaçados o dummy chegou a 0, a tecla T recriou o alvo, e a inspeção confirmou Humanoid 100/100 e rótulo `DUMMY  100 / 100 HP`.
+- Evidência dirigida anterior: QA-03/06/08/09 passaram em sessões `StudioTestService` com clientes simulados, QA-05 tem três payloads inválidos sem alterar HP no cliente shooter. Repetições integradas, snapshots de observador após cada payload inválido e latência variada continuam pendentes.
+- QA-10 permanece sem resultado: um teste de 10 minutos não foi concluído. O runner atual recusou nova sessão por `Failed to start the test because a previous one is still in progress`; o monitor que foi iniciado por menos de um minuto foi excluído da evidência.
+- Decisão **NO-GO**: zero bloqueadores P0 não está demonstrado e nenhuma aprovação humana do MVP foi dada. PR draft #54 segue empilhado sobre FL-022; revisar relatório e executar matriz integrada antes de liberar S4.
+- Neste commit: validator passou, 3 testes Python passaram e `git diff --check` passou. `rojo build` foi tentado mas `rojo` não está instalado/no PATH; Selene e StyLua também indisponíveis. Resultados de build em commits ancestrais não foram reivindicados para esta revisão.
 
 ## Implementação parcial da FL-020 — 2026-10-15
 
