@@ -22,7 +22,7 @@ Atualizado em 2026-10-15. Este registro acompanha as issues abertas #13–#32. `
 | #28 FL-028 | Parcial | [#55](https://github.com/dreyvinixz/RobloxGame/pull/55) | ADR-0002 recomenda NO-GO para ponte com processo BF6 ao vivo; GO somente para Roblox independente, workflow Portal dentro do escopo oficial ou mock sintético. Fontes oficiais, obstáculos e política anticheat documentados; sem alteração de executáveis. |
 | #29 FL-029 | Parcial / bloqueado | [#60](https://github.com/dreyvinixz/RobloxGame/pull/60) | Plano server-authoritative e experimento em `docs/AI_BOT_READINESS.md`; implementação aguardará FL-023 NO-GO e perfil S4. |
 | #30 FL-030 | Parcial / bloqueado | [#61](https://github.com/dreyvinixz/RobloxGame/pull/61) | Plano de reuso e rotação server-owned em `docs/MAP_2_READINESS.md`; aguardando FL-027 NO-GO. |
-| #31 FL-031 | Pendente | — | Áudio e efeitos após alpha. |
+| #31 FL-031 | Parcial / bloqueado | [#62](https://github.com/dreyvinixz/RobloxGame/pull/62) | Design de assets, mix e pool cosmetic em `docs/AUDIO_VFX_READINESS.md`; aguarda FL-027. Nenhum efeito importado. |
 | #32 FL-032 | Pendente | — | Controles mobile e teste em aparelho real. |
 
 ## Decisões de FL-013
@@ -134,3 +134,7 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 ## Preparação parcial FL-030 — 2026-10-15
 
 - Documentados limites entre builder, serviços de partida e conteúdo, rotação permitida somente entre rounds e cenário de benchmark/reconexão. Nenhum asset novo inserido antes do gate alpha.
+
+## Preparação parcial FL-031 — 2026-10-15
+
+- Definidos gates de licença, pool de partículas limitado, feedback cosmetic e teste A/B com duas sessões e dois clientes. Nenhum audio/efeito adicionado, sem compras e sem medida A/B.
