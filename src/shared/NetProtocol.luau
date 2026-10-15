@@ -9,6 +9,9 @@ local NetProtocol = {
 	EquipWeaponEvent = "EquipWeapon",
 	HitConfirmedEvent = "HitConfirmed",
 	ResetTrainingTargetEvent = "ResetTrainingTarget",
+	VehicleActionEvent = "VehicleAction",
+	VehicleInputEvent = "VehicleInput",
+	VehicleStateEvent = "VehicleState",
 }
 
 return table.freeze(NetProtocol)
