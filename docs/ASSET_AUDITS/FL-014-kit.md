@@ -1,14 +1,14 @@
 # FL-014 — Auditoria do kit militar mínimo
 
-**Data:** 2026-10-15 · **Studio:** `Place1`, modo Edit · **Estado:** candidatos em quarentena, sem promoção ao mapa final.
+**Data:** 2026-10-15 · **Studio:** `Place1` · **Estado:** três cópias visuais aprovadas para prototipagem; originais e candidatos técnicos continuam isolados em quarentena.
 
 ## Decisão de seleção
 
 | Papel | Candidato | Origem e termos | Resultado |
 |---|---|---|---|
-| Rifle visual | [Auto Rifle oficial](https://create.roblox.com/store/asset/4842207161/Auto-Rifle), ID `4842207161`, `@Roblox` | Gratuito; [Weapons Kit](https://create.roblox.com/docs/resources/weapons-kit) sob [Limited Use License](https://create.roblox.com/docs/resources/limited-use-license), para desenvolvimento de experiências Roblox | Usar somente a geometria de um dos três rifles importados; o sistema próprio de combate não será usado. |
-| Rig técnico | R15 neutro gerado pelo [Rig Builder/API do Studio](https://create.roblox.com/docs/studio/rig-builder), ID interno `builtin:R15` | Recurso nativo da Roblox, sem compra ou asset de terceiro | Base R15 para FL-015; uniforme e equipamento visual ainda faltam. |
-| Kit urbano | [City Props Pack](https://create.roblox.com/store/asset/6370681139), ID `6370681139`, `@Roblox` | Get Model gratuito; termos do [Creator Store](https://create.roblox.com/docs/production/creator-store) | Subconjunto: `StreetLightPole_01_A`, `Bus_Stop_01_A`, `FireHydrant_01_A`. |
+| Rifle visual | [Auto Rifle oficial](https://create.roblox.com/store/asset/4842207161/Auto-Rifle), ID `4842207161`, `@Roblox` | Gratuito; [Weapons Kit](https://create.roblox.com/docs/resources/weapons-kit) sob [Limited Use License](https://create.roblox.com/docs/resources/limited-use-license), para desenvolvimento de experiências Roblox | **APPROVED, visual only.** Usar somente a geometria limpa de um rifle; não usar o sistema de combate importado. |
+| Rig técnico | R15 neutro gerado pelo [Rig Builder/API do Studio](https://create.roblox.com/docs/studio/rig-builder), ID interno `builtin:R15` | Recurso nativo da Roblox, sem compra ou asset de terceiro | **APPROVED como base técnica.** FL-015 ainda deve criar uniforme, braços em primeira pessoa e animações próprias. |
+| Kit urbano | [City Props Pack](https://create.roblox.com/store/asset/6370681139), ID `6370681139`, `@Roblox` | Get Model gratuito; termos do [Creator Store](https://create.roblox.com/docs/production/creator-store) | **APPROVED para prototipagem:** `StreetLightPole_01_A`, `Bus_Stop_01_A`, `FireHydrant_01_A`, sem scripts e com cópias de teste ancoradas. Posição e simplificação de colisão finais são FL-016. |
 
 A busca do Studio por rigs militares trouxe resultados com nomes de criador que imitam `Roblox` usando caracteres invisíveis. Eles não foram escolhidos. O apartamento da FL-013 tem 10.427 descendentes e segue como candidato condicional, fora do kit mínimo.
 
@@ -31,4 +31,13 @@ O Output coletado após o playtest não trouxe mensagens de falha de carregament
 
 O rifle tem silhueta adequada como visual de teste. O R15 gerado ainda é um manequim escuro; a FL-015 precisa de uniforme, braços em primeira pessoa e animações próprias. O ponto de ônibus é relativamente grande para a largura das rotas e precisa de posicionamento final na FL-016. O lote não deve ser copiado inteiro para a arena, pois o sistema do Auto Rifle duplicaria o combate e a câmera existentes.
 
-As cópias estão em `PERFORMANCE_TESTED` como teste local exploratório. Para `APPROVED`, faltam verificação de escala/colisão no mapa persistido e confirmação de carregamento das dependências na experiência de destino quando ela for publicada. A FL-016 deve persistir posição e colisão simplificada na fonte; o Studio aberto guarda os modelos, mas Git versiona somente IDs e a auditoria.
+### Revisão de aprovação — 2026-10-15
+
+- Inspeção no modo Edit confirmou zero `Script`, `LocalScript`, `ModuleScript`, `RemoteEvent`, sons ou efeitos nos três candidatos limpos. O pacote original de armas continua em quarentena com scripts desativados; somente a cópia de 3 `MeshPart` foi aprovada.
+- `ContentProvider:PreloadAsync` sobre as instâncias reais carregou com `Success` todos os conteúdos: 4 no rifle, 31 no rig e 10 no subconjunto urbano. Isso confirma permissões/carregamento nesta experiência local `Place1`; não prova que outra experiência publicada tenha permissões idênticas.
+- O rig mede aproximadamente `4,00 × 5,18 × 1,16` studs; rifle visual, `0,28 × 1,38 × 4,73` studs; subconjunto urbano, 9 `MeshPart` e 2 `SurfaceAppearance`. As cópias de teste não têm peças soltas.
+- A checagem geométrica na arena salva encontrou o ponto de ônibus sobreposto ao bloco `TestBlock_76_-66` na posição antiga `(84, -65)`. Ele foi deslocado para `(112, -65)`; a nova caixa de limites não cruza blocos, paredes ou coberturas. Poste e hidrante estão ancorados; a interseção AABB de 0,12 stud com a superfície viária é o assentamento vertical no piso, sem interseção com estruturas.
+- Playtest no Studio: personagem percorreu o entorno do ponto de ônibus de um lado ao outro, terminou em `(117,30; 5,19; -64,59)` com 100 HP. O humanoide permaneceu em estado `Running`; teste de colisão e escala é local e não representa hardware fraco.
+- O Output não mostrou falha de carregamento dos candidatos. Também registrou aviso repetido `FoundationProvider not found` do CorePackages e timeouts de três sons `3963012401`, `3963014042` e `3963015379`; esses itens não pertencem aos clones aprovados e não foram alterados.
+
+Os três registros selecionados passam para `APPROVED` para uso visual/técnico no protótipo. Os modelos originais permanecem em quarentena; aprovação não significa integração na arena final. FL-016 deve versionar as posições em fonte, validar as rotas no mapa de Rojo e manter colisão simplificada. O apartamento da FL-013 e os scripts do kit de armas permanecem fora da seleção.
