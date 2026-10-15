@@ -19,7 +19,7 @@ Atualizado em 2026-10-15. Este registro acompanha as issues abertas #13–#32. `
 | #25 FL-025 | Pendente | — | Dano e regra de veículo. |
 | #26 FL-026 | Pendente | — | Profiling posterior aos cenários e veículos. |
 | #27 FL-027 | Pendente | — | Checklist alpha; publicação Roblox requer autorização humana. |
-| #28 FL-028 | Pendente | — | Pesquisa de extensões oficiais. |
+| #28 FL-028 | Parcial | [#55](https://github.com/dreyvinixz/RobloxGame/pull/55) | ADR-0002 recomenda NO-GO para ponte com processo BF6 ao vivo; GO somente para Roblox independente, workflow Portal dentro do escopo oficial ou mock sintético. Fontes oficiais, obstáculos e política anticheat documentados; sem alteração de executáveis. |
 | #29 FL-029 | Pendente | — | Bots depois do MVP. |
 | #30 FL-030 | Pendente | — | Segundo mapa após alpha. |
 | #31 FL-031 | Pendente | — | Áudio e efeitos após alpha. |
