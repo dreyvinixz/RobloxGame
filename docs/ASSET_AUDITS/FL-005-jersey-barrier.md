@@ -17,7 +17,7 @@
 
 - Estado do Studio: Edit.
 - Importado via MCP como `ServerStorage.FL005_Quarantine_JerseyBarrier`.
-- Não foi inserido em `Workspace`, na cena final ou iniciado em Play.
+- Para teste temporário, o candidato foi movido para `Workspace` e voltou a `ServerStorage`; no estado atual inspecionado, não há cópia na cena. Não foi adicionado ao mapa final e nenhum código do asset foi executado.
 - Estrutura reportada: um `Folder` com quatro `BasePart` descendentes: dois `Part` e dois `WedgePart`.
 - Todos os quatro estavam `Anchored=true`, `CanCollide=true`, `CanQuery=true` e `CanTouch=true`.
 - Dimensões reportadas (studs): `8 × 2.89 × 1`, `8.00001 × 0.52 × 2.13`, `8 × 1 × 2`, `8.00001 × 0.51 × 2.13`.
@@ -25,10 +25,13 @@
 
 ## Colisão e triagem de desempenho
 
-- **Colisão estrutural:** propriedades `CanCollide=true` em todas as partes; isto confirma a configuração, não um contato físico testado durante gameplay. A forma/cobertura balística e a colisão efetiva ainda precisam de playtest antes de usar a barreira no mapa.
-- **Triagem de custo:** quatro peças ancoradas, sem MeshParts, texturas ou scripts; estrutura pequena e estática, com baixa complexidade aparente. Esta é evidência estrutural, não medição de FPS, memória, custo de física ou draw calls. Nenhum número de desempenho foi medido ou inventado.
-- **Próximo gate:** testar contato/oclusão em sessão isolada; colher benchmark em hardware-alvo quando a etapa de performance S2 estiver disponível. Até lá, manter o candidato em quarentena e fora do mapa final.
+- **Colisão estrutural:** propriedades `CanCollide=true` e `CollisionGroup=Default` nas quatro partes.
+- **Teste físico relatado pelo proprietário (2026-10-15):** após baixar a barreira até a baseplate, o personagem deixou de atravessá-la; colisão física aprovada pelo teste manual do proprietário. Isso não valida bloqueio de tiros ou comportamento de destruição.
+- **Desempenho relatado:** leitura isolada de 60 FPS. Não foi feita comparação com/sem asset nas mesmas condições, portanto ainda não demonstra impacto ou ausência de impacto.
+- **Diagnóstico de posicionamento:** no Studio, a baseplate está com superfície superior em Y=0 e a barreira em ServerStorage tinha seu ponto mais baixo aproximadamente em Y=12.17. Um teste com o asset nesse posicionamento pode deixar o personagem passar por baixo, sem indicar falha de `CanCollide`. A barreira não estava em Workspace no momento da inspeção, então não foi possível confirmar onde estava durante o teste relatado.
+- **Triagem de custo:** quatro peças ancoradas, sem MeshParts, texturas ou scripts; estrutura pequena e estática, com baixa complexidade aparente. Uma leitura de 60 FPS, sem linha de base e possivelmente limitada pelo teto de frames, não mede impacto de FPS, memória, física ou draw calls.
+- **Próximo gate:** comparar desempenho com e sem o asset, sob as mesmas condições, e registrar FPS/frame time e memória. Até lá, manter o candidato em quarentena e fora do mapa final.
 
 ## Decisão
 
-Importação, procedência disponível, isolamento e inspeção de scripts foram validados como primeira amostra do pipeline. O item permanece **QUARANTINED**; não está aprovado para integrar a arena porque colisão em runtime e benchmark ainda não foram medidos.
+Importação, procedência disponível, isolamento, inspeção de scripts e colisão física básica foram validados como primeira amostra do pipeline. O item permanece **QUARANTINED**; falta benchmark comparativo antes de aprovar sua integração na arena.

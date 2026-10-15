@@ -18,7 +18,7 @@ Codex / agente IA ── MCP oficial ── Roblox Studio (assets, inspeção, p
 - `ReplicatedStorage/Remotes`: pasta reservada a eventos; eventos específicos serão criados pelo código servidor nas issues de rede.
 - `ServerScriptService/GameServer` ← `src/server`: autenticação implícita de jogador e regras autoritativas.
 - `StarterPlayer/StarterPlayerScripts/GameClient` ← `src/client`: câmera, inputs, HUD, render FX.
-- `Workspace`: mapa e assets criados/revisados no Studio. Não limpar o Workspace via Rojo.
+- `Workspace`: mapa e assets autorados no Studio; a arena greybox inicial é gerada pelo servidor a partir de `src/server/ArenaBuilder.luau`. Não limpar o Workspace via Rojo.
 
 ## Rede e autoridade
 Cliente envia intenção (`FireWeapon`, `RequestReload`, `EnterVehicle`); servidor valida player, cadência, arma, alcance, cooldown, estado, posição coerente e aplica dano. Servidor replica resultado e estados. Não confiar em campos de HP, kills ou velocidade informados pelo cliente.
