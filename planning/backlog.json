@@ -193,7 +193,7 @@
       "caminhada/sprint",
       "entrada",
       "zoom contínuo pela roda até primeira pessoa conforme limites Roblox",
-      "manter controles padrão de câmera e mouse/UI do Roblox"
+      "capturar/ocultar cursor no jogo e liberá-lo para chat, menu e perda de foco"
     ],
     "acceptance": [
       "Movimento e câmera funcionam",

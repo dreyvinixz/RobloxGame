@@ -7,16 +7,41 @@ local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local GuiService = game:GetService("GuiService")
 
 local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
 local localPlayer = Players.LocalPlayer
 local cfg = Config.Player
 local isSprinting = false
+local windowFocused = true
 local humanoid: Humanoid? = nil
 
--- Classic + Custom mantém a câmera padrão: roda para zoom contínuo, arraste
--- com botão direito e zoom até a primeira pessoa conforme as preferências Roblox.
+-- Classic + Custom mantém câmera/zoom padrão. Captura central do mouse gira
+-- a câmera continuamente; menu e caixas de texto liberam o cursor.
 localPlayer.CameraMode = Enum.CameraMode.Classic
+
+local function updateMouseCapture()
+	local textBoxFocused = UserInputService:GetFocusedTextBox() ~= nil
+	local shouldCapture = windowFocused and not GuiService.MenuIsOpen and not textBoxFocused
+	UserInputService.MouseBehavior = if shouldCapture
+		then Enum.MouseBehavior.LockCenter
+		else Enum.MouseBehavior.Default
+	UserInputService.MouseIconEnabled = not shouldCapture
+end
+
+updateMouseCapture()
+GuiService.MenuOpened:Connect(updateMouseCapture)
+GuiService.MenuClosed:Connect(updateMouseCapture)
+UserInputService.TextBoxFocused:Connect(updateMouseCapture)
+UserInputService.TextBoxFocusReleased:Connect(updateMouseCapture)
+UserInputService.WindowFocusReleased:Connect(function()
+	windowFocused = false
+	updateMouseCapture()
+end)
+UserInputService.WindowFocused:Connect(function()
+	windowFocused = true
+	updateMouseCapture()
+end)
 
 local function useDefaultCamera(character: Model)
 	local characterHumanoid = character:WaitForChild("Humanoid") :: Humanoid
