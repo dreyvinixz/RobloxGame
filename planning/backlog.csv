@@ -1,0 +1,33 @@
+﻿id,sprint,priority,type,area,points,status,title,dependencies
+FL-001,S0,P0,chore,repo,2,TODO,"Estabelecer repositório, convenções e proteção de main",
+FL-002,S0,P0,feature,tooling,3,TODO,Sincronizar código via Rojo com Roblox Studio,FL-001
+FL-003,S0,P0,research,tooling,3,TODO,Validar MCP oficial Roblox Studio com Codex,FL-001
+FL-004,S0,P0,docs,product,2,TODO,"Aprovar PRD, MVP e decisões de arquitetura",FL-001
+FL-005,S0,P0,security,assets,3,TODO,Criar registro de assets e sandbox de inspeção,FL-003
+FL-006,S0,P1,chore,quality,2,TODO,Automatizar validação de projeto e documentação,FL-001
+FL-007,S1,P0,feature,world,3,TODO,Montar arena greybox de combate,FL-002
+FL-008,S1,P0,feature,player,5,TODO,Implementar controlador FPS inicial,FL-002
+FL-009,S1,P0,feature,network,5,TODO,Definir contrato de remotes e validação no servidor,"FL-002,FL-004"
+FL-010,S1,P0,feature,weapons,5,TODO,Implementar rifle hitscan de teste,"FL-008,FL-009"
+FL-011,S1,P0,feature,gameplay,3,TODO,Completar vertical slice contra alvo de teste,"FL-007,FL-010"
+FL-012,S1,P0,test,quality,3,TODO,Executar bateria de testes do vertical slice,FL-011
+FL-013,S2,P0,research,assets,3,TODO,Selecionar direção artística e orçamento de assets,"FL-005,FL-012"
+FL-014,S2,P0,feature,assets,5,TODO,Importar e aprovar kit militar mínimo,FL-013
+FL-015,S2,P1,feature,animation,3,TODO,"Integrar rig, animações e arma de primeira pessoa","FL-014,FL-010"
+FL-016,S2,P1,feature,world,5,TODO,Converter arena greybox para cenário militar modular,"FL-007,FL-014"
+FL-017,S2,P1,test,performance,3,TODO,Criar primeiro benchmark de desempenho,FL-016
+FL-018,S3,P0,feature,gameplay,3,TODO,"Criar equipes, spawns e placar",FL-012
+FL-019,S3,P0,security,network,5,TODO,Validar combate multiplayer e resistência a exploits,"FL-018,FL-009,FL-010"
+FL-020,S3,P0,feature,weapons,3,TODO,Adicionar pistola e balancear rifle,FL-019
+FL-021,S3,P1,feature,destruction,5,TODO,Implementar cobertura destrutível autoritativa,FL-019
+FL-022,S3,P1,feature,ui,3,TODO,"Criar HUD básico de HP, munição e placar","FL-018,FL-020"
+FL-023,S3,P0,test,quality,3,TODO,Conduzir teste de aceitação multiplayer MVP,"FL-019,FL-020,FL-021,FL-022"
+FL-024,S4,P1,feature,vehicles,5,TODO,Integrar primeiro veículo terrestre dirigido,"FL-014,FL-023"
+FL-025,S4,P1,feature,vehicles,5,TODO,Sincronizar dano e estado do veículo no servidor,FL-024
+FL-026,S4,P1,test,performance,3,TODO,Realizar profiling e estabilização,"FL-025,FL-017"
+FL-027,S4,P0,chore,release,3,TODO,Preparar pacote alfa e checklist de publicação,"FL-023,FL-026"
+FL-028,LATER,P2,research,reverse-engineering,3,TODO,Investigar viabilidade de mashup real entre processos,FL-004
+FL-029,LATER,P2,feature,ai,5,TODO,Protótipo de bots táticos,FL-023
+FL-030,LATER,P2,feature,world,5,TODO,Segundo mapa modular,FL-027
+FL-031,LATER,P2,feature,audio,3,TODO,"Pacote de áudio, partículas e feedback",FL-027
+FL-032,LATER,P2,feature,platform,5,TODO,Controles para dispositivos móveis,FL-027

@@ -1,0 +1,36 @@
+name: Bug report
+description: Reporte reproduzível no Roblox Studio ou experiência de teste
+title: '[BUG] '
+labels: ['type:bug']
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Resumo
+      description: Descreva o comportamento observado.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reprodução
+      description: Passo a passo, Studio version, single/multiplayer, dispositivo.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Esperado / observado
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Logs, screenshots e build
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severidade
+      options: [Bloqueador, Alta, Média, Baixa]
+    validations:
+      required: true

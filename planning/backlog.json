@@ -1,0 +1,818 @@
+[
+  {
+    "id": "FL-001",
+    "sprint": "S0",
+    "priority": "P0",
+    "type": "chore",
+    "area": "repo",
+    "points": 2,
+    "title": "Estabelecer repositório, convenções e proteção de main",
+    "goal": "Definir a base de colaboração e rastreabilidade.",
+    "implementation": [
+      "Criar repositório privado",
+      "habilitar Issues",
+      "configurar branch main e regras de PR",
+      "preparar etiquetas e milestones."
+    ],
+    "acceptance": [
+      "Repo existe",
+      "main é branch padrão",
+      "PR template está disponível",
+      "Issues acessíveis."
+    ],
+    "verification": "Capturas das configurações e link do repositório.",
+    "dependencies": [],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-002",
+    "sprint": "S0",
+    "priority": "P0",
+    "type": "feature",
+    "area": "tooling",
+    "points": 3,
+    "title": "Sincronizar código via Rojo com Roblox Studio",
+    "goal": "Estabelecer o fluxo Git → Rojo → Studio sem perder alterações.",
+    "implementation": [
+      "Instalar Rojo",
+      "abrir projeto base",
+      "usar rojo serve",
+      "conectar plugin",
+      "conferir scripts cliente e servidor."
+    ],
+    "acceptance": [
+      "Configuração default.project.json carrega",
+      "client e server aparecem nos serviços esperados",
+      "um commit reflete no Studio."
+    ],
+    "verification": "Print da árvore no Studio + log de Rojo sem erro.",
+    "dependencies": [
+      "FL-001"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-003",
+    "sprint": "S0",
+    "priority": "P0",
+    "type": "research",
+    "area": "tooling",
+    "points": 3,
+    "title": "Validar MCP oficial Roblox Studio com Codex",
+    "goal": "Verificar capacidades disponíveis na instalação real, sem presumir ferramentas.",
+    "implementation": [
+      "Habilitar MCP do Studio",
+      "conectar Codex",
+      "ler árvore",
+      "executar Luau inofensivo",
+      "iniciar/parar playtest."
+    ],
+    "acceptance": [
+      "Conexão estabelecida",
+      "árvore consultada",
+      "playtest controlado",
+      "problemas documentados."
+    ],
+    "verification": "Log do Codex e registro do teste na docs/SETUP.md.",
+    "dependencies": [
+      "FL-001"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-004",
+    "sprint": "S0",
+    "priority": "P0",
+    "type": "docs",
+    "area": "product",
+    "points": 2,
+    "title": "Aprovar PRD, MVP e decisões de arquitetura",
+    "goal": "Congelar recorte inicial e regras de escopo.",
+    "implementation": [
+      "Revisar PRD",
+      "registrar ADR-0001",
+      "determinar métricas do primeiro teste",
+      "excluir extração de BF6."
+    ],
+    "acceptance": [
+      "PRD tem não-objetivos, critérios verificáveis e escopo de S1",
+      "ADR aprovada."
+    ],
+    "verification": "PR revisado e checklist de PRD assinado.",
+    "dependencies": [
+      "FL-001"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-005",
+    "sprint": "S0",
+    "priority": "P0",
+    "type": "security",
+    "area": "assets",
+    "points": 3,
+    "title": "Criar registro de assets e sandbox de inspeção",
+    "goal": "Garantir cadeia de procedência, licenças e segurança dos modelos.",
+    "implementation": [
+      "Criar planilha de ativos",
+      "registrar fonte/autor/licença/ID",
+      "isolar importações",
+      "auditar scripts de Toolbox."
+    ],
+    "acceptance": [
+      "Asset desconhecido nunca entra na cena final",
+      "modelo com scripts não auditados não executa",
+      "manifest é rastreável."
+    ],
+    "verification": "Exemplo de ativo inspecionado com evidência e registro.",
+    "dependencies": [
+      "FL-003"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-006",
+    "sprint": "S0",
+    "priority": "P1",
+    "type": "chore",
+    "area": "quality",
+    "points": 2,
+    "title": "Automatizar validação de projeto e documentação",
+    "goal": "Criar primeiro gate de qualidade reprodutível.",
+    "implementation": [
+      "Rodar validador de backlog, consistência de docs e estrutura Rojo em PR",
+      "documentar passos de lint Luau."
+    ],
+    "acceptance": [
+      "Validação Python executa no CI",
+      "PR não é considerado testado in-game somente por CI."
+    ],
+    "verification": "Log de workflow + python scripts/validate_project.py.",
+    "dependencies": [
+      "FL-001"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-007",
+    "sprint": "S1",
+    "priority": "P0",
+    "type": "feature",
+    "area": "world",
+    "points": 3,
+    "title": "Montar arena greybox de combate",
+    "goal": "Entregar espaço navegável antes de investir em arte final.",
+    "implementation": [
+      "Criar terreno/ruas/blocos simples",
+      "pontos de teste",
+      "cobertura",
+      "colisões previsíveis."
+    ],
+    "acceptance": [
+      "Arena tem duas entradas distintas",
+      "circulação sem softlock",
+      "escala jogável."
+    ],
+    "verification": "Playtest com vídeo de 30 segundos.",
+    "dependencies": [
+      "FL-002"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-008",
+    "sprint": "S1",
+    "priority": "P0",
+    "type": "feature",
+    "area": "player",
+    "points": 5,
+    "title": "Implementar controlador FPS inicial",
+    "goal": "Dar sensação consistente de câmera, movimento e mira.",
+    "implementation": [
+      "Controlar camera local",
+      "caminhada/sprint",
+      "entrada",
+      "bloqueio de câmera por UI",
+      "verificar mouse lock."
+    ],
+    "acceptance": [
+      "Movimento e câmera funcionam",
+      "sprint não altera autoridade do servidor",
+      "não causa travamentos."
+    ],
+    "verification": "Playtest 60 FPS alvo em desktop de referência.",
+    "dependencies": [
+      "FL-002"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-009",
+    "sprint": "S1",
+    "priority": "P0",
+    "type": "feature",
+    "area": "network",
+    "points": 5,
+    "title": "Definir contrato de remotes e validação no servidor",
+    "goal": "Criar base segura para ações de combate.",
+    "implementation": [
+      "Definir payload e rate limit",
+      "autenticar player implícito",
+      "validação de origem, direção, intervalo e alcance."
+    ],
+    "acceptance": [
+      "Servidor rejeita solicitações fora de faixa",
+      "cliente não escreve pontos de vida arbitrários",
+      "logs de recusa."
+    ],
+    "verification": "Teste manual com payloads inválidos e válido.",
+    "dependencies": [
+      "FL-002",
+      "FL-004"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-010",
+    "sprint": "S1",
+    "priority": "P0",
+    "type": "feature",
+    "area": "weapons",
+    "points": 5,
+    "title": "Implementar rifle hitscan de teste",
+    "goal": "Criar primeiro loop disparar → acertar → causar dano.",
+    "implementation": [
+      "Raycast com validações",
+      "cadência",
+      "munição",
+      "recarga",
+      "interface temporária de tiro."
+    ],
+    "acceptance": [
+      "Dummy perde HP validado pelo servidor",
+      "cadência limitada",
+      "raycast não acerta através de parede."
+    ],
+    "verification": "Playtest gravado, logs e tabela de parâmetros.",
+    "dependencies": [
+      "FL-008",
+      "FL-009"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-011",
+    "sprint": "S1",
+    "priority": "P0",
+    "type": "feature",
+    "area": "gameplay",
+    "points": 3,
+    "title": "Completar vertical slice contra alvo de teste",
+    "goal": "Integrar mapa, movimentação e arma.",
+    "implementation": [
+      "Juntar greybox + rifle + alvo com feedback",
+      "reset de alvo",
+      "cenário reproduzível."
+    ],
+    "acceptance": [
+      "Usuário entra, move-se, mira, atira, elimina dummy e reinicia teste."
+    ],
+    "verification": "Gravação completa do fluxo sem edição.",
+    "dependencies": [
+      "FL-007",
+      "FL-010"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-012",
+    "sprint": "S1",
+    "priority": "P0",
+    "type": "test",
+    "area": "quality",
+    "points": 3,
+    "title": "Executar bateria de testes do vertical slice",
+    "goal": "Evitar avançar para arte sobre base instável.",
+    "implementation": [
+      "Seguir TEST_PLAN",
+      "registrar bugs",
+      "medir FPS e saída de console",
+      "salvar evidências."
+    ],
+    "acceptance": [
+      "Todos critérios P0 de S1 aprovados",
+      "bugs bloqueadores corrigidos ou Sprint replanejada."
+    ],
+    "verification": "Relatório de teste anexado à issue.",
+    "dependencies": [
+      "FL-011"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-013",
+    "sprint": "S2",
+    "priority": "P0",
+    "type": "research",
+    "area": "assets",
+    "points": 3,
+    "title": "Selecionar direção artística e orçamento de assets",
+    "goal": "Evitar incompatibilidade visual e quedas de desempenho.",
+    "implementation": [
+      "Comparar 2-3 coleções",
+      "definir qualidade alvo",
+      "estimar triangles/textures/partes."
+    ],
+    "acceptance": [
+      "Moodboard referencial próprio",
+      "guia de materiais",
+      "seleção com licenças registradas."
+    ],
+    "verification": "Documento docs/ART_DIRECTION.md atualizado.",
+    "dependencies": [
+      "FL-005",
+      "FL-012"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-014",
+    "sprint": "S2",
+    "priority": "P0",
+    "type": "feature",
+    "area": "assets",
+    "points": 5,
+    "title": "Importar e aprovar kit militar mínimo",
+    "goal": "Obter assets de personagem, rifle, construções e cobertura sem modelagem manual.",
+    "implementation": [
+      "Pesquisar via MCP/Creator Store",
+      "filtrar",
+      "auditar scripts",
+      "inserir em sandbox",
+      "catalogar IDs."
+    ],
+    "acceptance": [
+      "Ao menos 1 rifle, 1 rig e 1 kit urbano aprovados",
+      "nenhuma dependência oculta",
+      "IDs no registro."
+    ],
+    "verification": "Screenshots antes/depois e planilha de procedência.",
+    "dependencies": [
+      "FL-013"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-015",
+    "sprint": "S2",
+    "priority": "P1",
+    "type": "feature",
+    "area": "animation",
+    "points": 3,
+    "title": "Integrar rig, animações e arma de primeira pessoa",
+    "goal": "Substituir placeholders mantendo precisão de tiro.",
+    "implementation": [
+      "Validar compatibilidade R15",
+      "viewmodel",
+      "animações de recarga e disparo",
+      "separação cliente/servidor."
+    ],
+    "acceptance": [
+      "Sem mãos atravessando arma em repouso",
+      "tiros seguem câmera",
+      "animações não quebram em respawn."
+    ],
+    "verification": "Capturas e playtest com 3 situações.",
+    "dependencies": [
+      "FL-014",
+      "FL-010"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-016",
+    "sprint": "S2",
+    "priority": "P1",
+    "type": "feature",
+    "area": "world",
+    "points": 5,
+    "title": "Converter arena greybox para cenário militar modular",
+    "goal": "Melhorar visual mantendo espaços e colisões testados.",
+    "implementation": [
+      "Substituir fachadas, cobertura e pavimento em pequenos lotes",
+      "preservar layout",
+      "organizar pastas."
+    ],
+    "acceptance": [
+      "Rotas principais preservadas",
+      "sem gaps ou colisões invisíveis críticas",
+      "assets aprovados."
+    ],
+    "verification": "Comparação de trajetos antes/depois.",
+    "dependencies": [
+      "FL-007",
+      "FL-014"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-017",
+    "sprint": "S2",
+    "priority": "P1",
+    "type": "test",
+    "area": "performance",
+    "points": 3,
+    "title": "Criar primeiro benchmark de desempenho",
+    "goal": "Estabelecer baseline antes do multiplayer.",
+    "implementation": [
+      "Medir FPS, draw calls quando disponível, memória, rede e tempo de carregamento em máquina alvo."
+    ],
+    "acceptance": [
+      "Tabela com hardware e métricas reais",
+      "gargalos classificados",
+      "sem números inventados."
+    ],
+    "verification": "docs/PERFORMANCE.md com dados medidos.",
+    "dependencies": [
+      "FL-016"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-018",
+    "sprint": "S3",
+    "priority": "P0",
+    "type": "feature",
+    "area": "gameplay",
+    "points": 3,
+    "title": "Criar equipes, spawns e placar",
+    "goal": "Transformar vertical slice em partida básica.",
+    "implementation": [
+      "Atribuição de times",
+      "spawn protegido",
+      "loop de rodada",
+      "condição de pontuação."
+    ],
+    "acceptance": [
+      "Dois times",
+      "mortes pontuam corretamente",
+      "respawn ocorre na equipe certa."
+    ],
+    "verification": "Teste com 2 jogadores.",
+    "dependencies": [
+      "FL-012"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-019",
+    "sprint": "S3",
+    "priority": "P0",
+    "type": "security",
+    "area": "network",
+    "points": 5,
+    "title": "Validar combate multiplayer e resistência a exploits",
+    "goal": "Garantir autoridade servidor com diferentes latências.",
+    "implementation": [
+      "Simular duas sessões no Studio",
+      "validar danos e rate limits",
+      "testar spam de remotes e ações inválidas."
+    ],
+    "acceptance": [
+      "HP consistente nos clientes",
+      "sem dano remoto arbitrário",
+      "solicitações inválidas bloqueadas."
+    ],
+    "verification": "Logs e vídeo de teste 2 clientes.",
+    "dependencies": [
+      "FL-018",
+      "FL-009",
+      "FL-010"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-020",
+    "sprint": "S3",
+    "priority": "P0",
+    "type": "feature",
+    "area": "weapons",
+    "points": 3,
+    "title": "Adicionar pistola e balancear rifle",
+    "goal": "Ter duas classes de armamento distintas.",
+    "implementation": [
+      "Criar configs versionadas",
+      "disparo, recarga, dropoff simples",
+      "comparar time-to-kill em alvo controlado."
+    ],
+    "acceptance": [
+      "Rifle e pistola equipáveis",
+      "números documentados",
+      "nenhuma arma ignora validações."
+    ],
+    "verification": "Teste funcional nos dois clientes.",
+    "dependencies": [
+      "FL-019"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-021",
+    "sprint": "S3",
+    "priority": "P1",
+    "type": "feature",
+    "area": "destruction",
+    "points": 5,
+    "title": "Implementar cobertura destrutível autoritativa",
+    "goal": "Ter primeira mecânica emblemática de combate dinâmico.",
+    "implementation": [
+      "Criar parede com states intacta/danificada/destruída",
+      "dano servidor",
+      "replicação dos estados."
+    ],
+    "acceptance": [
+      "Parede quebra após dano estipulado",
+      "colisão e visual replicados",
+      "cliente isolado não destrói."
+    ],
+    "verification": "Teste de 2 jogadores e reconexão.",
+    "dependencies": [
+      "FL-019"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-022",
+    "sprint": "S3",
+    "priority": "P1",
+    "type": "feature",
+    "area": "ui",
+    "points": 3,
+    "title": "Criar HUD básico de HP, munição e placar",
+    "goal": "Exibir feedback necessário sem excesso de interface.",
+    "implementation": [
+      "Construir UI responsiva",
+      "estados de recarga",
+      "marcador de hit validado",
+      "tela de fim da rodada."
+    ],
+    "acceptance": [
+      "Informação legível em resolução-alvo",
+      "sem dados conflitantes."
+    ],
+    "verification": "Capturas de duas resoluções.",
+    "dependencies": [
+      "FL-018",
+      "FL-020"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-023",
+    "sprint": "S3",
+    "priority": "P0",
+    "type": "test",
+    "area": "quality",
+    "points": 3,
+    "title": "Conduzir teste de aceitação multiplayer MVP",
+    "goal": "Decidir liberar ou bloquear próxima etapa.",
+    "implementation": [
+      "Executar 10 cenários do plano",
+      "coletar bugs, lag e observações",
+      "revisar critérios P0."
+    ],
+    "acceptance": [
+      "Zero bloqueadores P0 abertos",
+      "evidências anexadas",
+      "escopo MVP formalmente aceito."
+    ],
+    "verification": "docs/TEST_REPORTS template preenchido.",
+    "dependencies": [
+      "FL-019",
+      "FL-020",
+      "FL-021",
+      "FL-022"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-024",
+    "sprint": "S4",
+    "priority": "P1",
+    "type": "feature",
+    "area": "vehicles",
+    "points": 5,
+    "title": "Integrar primeiro veículo terrestre dirigido",
+    "goal": "Validar sistema de veículo sem física avançada prematura.",
+    "implementation": [
+      "Selecionar chassi com licença",
+      "auditar scripts",
+      "conectar controle",
+      "câmera",
+      "entrar/sair."
+    ],
+    "acceptance": [
+      "Um jogador entra, dirige, sai",
+      "veículo não dispara movimentos extremos em rede."
+    ],
+    "verification": "Teste vídeo de percurso.",
+    "dependencies": [
+      "FL-014",
+      "FL-023"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-025",
+    "sprint": "S4",
+    "priority": "P1",
+    "type": "feature",
+    "area": "vehicles",
+    "points": 5,
+    "title": "Sincronizar dano e estado do veículo no servidor",
+    "goal": "Criar ciclo de vida do veículo multiplayer.",
+    "implementation": [
+      "Adotar hitpoints servidor",
+      "colisões",
+      "destruction/reset",
+      "anti-spam."
+    ],
+    "acceptance": [
+      "Dano replicado",
+      "veículo destruído não é dirigível",
+      "reset sem estados órfãos."
+    ],
+    "verification": "2-client playtest com logs.",
+    "dependencies": [
+      "FL-024"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-026",
+    "sprint": "S4",
+    "priority": "P1",
+    "type": "test",
+    "area": "performance",
+    "points": 3,
+    "title": "Realizar profiling e estabilização",
+    "goal": "Limitar regressões causadas pelo veículo e efeitos.",
+    "implementation": [
+      "Repetir benchmark S2",
+      "corrigir maiores gargalos",
+      "inspecionar memory leaks e warnings."
+    ],
+    "acceptance": [
+      "Comparação S2/S4 registrada",
+      "regressões críticas resolvidas."
+    ],
+    "verification": "Tabela de resultados medidos e plano de correção.",
+    "dependencies": [
+      "FL-025",
+      "FL-017"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-027",
+    "sprint": "S4",
+    "priority": "P0",
+    "type": "chore",
+    "area": "release",
+    "points": 3,
+    "title": "Preparar pacote alfa e checklist de publicação",
+    "goal": "Publicar com rastreabilidade e sem reivindicação de IP Battlefield.",
+    "implementation": [
+      "Auditar assets",
+      "fechar P0",
+      "verificar classificação etária/conteúdo",
+      "revisar privacidade e testes."
+    ],
+    "acceptance": [
+      "Checklist alfa fechado",
+      "changelog",
+      "rollback",
+      "nenhum asset sem procedência."
+    ],
+    "verification": "Aprovação manual, sem publicar automaticamente.",
+    "dependencies": [
+      "FL-023",
+      "FL-026"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-028",
+    "sprint": "LATER",
+    "priority": "P2",
+    "type": "research",
+    "area": "reverse-engineering",
+    "points": 3,
+    "title": "Investigar viabilidade de mashup real entre processos",
+    "goal": "Separar pesquisa experimental do produto principal.",
+    "implementation": [
+      "Analisar licenças e superfícies de extensão oficiais",
+      "listar obstáculos técnicos",
+      "não contornar anticheat."
+    ],
+    "acceptance": [
+      "Relatório go/no-go documentado",
+      "sem alteração de executáveis protegidos."
+    ],
+    "verification": "ADR de descoberta com fontes e limitações.",
+    "dependencies": [
+      "FL-004"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-029",
+    "sprint": "LATER",
+    "priority": "P2",
+    "type": "feature",
+    "area": "ai",
+    "points": 5,
+    "title": "Protótipo de bots táticos",
+    "goal": "Explorar IA de combate após estabilidade multiplayer.",
+    "implementation": [
+      "Criar navegação simplificada, mira configurável e estados finitos",
+      "avaliar custo servidor."
+    ],
+    "acceptance": [
+      "Um bot navega entre coberturas e enfrenta alvo sem queda severa de FPS."
+    ],
+    "verification": "Playtest controlado e benchmark.",
+    "dependencies": [
+      "FL-023"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-030",
+    "sprint": "LATER",
+    "priority": "P2",
+    "type": "feature",
+    "area": "world",
+    "points": 5,
+    "title": "Segundo mapa modular",
+    "goal": "Expandir sem comprometer QA.",
+    "implementation": [
+      "Reusar pipeline e assets",
+      "adaptar spawns e colisão",
+      "registrar benchmarks."
+    ],
+    "acceptance": [
+      "Mapa adicional completo e testado com regras MVP."
+    ],
+    "verification": "Teste de rotação de mapa e checklist.",
+    "dependencies": [
+      "FL-027"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-031",
+    "sprint": "LATER",
+    "priority": "P2",
+    "type": "feature",
+    "area": "audio",
+    "points": 3,
+    "title": "Pacote de áudio, partículas e feedback",
+    "goal": "Melhorar impacto visual e sonoro com material licenciado.",
+    "implementation": [
+      "Recolher efeitos permitidos",
+      "construir pooling de partículas",
+      "definir mixagem."
+    ],
+    "acceptance": [
+      "Sem assets sem licença e sem queda severa de performance."
+    ],
+    "verification": "Demonstração A/B.",
+    "dependencies": [
+      "FL-027"
+    ],
+    "status": "TODO"
+  },
+  {
+    "id": "FL-032",
+    "sprint": "LATER",
+    "priority": "P2",
+    "type": "feature",
+    "area": "platform",
+    "points": 5,
+    "title": "Controles para dispositivos móveis",
+    "goal": "Avaliar compatibilidade real com mobile.",
+    "implementation": [
+      "Adaptar HUD, inputs touch, aim assistance compatível e medir desempenho."
+    ],
+    "acceptance": [
+      "Fluxo completo em dispositivo-alvo validado",
+      "sem bloqueios de UI."
+    ],
+    "verification": "Playtest em smartphone real.",
+    "dependencies": [
+      "FL-027"
+    ],
+    "status": "TODO"
+  }
+]

@@ -1,0 +1,25 @@
+# Roblox / Rojo outputs
+*.rbxl
+*.rbxlx
+*.rbxm
+*.rbxmx
+*.rbxl.lock
+*.rbxlx.lock
+*.log
+# ferramentas/segredos
+.env
+.env.*
+!.env.example
+*.token
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/settings.json
+.idea/
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+# build
+build/
+dist/

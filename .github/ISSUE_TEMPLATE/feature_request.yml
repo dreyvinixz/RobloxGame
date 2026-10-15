@@ -1,0 +1,27 @@
+name: Feature request
+description: Propor incremento com critérios de aceite verificáveis
+title: '[FEATURE] '
+labels: ['type:feature']
+body:
+  - type: textarea
+    id: objective
+    attributes:
+      label: Objetivo do jogador / valor
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Escopo e fora de escopo
+    validations:
+      required: true
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Critérios de aceite testáveis
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Testes, riscos e dependências
