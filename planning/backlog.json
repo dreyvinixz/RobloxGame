@@ -173,11 +173,11 @@
       "circulação sem softlock",
       "escala jogável."
     ],
-    "verification": "Playtest com vídeo de 30 segundos.",
+    "verification": "Playtest manual confirmado pelo proprietário no Studio; vídeo de 30 segundos segue pendente.",
     "dependencies": [
       "FL-002"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-008",
