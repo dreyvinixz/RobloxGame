@@ -25,11 +25,12 @@ local remotesFolder = ReplicatedStorage:WaitForChild(NetProtocol.RemoteFolderNam
 local fireWeaponEvent: RemoteEvent = remotesFolder:WaitForChild(NetProtocol.FireWeaponEvent) :: RemoteEvent
 local reloadWeaponEvent: RemoteEvent = remotesFolder:WaitForChild(NetProtocol.ReloadWeaponEvent) :: RemoteEvent
 local weaponStateEvent: RemoteEvent = remotesFolder:WaitForChild(NetProtocol.WeaponStateEvent) :: RemoteEvent
+local equipWeaponEvent: RemoteEvent = remotesFolder:WaitForChild(NetProtocol.EquipWeaponEvent) :: RemoteEvent
 
 -- ─── Estado da arma ──────────────────────────────────────────────────────────
 
-local WEAPON_ID  = Config.Combat.TestWeaponId
-local weaponDef  = WeaponConfig[WEAPON_ID]
+local weaponId = Config.Combat.TestWeaponId
+local weaponDef = WeaponConfig[weaponId]
 assert(weaponDef, "[Frontline][FL-010] WeaponConfig não encontrado para: " .. WEAPON_ID)
 
 local ammo         = weaponDef.magazineSize  -- balas no pente atual
@@ -94,10 +95,10 @@ statusLabel.Parent = screenGui
 
 local function updateHUD()
 	if isReloading then
-		ammoLabel.Text = "RECARREGANDO..."
+		ammoLabel.Text = weaponId .. " | RECARREGANDO..."
 		ammoLabel.TextColor3 = Color3.fromRGB(255, 200, 60)
 	else
-		ammoLabel.Text = ammo .. " / " .. weaponDef.magazineSize
+		ammoLabel.Text = weaponId .. " | " .. ammo .. " / " .. weaponDef.magazineSize
 		ammoLabel.TextColor3 = if ammo == 0
 			then Color3.fromRGB(255, 80, 80)
 			else Color3.fromRGB(230, 230, 230)
@@ -167,7 +168,7 @@ local function tryFire()
 
 	-- Envia intenção ao servidor — servidor valida e aplica dano se aprovado
 	fireWeaponEvent:FireServer({
-		weaponId       = WEAPON_ID,
+		weaponId       = weaponId,
 		origin         = origin,
 		direction      = direction,
 		targetPosition = targetPosition,
@@ -190,8 +191,11 @@ startReload = function()
 	reloadWeaponEvent:FireServer()
 end
 
-weaponStateEvent.OnClientEvent:Connect(function(serverAmmo: number, serverReloading: boolean)
-	if typeof(serverAmmo) ~= "number" or typeof(serverReloading) ~= "boolean" then return end
+weaponStateEvent.OnClientEvent:Connect(function(serverWeaponId: string, serverAmmo: number, serverReloading: boolean)
+	local serverWeapon = WeaponConfig[serverWeaponId]
+	if not serverWeapon or typeof(serverAmmo) ~= "number" or typeof(serverReloading) ~= "boolean" then return end
+	weaponId = serverWeaponId
+	weaponDef = serverWeapon
 	local wasReloading = isReloading
 	ammo = math.clamp(math.floor(serverAmmo), 0, weaponDef.magazineSize)
 	isReloading = serverReloading
@@ -216,6 +220,10 @@ UserInputService.InputBegan:Connect(function(input: InputObject, gameProcessed: 
 		tryFire()
 	elseif input.KeyCode == Enum.KeyCode.R then
 		startReload()
+	elseif input.KeyCode == Enum.KeyCode.One then
+		equipWeaponEvent:FireServer("TestRifle")
+	elseif input.KeyCode == Enum.KeyCode.Two then
+		equipWeaponEvent:FireServer("ServicePistol")
 	end
 end)
 
@@ -253,5 +261,5 @@ updateHUD()
 showStatus("Rifle pronto")
 print(string.format(
 	"[Frontline][FL-010] WeaponController | arma=%s | mag=%d | cadência=%.2fs | range=%d",
-	WEAPON_ID, weaponDef.magazineSize, weaponDef.fireInterval, weaponDef.maxRange
+	weaponId, weaponDef.magazineSize, weaponDef.fireInterval, weaponDef.maxRange
 ))
