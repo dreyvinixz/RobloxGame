@@ -25,7 +25,7 @@ FL-023,S3,P0,test,quality,3,IN_PROGRESS,Conduzir teste de aceitação multiplaye
 FL-024,S4,P1,feature,vehicles,5,IN_PROGRESS,Integrar primeiro veículo terrestre dirigido,"FL-014,FL-023"
 FL-025,S4,P1,feature,vehicles,5,IN_PROGRESS,Sincronizar dano e estado do veículo no servidor,FL-024
 FL-026,S4,P1,test,performance,3,IN_PROGRESS,Realizar profiling e estabilização,"FL-025,FL-017"
-FL-027,S4,P0,chore,release,3,TODO,Preparar pacote alfa e checklist de publicação,"FL-023,FL-026"
+FL-027,S4,P0,chore,release,3,IN_PROGRESS,Preparar pacote alfa e checklist de publicação,"FL-023,FL-026"
 FL-028,LATER,P2,research,reverse-engineering,3,TODO,Investigar viabilidade de mashup real entre processos,FL-004
 FL-029,LATER,P2,feature,ai,5,TODO,Protótipo de bots táticos,FL-023
 FL-030,LATER,P2,feature,world,5,TODO,Segundo mapa modular,FL-027
