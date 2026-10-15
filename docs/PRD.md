@@ -1,6 +1,6 @@
 # PRD — Project Frontline
 
-**Produto:** experiência Roblox FPS militar multiplayer **independente**, inspirada no ritmo e nas mecânicas amplas de shooters de grande escala, sem utilizar marca, assets ou código proprietário da EA. Versão documento: 0.1. Responsável pela aprovação do produto: proprietário do projeto.
+**Produto:** experiência Roblox FPS militar multiplayer **independente**, inspirada em convenções amplas do gênero de shooters militares, sem utilizar marca, assets ou código proprietário da EA. Versão documento: 0.2. Escopo técnico aprovado pelo proprietário em 2026-10-15 por FL-004.
 
 ## Problema e proposta de valor
 Criar uma experiência que transmita combate militar tático (posicionamento, balística simplificada, mobilidade, cobertura e cooperação), usando IA para acelerar implementação e assets prontos para eliminar modelagem manual obrigatória.
@@ -17,6 +17,7 @@ Entrar → escolher/atribuir time → spawn → deslocar → mirar/atirar → ob
 - Rifle e pistola com disparo e dano **validados pelo servidor**.
 - Câmera e movimentação FPS, munição/recarga, HUD mínimo.
 - 1 cobertura destrutível com colisão e visual replicados.
+- Combate e destruição validados no servidor; o cliente envia intenções e apresenta câmera, HUD e efeitos.
 - Pelo menos 2 clientes no teste multiplayer; logs e vídeo.
 - 100% dos assets em uso final identificados, autorizados e auditados.
 
@@ -28,6 +29,9 @@ Mapa gigantesco, 64 jogadores, destruição total do cenário, física realista 
 - **Performance:** estabelecer baseline S2 em hardware real; alvo inicial **60 FPS desktop**, a validar; não é promessa nem métrica já observada.
 - **Rede:** medir divergência de HP, latência percebida e spam de remotes; zero exploração crítica reproduzível em QA.
 - **Usabilidade:** jogador conclui loop entrar → atirar → respawn sem intervenção externa.
+
+## Primeiro teste de combate aprovado
+Em sessão controlada com pelo menos dois clientes, registrar o resultado de: (1) atribuição às duas equipes e respawn; (2) dano de rifle e pistola aplicado pelo servidor; (3) descarte de tiro acima da cadência permitida; (4) cobertura íntegra bloqueando tiro; (5) estado e colisão da cobertura destruída consistentes nos clientes. Coletar logs, resultado por cenário, divergência de HP e latência percebida. Estes são critérios planejados, não resultados já observados; alvos numéricos de desempenho dependem do benchmark S2.
 
 ## Restrições
 - Sem modelagem manual obrigatória; textura/modelo só de fontes autorizadas ou geração própria.
