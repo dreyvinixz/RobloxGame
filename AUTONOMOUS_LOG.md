@@ -20,7 +20,7 @@ Atualizado em 2026-10-15. Este registro acompanha as issues abertas #13–#32. `
 | #26 FL-026 | Parcial | [#58](https://github.com/dreyvinixz/RobloxGame/pull/58) | S4 idle sample 30.022 s coletado: 56.21 FPS médio/p1 8.91; LibMP 62 frames, 15.71 ms média. Nove outras sessões Studio em Play e cena/viewport diferentes do S2 tornam a amostra não comparável; não atribuir regressão ao jogo. Repeat equivalente, MicroProfiler com cena controlada, draw calls/triângulos e leak/warning check seguem pendentes. Ver `docs/TEST_REPORTS/FL-026.md` e `docs/PERFORMANCE.md`. |
 | #27 FL-027 | Parcial / NO-GO | [#59](https://github.com/dreyvinixz/RobloxGame/pull/59) | Checklist e changelog draft, runbook de rollback e revisão estática de assets/privacidade em `docs/ALPHA_RELEASE_CHECKLIST.md`. FL-023, FL-025 e FL-026 mantêm gates abertos; nada foi publicado. |
 | #28 FL-028 | Parcial | [#55](https://github.com/dreyvinixz/RobloxGame/pull/55) | ADR-0002 recomenda NO-GO para ponte com processo BF6 ao vivo; GO somente para Roblox independente, workflow Portal dentro do escopo oficial ou mock sintético. Fontes oficiais, obstáculos e política anticheat documentados; sem alteração de executáveis. |
-| #29 FL-029 | Pendente | — | Bots depois do MVP. |
+| #29 FL-029 | Parcial / bloqueado | [#60](https://github.com/dreyvinixz/RobloxGame/pull/60) | Plano server-authoritative e experimento em `docs/AI_BOT_READINESS.md`; implementação aguardará FL-023 NO-GO e perfil S4. |
 | #30 FL-030 | Pendente | — | Segundo mapa após alpha. |
 | #31 FL-031 | Pendente | — | Áudio e efeitos após alpha. |
 | #32 FL-032 | Pendente | — | Controles mobile e teste em aparelho real. |
@@ -126,3 +126,7 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - Inventário dos 10 registros de assets: 3 aprovados para protótipo, 3 em quarentena, 3 descobertos e 1 procedural em protótipo. Nenhum item fora do estado aprovado/protótipo foi promovido. Não houve compra/publicação.
 - Scan de código não achou DataStore, HttpService ou AnalyticsService customizados em `src/`; configurações da experiência e política de privacidade continuam revisão do proprietário. Questionário de maturidade deixado para revisão manual do conteúdo final.
 - FL-023 segue NO-GO; FL-025/026 têm evidências multiplayer/performance pendentes. Checklist não autoriza publicação.
+
+## Preparação parcial FL-029 — 2026-10-15
+
+- Design de bot server-authoritative, estados, cotas e sequência de benchmark registrados. FL-023 ainda NO-GO; não foram criados NPC, scripts ou novos assets antes da estabilidade multiplayer.
