@@ -7,6 +7,7 @@ local NetProtocol = {
 	ReloadWeaponEvent = "ReloadWeapon",
 	WeaponStateEvent = "WeaponState",
 	EquipWeaponEvent = "EquipWeapon",
+	HitConfirmedEvent = "HitConfirmed",
 	ResetTrainingTargetEvent = "ResetTrainingTarget",
 }
 

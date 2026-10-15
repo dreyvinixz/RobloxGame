@@ -13,7 +13,7 @@ Atualizado em 2026-10-15. Este registro acompanha as issues abertas #13–#32. `
 | #19 FL-019 | Parcial | [#50](https://github.com/dreyvinixz/RobloxGame/pull/50) | Dois clientes confirmaram dano válido, score inalterado em hit não letal e 2 respostas a 50 pedidos de reload. Isolamento runtime de HP e comparação simultânea entre clientes pendentes. |
 | #20 FL-020 | Parcial | [#51](https://github.com/dreyvinixz/RobloxGame/pull/51) | Rifle/pistola, troca validada, munição por arma e falloff implementados; validator, 3 testes e Rojo build passaram. TTK é aritmético; teste Studio de equip/munição/falloff e comparação de tempos ainda pendente devido a sync desconectado. |
 | #21 FL-021 | Parcial | [#52](https://github.com/dreyvinixz/RobloxGame/pull/52) | Estado Intact/Damaged/Destroyed, 100 HP, dano somente por tiro validado server-side, visibilidade/colisão em estado quebrado implementados. Validator, 3 testes e Rojo build passaram. Multiplayer, tentativa de destruição client-side e late join ainda sem evidência Studio. |
-| #22 FL-022 | Pendente | — | HUD de equipe, munição e resultado. |
+| #22 FL-022 | Parcial | [#53](https://github.com/dreyvinixz/RobloxGame/pull/53) | HUD responsivo de HP, estado da arma, placar/rodada, hit confirmado e resultado implementado. Validator, 3 testes e Rojo build passaram. Studio e capturas em duas resoluções pendentes pelo estado da conexão Rojo. |
 | #23 FL-023 | Pendente | — | Aceite do MVP com dois clientes. |
 | #24 FL-024 | Pendente | — | Protótipo de veículo após MVP. |
 | #25 FL-025 | Pendente | — | Dano e regra de veículo. |
@@ -86,6 +86,13 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - `StudioTestService.ExecuteMultiplayerTestAsync(2, "FL018_Acceptance")` passou com servidor e dois clientes simulados. O cliente de teste enviou o payload FireWeapon por RemoteEvent com câmera central e posições controladas; não foi clique físico de mouse. Resultado: `PASS | FireWeapon server-validated | Azul vs Laranja | scores Azul=1 Laranja=0 | spawn e escudo validados`.
 - Confirmados bloqueio e expiração da proteção inicial, dano letal validado, incrementos de score/KOs/Deaths, respawn no time certo e reaplicação de ForceField. A transição de timeout e a condição de vitória foram inspecionadas no código, sem avanço de relógio no teste.
 - Relatório em `docs/TEST_REPORTS/FL-018.md`. PR [#49](https://github.com/dreyvinixz/RobloxGame/pull/49) empilhado sobre FL-017; revisão e integração pendentes.
+
+## Implementação parcial da FL-022 — 2026-10-15
+
+- `HudController` exibe HP/barra, placar Azul/Laranja, fase/cronômetro e resultado final a partir do Humanoid local e atributos replicados de `MatchState`.
+- `WeaponController` mantém munição/reload/arma atual com layout relativo à viewport; dano confirmado pelo servidor aciona hit marker, sem feedback de hit decidido pelo cliente.
+- Validator, 3 testes Python, Rojo build e diff check passaram. Falta validar legibilidade visual e salvar capturas em duas resoluções no Studio.
+- Evidência e limitação em `docs/TEST_REPORTS/FL-022.md`; PR draft #53 empilhado sobre FL-021.
 
 ## Implementação parcial da FL-020 — 2026-10-15
 
