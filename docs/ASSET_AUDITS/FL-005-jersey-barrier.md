@@ -25,9 +25,11 @@
 
 ## Colisão e triagem de desempenho
 
-- **Colisão estrutural:** propriedades `CanCollide=true` em todas as partes; isto confirma a configuração, não um contato físico testado durante gameplay. A forma/cobertura balística e a colisão efetiva ainda precisam de playtest antes de usar a barreira no mapa.
-- **Triagem de custo:** quatro peças ancoradas, sem MeshParts, texturas ou scripts; estrutura pequena e estática, com baixa complexidade aparente. Esta é evidência estrutural, não medição de FPS, memória, custo de física ou draw calls. Nenhum número de desempenho foi medido ou inventado.
-- **Próximo gate:** testar contato/oclusão em sessão isolada; colher benchmark em hardware-alvo quando a etapa de performance S2 estiver disponível. Até lá, manter o candidato em quarentena e fora do mapa final.
+- **Colisão estrutural:** propriedades `CanCollide=true` e `CollisionGroup=Default` nas quatro partes; isto confirma a configuração, não um contato físico testado durante gameplay.
+- **Resultado de teste relatado pelo proprietário (2026-10-15):** leitura isolada de 60 FPS; personagem pareceu atravessar/passar pela barreira. Não foi feita comparação com/sem asset nas mesmas condições.
+- **Diagnóstico de posicionamento:** no Studio, a baseplate está com superfície superior em Y=0 e a barreira em ServerStorage tinha seu ponto mais baixo aproximadamente em Y=12.17. Um teste com o asset nesse posicionamento pode deixar o personagem passar por baixo, sem indicar falha de `CanCollide`. A barreira não estava em Workspace no momento da inspeção, então não foi possível confirmar onde estava durante o teste relatado.
+- **Triagem de custo:** quatro peças ancoradas, sem MeshParts, texturas ou scripts; estrutura pequena e estática, com baixa complexidade aparente. Uma leitura de 60 FPS, sem linha de base e possivelmente limitada pelo teto de frames, não mede impacto de FPS, memória, física ou draw calls.
+- **Próximo gate:** em teste temporário, mover o conjunto cerca de 12.2 studs para baixo até a base encostar na baseplate e repetir o contato. Comparar desempenho com e sem o asset, sob as mesmas condições. Até lá, manter o candidato em quarentena e fora do mapa final.
 
 ## Decisão
 
