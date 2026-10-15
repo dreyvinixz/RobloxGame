@@ -7,12 +7,14 @@ local CombatRequestService = require(script.Parent:WaitForChild("CombatRequestSe
 local DamageService = require(script.Parent:WaitForChild("DamageService"))
 local ViewmodelAssetService = require(script.Parent:WaitForChild("ViewmodelAssetService"))
 local MatchService = require(script.Parent:WaitForChild("MatchService"))
+local DestructibleCoverService = require(script.Parent:WaitForChild("DestructibleCoverService"))
 
 local arena = ArenaBuilder.Build()
 MatchService.Start(arena)
+DestructibleCoverService.Start(arena)
 TrainingTargetService.Start()
 CombatRequestService.Start()
-DamageService.Start(CombatRequestService, MatchService)
+DamageService.Start(CombatRequestService, MatchService, DestructibleCoverService)
 ViewmodelAssetService.Start()
 
 -- Arena (FL-007) | combate (FL-009/010) | alvo (FL-011) | partida (FL-018)

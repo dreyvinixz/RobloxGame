@@ -29,6 +29,7 @@ local lastReloadRequestAt: {[Player]: number} = {}
 local stateEvent: RemoteEvent
 local worldExclusions: {Instance} = {}
 local matchService: any
+local destructionService: any
 
 local function getOrCreateRemote(name: string): RemoteEvent
 	local remotes = ReplicatedStorage:WaitForChild(NetProtocol.RemoteFolderName)
@@ -131,15 +132,19 @@ local function applyShot(shooter: Player, shot: ShotPayload)
 	params.FilterDescendantsInstances = excluded
 	local result = workspace:Raycast(shot.origin, shot.direction * shot.maxRange, params)
 	if not result then return end
+	local distance = (result.Position - shot.origin).Magnitude
+	local dropoffAlpha = math.clamp((distance - def.dropoffStart) / (def.dropoffEnd - def.dropoffStart), 0, 1)
+	local baseDamage = def.damage + (def.minimumDamage - def.damage) * dropoffAlpha
+	if destructionService.ApplyHit(result.Instance, baseDamage) then
+		print(string.format("[Frontline][FL-021] cobertura atingida | arma=%s | dano=%.1f", shot.weaponId, baseDamage))
+		return
+	end
 
 	local model = result.Instance:FindFirstAncestorOfClass("Model")
 	local humanoid = model and model:FindFirstChildOfClass("Humanoid")
 	if not model or model == character or not humanoid or humanoid.Health <= 0 then return end
 	local targetPlayer = Players:GetPlayerFromCharacter(model)
 	if targetPlayer and not matchService.CanDamage(shooter, targetPlayer) then return end
-	local distance = (result.Position - shot.origin).Magnitude
-	local dropoffAlpha = math.clamp((distance - def.dropoffStart) / (def.dropoffEnd - def.dropoffStart), 0, 1)
-	local baseDamage = def.damage + (def.minimumDamage - def.damage) * dropoffAlpha
 	local damage = baseDamage * (if result.Instance.Name == "Head" then def.headshotMultiplier else 1)
 	local healthBefore = humanoid.Health
 	local ok, err = pcall(function() humanoid:TakeDamage(damage) end)
@@ -154,10 +159,12 @@ local function applyShot(shooter: Player, shot: ShotPayload)
 		if result.Instance.Name == "Head" then " [HEADSHOT]" else ""))
 end
 
-function DamageService.Start(combatRequestService: any, matchServiceArg: any)
+function DamageService.Start(combatRequestService: any, matchServiceArg: any, destructionServiceArg: any)
 	if started then return end
 	assert(matchServiceArg, "MatchService ausente")
+	assert(destructionServiceArg, "DestructibleCoverService ausente")
 	matchService = matchServiceArg
+	destructionService = destructionServiceArg
 	started = true
 	stateEvent = getOrCreateRemote(NetProtocol.WeaponStateEvent)
 	local reloadEvent = getOrCreateRemote(NetProtocol.ReloadWeaponEvent)
