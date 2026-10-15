@@ -38,6 +38,18 @@ local Config = {
 	Destruction = {
 		CoverMaxHealth = 100,
 	},
+
+	-- FL-024: prototype kinematic vehicle; server owns every movement step.
+	Vehicle = {
+		MaxSpeed = 24,
+		Acceleration = 14,
+		TurnRateDegrees = 58,
+		InputInterval = 0.05,
+		InputTimeout = 0.35,
+		InteractionDistance = 12,
+		BoundaryX = 125,
+		BoundaryZ = 100,
+	},
 }
 
 return table.freeze(Config)

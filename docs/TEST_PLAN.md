@@ -27,3 +27,10 @@ Data, hash commit/PR, versão Studio/Rojo, ambiente/hardware, passos, resultado,
 
 ## Limiares
 Critério FPS inicial 60 desktop é **hipótese**; medir antes de travar meta. No MVP, qualquer exploit reproduzível com alteração não autorizada de HP ou pontuação é bloqueador P0.
+
+## FL-024 vehicle acceptance (after FL-023 gate)
+- Enter the procedural scout through its server-validated proximity prompt; confirm one occupant only.
+- Drive forward, reverse, brake, steer, exit, and re-enter. Confirm camera follows the chassis and returns to the character.
+- Attempt out-of-bounds movement and drive toward an obstacle. Confirm the server stops the anchored chassis within speed/acceleration/delta bounds.
+- Observe from a second client; server-replicated chassis motion must not jump or accept client-supplied positions.
+- Save Studio logs and a short route video before marking the issue accepted.

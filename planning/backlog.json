@@ -605,11 +605,11 @@
     "title": "Integrar primeiro veículo terrestre dirigido",
     "goal": "Validar sistema de veículo sem física avançada prematura.",
     "implementation": [
-      "Selecionar chassi com licença",
-      "auditar scripts",
-      "conectar controle",
-      "câmera",
-      "entrar/sair."
+      "Usar chassi procedural autorado, sem custo ou dependência externa",
+      "auditar proveniência e scripts",
+      "conectar controles com validação no servidor",
+      "câmera de acompanhamento local",
+      "entrar/sair com validação de proximidade e ocupação."
     ],
     "acceptance": [
       "Um jogador entra, dirige, sai",
@@ -620,7 +620,7 @@
       "FL-014",
       "FL-023"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-025",
