@@ -4,6 +4,8 @@ local NetProtocol = {
 	Version = 1,
 	RemoteFolderName = "Remotes",
 	FireWeaponEvent = "FireWeapon",
+	ReloadWeaponEvent = "ReloadWeapon",
+	WeaponStateEvent = "WeaponState",
 }
 
 return table.freeze(NetProtocol)

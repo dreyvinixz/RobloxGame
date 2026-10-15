@@ -21,6 +21,8 @@ local camera       = workspace.CurrentCamera
 -- Aguarda o servidor criar o evento (feito pelo CombatRequestService.Start)
 local remotesFolder = ReplicatedStorage:WaitForChild(NetProtocol.RemoteFolderName)
 local fireWeaponEvent: RemoteEvent = remotesFolder:WaitForChild(NetProtocol.FireWeaponEvent) :: RemoteEvent
+local reloadWeaponEvent: RemoteEvent = remotesFolder:WaitForChild(NetProtocol.ReloadWeaponEvent) :: RemoteEvent
+local weaponStateEvent: RemoteEvent = remotesFolder:WaitForChild(NetProtocol.WeaponStateEvent) :: RemoteEvent
 
 -- ─── Estado da arma ──────────────────────────────────────────────────────────
 
@@ -32,6 +34,7 @@ local ammo         = weaponDef.magazineSize  -- balas no pente atual
 local isReloading  = false
 local lastShotAt   = -math.huge              -- os.clock() do último disparo aceito
 local isTriggerHeld = false                  -- para modo automático (mouse mantido)
+local startReload: () -> ()
 
 -- ─── HUD temporário ──────────────────────────────────────────────────────────
 -- UI mínima em texto enquanto FL-022 não cria o HUD definitivo.
@@ -157,10 +160,6 @@ local function tryFire()
 		then localRayResult.Position
 		else origin + direction * weaponDef.maxRange
 
-	-- Decrementa munição antes do envio (reverte se servidor rejeitar — MVP simples)
-	ammo -= 1
-	updateHUD()
-
 	-- Envia intenção ao servidor — servidor valida e aplica dano se aprovado
 	fireWeaponEvent:FireServer({
 		weaponId       = WEAPON_ID,
@@ -169,23 +168,11 @@ local function tryFire()
 		targetPosition = targetPosition,
 	})
 
-	-- Recarrega automático quando pente esvaziar
-	if ammo == 0 then
-		task.delay(0.1, function()
-			if ammo == 0 and not isReloading then
-				-- dispara reload automaticamente
-				UserInputService.InputBegan:Fire(
-					{ KeyCode = Enum.KeyCode.R, UserInputType = Enum.UserInputType.Keyboard } :: any,
-					false
-				)
-			end
-		end)
-	end
 end
 
 -- ─── Recarga ─────────────────────────────────────────────────────────────────
 
-local function startReload()
+startReload = function()
 	if isReloading then return end
 	if ammo == weaponDef.magazineSize then
 		showStatus("Pente cheio")
@@ -195,19 +182,18 @@ local function startReload()
 	local humanoid = getCharacterRefs()
 	if not humanoid or humanoid.Health <= 0 then return end
 
-	isReloading = true
-	updateHUD()
-	showStatus("Recarregando... " .. weaponDef.reloadTime .. "s", weaponDef.reloadTime)
-
-	task.delay(weaponDef.reloadTime, function()
-		if isReloading then
-			ammo = weaponDef.magazineSize
-			isReloading = false
-			updateHUD()
-			showStatus("Pronto!")
-		end
-	end)
+	reloadWeaponEvent:FireServer()
 end
+
+weaponStateEvent.OnClientEvent:Connect(function(serverAmmo: number, serverReloading: boolean)
+	if typeof(serverAmmo) ~= "number" or typeof(serverReloading) ~= "boolean" then return end
+	ammo = math.clamp(math.floor(serverAmmo), 0, weaponDef.magazineSize)
+	isReloading = serverReloading
+	updateHUD()
+	if ammo == 0 and not isReloading then
+		task.defer(function() startReload() end)
+	end
+end)
 
 -- ─── Inputs ──────────────────────────────────────────────────────────────────
 
@@ -238,7 +224,6 @@ end)
 -- ─── Reset ao respawn ─────────────────────────────────────────────────────────
 
 localPlayer.CharacterAdded:Connect(function()
-	ammo        = weaponDef.magazineSize
 	isReloading = false
 	lastShotAt  = -math.huge
 	isTriggerHeld = false

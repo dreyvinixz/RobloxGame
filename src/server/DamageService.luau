@@ -1,16 +1,11 @@
 --!strict
--- DamageService.luau — FL-010 (servidor)
--- Consome shots validados do CombatRequestService e aplica dano autoritativo.
--- NUNCA aceita valores de HP do cliente. Toda a lógica de dano vive aqui.
-
+-- FL-010: munição, recarga e dano são mantidos pelo servidor.
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local WeaponConfig = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("WeaponConfig"))
+local NetProtocol = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("NetProtocol"))
 
--- ─── Tipos ────────────────────────────────────────────────────────────────────
-
--- ShotPayload replicado do CombatRequestService (mesma estrutura)
 type ShotPayload = {
 	weaponId: string,
 	origin: Vector3,
@@ -19,160 +14,140 @@ type ShotPayload = {
 	maxRange: number,
 }
 
-type HitResult = {
-	hit: boolean,
-	targetPlayer: Player?,
-	isHeadshot: boolean,
-	damage: number,
-	point: Vector3?,
-}
-
--- ─── Constantes ───────────────────────────────────────────────────────────────
-
--- Partes consideradas headshot para multiplicação de dano
-local HEADSHOT_PARTS = { Head = true }
-
--- Raycasting: ignorar partes que não são colisão sólida
-local RAYCAST_PARAMS = RaycastParams.new()
-RAYCAST_PARAMS.FilterType = Enum.RaycastFilterType.Exclude
-RAYCAST_PARAMS.FilterDescendantsInstances = {} -- preenchido em Start()
-
--- ─── Serviço ──────────────────────────────────────────────────────────────────
+type WeaponState = { ammo: number, reloading: boolean, generation: number }
 
 local DamageService = {}
 local started = false
+local states: {[Player]: WeaponState} = {}
+local stateEvent: RemoteEvent
+local worldExclusions: {Instance} = {}
 
--- Dado o resultado de raycast, descobre se acertou um jogador e qual parte
-local function resolveHit(
-	shooter: Player,
-	rayResult: RaycastResult?,
-	weaponId: string
-): HitResult
-
-	local weaponDef = WeaponConfig[weaponId]
-	if not weaponDef then
-		return { hit = false, targetPlayer = nil, isHeadshot = false, damage = 0, point = nil }
+local function getOrCreateRemote(name: string): RemoteEvent
+	local remotes = ReplicatedStorage:WaitForChild(NetProtocol.RemoteFolderName)
+	local existing = remotes:FindFirstChild(name)
+	if existing then
+		assert(existing:IsA("RemoteEvent"), name .. " precisa ser RemoteEvent")
+		return existing
 	end
-
-	if not rayResult then
-		return { hit = false, targetPlayer = nil, isHeadshot = false, damage = 0, point = nil }
-	end
-
-	-- Verifica se a instância atingida pertence a um personagem de jogador
-	local hitInstance = rayResult.Instance
-	local hitModel = hitInstance:FindFirstAncestorOfClass("Model")
-	if not hitModel then
-		return { hit = false, targetPlayer = nil, isHeadshot = false, damage = 0, point = rayResult.Position }
-	end
-
-	local targetPlayer: Player? = nil
-	for _, p in Players:GetPlayers() do
-		if p ~= shooter and p.Character == hitModel then
-			targetPlayer = p
-			break
-		end
-	end
-
-	if not targetPlayer then
-		-- Acertou geometria do mundo, não um jogador
-		return { hit = false, targetPlayer = nil, isHeadshot = false, damage = 0, point = rayResult.Position }
-	end
-
-	-- Verifica se o target ainda está vivo
-	local targetHumanoid = hitModel:FindFirstChildOfClass("Humanoid")
-	if not targetHumanoid or targetHumanoid.Health <= 0 then
-		return { hit = false, targetPlayer = targetPlayer, isHeadshot = false, damage = 0, point = rayResult.Position }
-	end
-
-	local isHeadshot = HEADSHOT_PARTS[hitInstance.Name] == true
-	local damage = weaponDef.damage * (if isHeadshot then weaponDef.headshotMultiplier else 1)
-
-	return {
-		hit        = true,
-		targetPlayer = targetPlayer,
-		isHeadshot = isHeadshot,
-		damage     = damage,
-		point      = rayResult.Position,
-	}
+	local event = Instance.new("RemoteEvent")
+	event.Name = name
+	event.Parent = remotes
+	return event
 end
 
--- Aplica dano a um Humanoid de forma segura (protegido por pcall)
-local function applyDamage(target: Player, damage: number): boolean
-	local character = target.Character
-	if not character then return false end
-	local humanoid = character:FindFirstChildOfClass("Humanoid")
-	if not humanoid or humanoid.Health <= 0 then return false end
-
-	local ok, err = pcall(function()
-		humanoid:TakeDamage(damage)
-	end)
-
-	if not ok then
-		warn("[Frontline][FL-010][DamageService] Erro ao aplicar dano:", err)
-		return false
+local function getState(player: Player): WeaponState
+	local state = states[player]
+	if not state then
+		state = { ammo = WeaponConfig.TestRifle.magazineSize, reloading = false, generation = 0 }
+		states[player] = state
 	end
-	return true
+	return state
 end
 
--- Processa um shot validado vindo do CombatRequestService
-function DamageService.ProcessShot(shooter: Player, shot: ShotPayload)
-	local weaponDef = WeaponConfig[shot.weaponId]
-	if not weaponDef then
-		warn("[Frontline][FL-010][DamageService] weaponId desconhecido:", shot.weaponId)
+local function sendState(player: Player)
+	local state = getState(player)
+	stateEvent:FireClient(player, state.ammo, state.reloading)
+end
+
+local function resetState(player: Player)
+	local state = getState(player)
+	state.generation += 1
+	state.ammo = WeaponConfig.TestRifle.magazineSize
+	state.reloading = false
+	sendState(player)
+end
+
+local function beginReload(player: Player)
+	local def = WeaponConfig.TestRifle
+	local state = getState(player)
+	local character = player.Character
+	local humanoid = character and character:FindFirstChildOfClass("Humanoid")
+	if not humanoid or humanoid.Health <= 0 or state.reloading or state.ammo >= def.magazineSize then
+		sendState(player)
 		return
 	end
-
-	-- Recast autoritativo no servidor — ignora o targetPosition do cliente para dano,
-	-- usa apenas origin + direction como vetor. O targetPosition já foi validado
-	-- em alcance pelo CombatRequestService, mas o hit real é determinado aqui.
-	local rayResult = workspace:Raycast(
-		shot.origin,
-		shot.direction * shot.maxRange,
-		RAYCAST_PARAMS
-	)
-
-	local result = resolveHit(shooter, rayResult, shot.weaponId)
-
-	if result.hit and result.targetPlayer and result.damage > 0 then
-		local applied = applyDamage(result.targetPlayer, result.damage)
-		if applied then
-			print(string.format(
-				"[Frontline][FL-010] HIT | %s → %s | dmg=%.0f%s",
-				shooter.Name,
-				result.targetPlayer.Name,
-				result.damage,
-				if result.isHeadshot then " [HEADSHOT]" else ""
-			))
+	state.generation += 1
+	local generation = state.generation
+	state.reloading = true
+	sendState(player)
+	task.delay(def.reloadTime, function()
+		if player.Parent ~= Players or states[player] ~= state or state.generation ~= generation then return end
+		local currentCharacter = player.Character
+		local currentHumanoid = currentCharacter and currentCharacter:FindFirstChildOfClass("Humanoid")
+		if not currentHumanoid or currentHumanoid.Health <= 0 then
+			state.reloading = false
+		else
+			state.ammo = def.magazineSize
+			state.reloading = false
 		end
+		sendState(player)
+	end)
+end
+
+local function applyShot(shooter: Player, shot: ShotPayload)
+	local def = WeaponConfig[shot.weaponId]
+	if not def then return end
+	local state = getState(shooter)
+	if state.reloading or state.ammo <= 0 then
+		sendState(shooter)
+		return
 	end
+	state.ammo -= 1
+	sendState(shooter)
+
+	-- Constrói exclusões por disparo para garantir que o atirador nunca bloqueie o próprio tiro.
+	local excluded = table.clone(worldExclusions)
+	local character = shooter.Character
+	if character then table.insert(excluded, character) end
+	local params = RaycastParams.new()
+	params.FilterType = Enum.RaycastFilterType.Exclude
+	params.FilterDescendantsInstances = excluded
+	local result = workspace:Raycast(shot.origin, shot.direction * shot.maxRange, params)
+	if not result then return end
+
+	local model = result.Instance:FindFirstAncestorOfClass("Model")
+	local humanoid = model and model:FindFirstChildOfClass("Humanoid")
+	if not model or model == character or not humanoid or humanoid.Health <= 0 then return end
+	local damage = def.damage * (if result.Instance.Name == "Head" then def.headshotMultiplier else 1)
+	local ok, err = pcall(function() humanoid:TakeDamage(damage) end)
+	if not ok then
+		warn("[Frontline][FL-010] erro ao aplicar dano:", err)
+		return
+	end
+	print(string.format("[Frontline][FL-010] HIT | %s -> %s | dmg=%.0f%s", shooter.Name, model.Name, damage,
+		if result.Instance.Name == "Head" then " [HEADSHOT]" else ""))
 end
 
 function DamageService.Start(combatRequestService: any)
 	if started then return end
 	started = true
-
-	-- Exclui o chão e partes de spawn do raycast para evitar self-hit em superfícies
-	-- A lista real de instâncias a ignorar pode ser estendida via atributo "ArenaRole"
-	local toExclude: { Instance } = {}
+	stateEvent = getOrCreateRemote(NetProtocol.WeaponStateEvent)
+	local reloadEvent = getOrCreateRemote(NetProtocol.ReloadWeaponEvent)
 	for _, desc in workspace:GetDescendants() do
-		if desc:IsA("BasePart") and desc:GetAttribute("ArenaRole") == "Ground" then
-			table.insert(toExclude, desc)
+		if desc:IsA("BasePart") and (desc:GetAttribute("ArenaRole") == "Ground" or desc:IsA("SpawnLocation")) then
+			table.insert(worldExclusions, desc)
 		end
 	end
-	-- Spawn locations também são excluídas
-	for _, desc in workspace:GetDescendants() do
-		if desc:IsA("SpawnLocation") then
-			table.insert(toExclude, desc)
-		end
-	end
-	RAYCAST_PARAMS.FilterDescendantsInstances = toExclude
-
-	-- Escuta shots aceitos pelo CombatRequestService
-	combatRequestService.OnShotAccepted(function(player: Player, shot: ShotPayload)
-		DamageService.ProcessShot(player, shot)
+	reloadEvent.OnServerEvent:Connect(function(player: Player, ...: any)
+		if select("#", ...) > 0 then return end
+		beginReload(player)
 	end)
-
-	print("[Frontline][FL-010] DamageService ativo | arma TestRifle configurada")
+	combatRequestService.OnShotAccepted(function(player: Player, shot: ShotPayload)
+		applyShot(player, shot)
+	end)
+	Players.PlayerAdded:Connect(function(player)
+		getState(player)
+		player.CharacterAdded:Connect(function()
+			task.defer(resetState, player)
+		end)
+	end)
+	for _, player in Players:GetPlayers() do
+		getState(player)
+		player.CharacterAdded:Connect(function() task.defer(resetState, player) end)
+		if player.Character then task.defer(sendState, player) end
+	end
+	Players.PlayerRemoving:Connect(function(player) states[player] = nil end)
+	print("[Frontline][FL-010] dano e estado autoritativo do rifle ativos")
 end
 
 return DamageService
