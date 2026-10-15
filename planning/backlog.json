@@ -173,11 +173,11 @@
       "circulação sem softlock",
       "escala jogável."
     ],
-    "verification": "Playtest com vídeo de 30 segundos.",
+    "verification": "Playtest manual confirmado pelo proprietário no Studio; vídeo de 30 segundos segue pendente.",
     "dependencies": [
       "FL-002"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-008",
@@ -189,11 +189,11 @@
     "title": "Implementar controlador FPS inicial",
     "goal": "Dar sensação consistente de câmera, movimento e mira.",
     "implementation": [
-      "Controlar camera local",
+      "Usar câmera padrão do Roblox em modo Classic/Custom com zoom e rotação livres",
       "caminhada/sprint",
       "entrada",
-      "bloqueio de câmera por UI",
-      "verificar mouse lock."
+      "zoom contínuo pela roda até primeira pessoa conforme limites Roblox",
+      "capturar/ocultar cursor no jogo e liberá-lo para chat, menu e perda de foco"
     ],
     "acceptance": [
       "Movimento e câmera funcionam",
@@ -204,7 +204,7 @@
     "dependencies": [
       "FL-002"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-009",

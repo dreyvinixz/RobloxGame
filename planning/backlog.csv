@@ -5,7 +5,7 @@ FL-003,S0,P0,research,tooling,3,TODO,Validar MCP oficial Roblox Studio com Codex
 FL-004,S0,P0,docs,product,2,TODO,"Aprovar PRD, MVP e decisões de arquitetura",FL-001
 FL-005,S0,P0,security,assets,3,TODO,Criar registro de assets e sandbox de inspeção,FL-003
 FL-006,S0,P1,chore,quality,2,TODO,Automatizar validação de projeto e documentação,FL-001
-FL-007,S1,P0,feature,world,3,TODO,Montar arena greybox de combate,FL-002
+FL-007,S1,P0,feature,world,3,IN_PROGRESS,Montar arena greybox de combate,FL-002
 FL-008,S1,P0,feature,player,5,TODO,Implementar controlador FPS inicial,FL-002
 FL-009,S1,P0,feature,network,5,IN_PROGRESS,Definir contrato de remotes e validação no servidor,"FL-002,FL-004"
 FL-010,S1,P0,feature,weapons,5,TODO,Implementar rifle hitscan de teste,"FL-008,FL-009"
