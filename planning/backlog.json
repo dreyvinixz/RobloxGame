@@ -189,12 +189,11 @@
     "title": "Implementar controlador FPS inicial",
     "goal": "Dar sensação consistente de câmera, movimento e mira.",
     "implementation": [
-      "Controlar camera local",
+      "Usar câmera padrão do Roblox em modo Classic/Custom com zoom e rotação livres",
       "caminhada/sprint",
       "entrada",
-      "alternar primeira/terceira pessoa pelo scroll",
-      "bloqueio de câmera por UI",
-      "verificar mouse lock."
+      "zoom contínuo pela roda até primeira pessoa conforme limites Roblox",
+      "manter controles padrão de câmera e mouse/UI do Roblox"
     ],
     "acceptance": [
       "Movimento e câmera funcionam",
