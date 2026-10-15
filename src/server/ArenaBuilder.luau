@@ -1,5 +1,6 @@
 --!strict
 local Workspace = game:GetService("Workspace")
+local ServerStorage = game:GetService("ServerStorage")
 
 local ARENA_NAME = "GreyboxArena"
 local GROUND_SIZE = Vector3.new(280, 2, 220)
@@ -202,6 +203,63 @@ local function makeCoverModules(parent: Instance, name: string, position: Vector
 	end
 end
 
+local function isSafeUrbanProp(model: Model): boolean
+	for _, descendant in model:GetDescendants() do
+		if descendant:IsA("BaseScript")
+			or descendant:IsA("RemoteEvent")
+			or descendant:IsA("RemoteFunction")
+			or descendant:IsA("Sound") then
+			return false
+		end
+	end
+	return true
+end
+
+local function addApprovedUrbanProps(parent: Instance)
+	local quarantine = ServerStorage:FindFirstChild("FL014_Quarantine")
+	local approved = quarantine and quarantine:FindFirstChild("FL014_UrbanProps_Candidate")
+	if not approved then
+		warn("[Frontline][FL-016] kit urbano aprovado ausente; arena mantém módulos nativos")
+		return
+	end
+
+	local placements = {
+		{ source = "StreetLightPole_01_A", name = "StreetLight_NorthWest", x = -50, z = -93 },
+		{ source = "Bus_Stop_01_A", name = "BusStop_EastNorth", x = 112, z = -65 },
+		{ source = "FireHydrant_01_A", name = "Hydrant_CenterWest", x = -42, z = -22 },
+	}
+	local props = makeFolder(parent, "ApprovedUrbanProps")
+
+	for _, placement in placements do
+		local source = approved:FindFirstChild(placement.source)
+		if not source or not source:IsA("Model") or not isSafeUrbanProp(source) then
+			warn("[Frontline][FL-016] prop ausente ou rejeitado na auditoria: " .. placement.source)
+			continue
+		end
+
+		local model = source:Clone()
+		model.Name = placement.name
+		for _, descendant in model:GetDescendants() do
+			if descendant:IsA("BasePart") then
+				descendant.Anchored = true
+				descendant.CanCollide = false
+				descendant.CanTouch = false
+				descendant.CanQuery = false
+			end
+		end
+
+		local bounds, size = model:GetBoundingBox()
+		local currentPivot = model:GetPivot()
+		local bottomY = bounds.Position.Y - size.Y / 2
+		model:PivotTo(currentPivot + Vector3.new(
+			placement.x - currentPivot.Position.X,
+			-bottomY,
+			placement.z - currentPivot.Position.Z
+		))
+		model.Parent = props
+	end
+end
+
 local function buildArena(): Model
 	local existing = Workspace:FindFirstChild(ARENA_NAME)
 	if existing then
@@ -322,6 +380,8 @@ local function buildArena(): Model
 	} do
 		makeCoverModules(coverModules, cover.name, cover.position)
 	end
+
+	addApprovedUrbanProps(arena)
 
 	arena.Parent = Workspace
 	return arena
