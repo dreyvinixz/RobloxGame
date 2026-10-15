@@ -18,7 +18,7 @@ Atualizado em 2026-10-15. Este registro acompanha as issues abertas #13–#32. `
 | #24 FL-024 | Parcial | [#56](https://github.com/dreyvinixz/RobloxGame/pull/56) | Scout procedural e servidor autoritativo. Play de um cliente com teclado real confirmou entrada, avanço (pivot z -8→-40.04), throttle-release até velocidade 0, curva (LookVector -0.553, 0, -0.833), ré a -24 studs/s, saída e câmera restaurada; script Studio restaurado após o teste. Rota básica passou; colisão controlada, limite, observador segundo cliente, vídeo e repetição no build integrado pendentes. Ver `docs/TEST_REPORTS/FL-024.md`; gate MVP permanece NO-GO. |
 | #25 FL-025 | Parcial | [#57](https://github.com/dreyvinixz/RobloxGame/pull/57) | Play Studio de um cliente confirmou tiro aceito HP 300→275; 11 tiros destruíram (HP 0, driver 0, speed 0, assento desativado), Enter foi bloqueado e Reset recriou um scout ativo HP 300 no pivot Y=3.15. Obstáculo queryable causou dano de colisão 300→290.4 e speed 0; removido o obstáculo, driver continuou e percorreu Z=-14.10→-24.36. Validator, 9 testes e Rojo passam. Replicação em 2 clientes, spam/cooldown e late join pendentes; ver relatório. |
 | #26 FL-026 | Parcial | [#58](https://github.com/dreyvinixz/RobloxGame/pull/58) | S4 idle sample 30.022 s coletado: 56.21 FPS médio/p1 8.91; LibMP 62 frames, 15.71 ms média. Nove outras sessões Studio em Play e cena/viewport diferentes do S2 tornam a amostra não comparável; não atribuir regressão ao jogo. Repeat equivalente, MicroProfiler com cena controlada, draw calls/triângulos e leak/warning check seguem pendentes. Ver `docs/TEST_REPORTS/FL-026.md` e `docs/PERFORMANCE.md`. |
-| #27 FL-027 | Pendente | — | Checklist alpha; publicação Roblox requer autorização humana. |
+| #27 FL-027 | Parcial / NO-GO | [#59](https://github.com/dreyvinixz/RobloxGame/pull/59) | Checklist e changelog draft, runbook de rollback e revisão estática de assets/privacidade em `docs/ALPHA_RELEASE_CHECKLIST.md`. FL-023, FL-025 e FL-026 mantêm gates abertos; nada foi publicado. |
 | #28 FL-028 | Parcial | [#55](https://github.com/dreyvinixz/RobloxGame/pull/55) | ADR-0002 recomenda NO-GO para ponte com processo BF6 ao vivo; GO somente para Roblox independente, workflow Portal dentro do escopo oficial ou mock sintético. Fontes oficiais, obstáculos e política anticheat documentados; sem alteração de executáveis. |
 | #29 FL-029 | Pendente | — | Bots depois do MVP. |
 | #30 FL-030 | Pendente | — | Segundo mapa após alpha. |
@@ -120,3 +120,9 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 
 - Baseline S2 registrada (idle local, 30 s). Repetição S4, MicroProfiler, contagem de warnings/leaks e standalone permanecem pendentes porque a branch ainda não foi sincronizada no Studio e Rojo não está disponível. Fontes revisadas sem atribuir gargalo ou propor otimização especulativa.
 - Issue em IN_PROGRESS; ver `docs/TEST_REPORTS/FL-026.md`.
+
+## Preparação parcial FL-027 — 2026-10-15
+
+- Inventário dos 10 registros de assets: 3 aprovados para protótipo, 3 em quarentena, 3 descobertos e 1 procedural em protótipo. Nenhum item fora do estado aprovado/protótipo foi promovido. Não houve compra/publicação.
+- Scan de código não achou DataStore, HttpService ou AnalyticsService customizados em `src/`; configurações da experiência e política de privacidade continuam revisão do proprietário. Questionário de maturidade deixado para revisão manual do conteúdo final.
+- FL-023 segue NO-GO; FL-025/026 têm evidências multiplayer/performance pendentes. Checklist não autoriza publicação.
