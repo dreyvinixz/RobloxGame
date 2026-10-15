@@ -14,7 +14,7 @@ Atualizado em 2026-10-15. Este registro acompanha as issues abertas #13–#32. `
 | #20 FL-020 | Parcial | [#51](https://github.com/dreyvinixz/RobloxGame/pull/51) | Rifle/pistola, troca validada, munição por arma e falloff implementados; validator, 3 testes e Rojo build passaram. TTK é aritmético; teste Studio de equip/munição/falloff e comparação de tempos ainda pendente devido a sync desconectado. |
 | #21 FL-021 | Parcial | [#52](https://github.com/dreyvinixz/RobloxGame/pull/52) | Estado Intact/Damaged/Destroyed, 100 HP, dano somente por tiro validado server-side, visibilidade/colisão em estado quebrado implementados. Validator, 3 testes e Rojo build passaram. Multiplayer, tentativa de destruição client-side e late join ainda sem evidência Studio. |
 | #22 FL-022 | Parcial | [#53](https://github.com/dreyvinixz/RobloxGame/pull/53) | HUD responsivo de HP, estado da arma, placar/rodada, hit confirmado e resultado implementado. Validator, 3 testes e Rojo build passaram. Studio e capturas em duas resoluções pendentes pelo estado da conexão Rojo. |
-| #23 FL-023 | Pendente | — | Aceite do MVP com dois clientes. |
+| #23 FL-023 | Parcial | [#54](https://github.com/dreyvinixz/RobloxGame/pull/54) | Gate revisado: NO-GO. A issue prevê 10 cenários, mas TEST_PLAN lista QA-01–QA-11; matriz incluída. Todos os testes de aceitação end-to-end e critérios zero P0 pendentes, com dependências #19–#22 parciais. |
 | #24 FL-024 | Pendente | — | Protótipo de veículo após MVP. |
 | #25 FL-025 | Pendente | — | Dano e regra de veículo. |
 | #26 FL-026 | Pendente | — | Profiling posterior aos cenários e veículos. |
@@ -93,6 +93,13 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - `WeaponController` mantém munição/reload/arma atual com layout relativo à viewport; dano confirmado pelo servidor aciona hit marker, sem feedback de hit decidido pelo cliente.
 - Validator, 3 testes Python, Rojo build e diff check passaram. Falta validar legibilidade visual e salvar capturas em duas resoluções no Studio.
 - Evidência e limitação em `docs/TEST_REPORTS/FL-022.md`; PR draft #53 empilhado sobre FL-021.
+
+## FL-023 — decisão de gate — 2026-10-15
+
+- `docs/TEST_PLAN.md` contém 11 casos QA-01–QA-11, embora a issue diga “10”; matriz preserva os 11.
+- Decisão **NO-GO**: #19–#22 ainda parciais; QA-03/06/08/09/10/11 não executados, outros casos têm evidência parcial e precisam repetição na build integrada.
+- Nenhuma aprovação formal do MVP ou liberação da Sprint S4. Repetir a matriz completa quando Studio estiver sincronizado, anexar vídeo/logs/capturas e resolver bloqueadores P0.
+- Validator, 3 testes Python, Rojo build e diff check passaram; isso não substitui o playtest. PR draft #54 empilhado sobre FL-022.
 
 ## Implementação parcial da FL-020 — 2026-10-15
 
