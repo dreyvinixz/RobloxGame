@@ -10,7 +10,7 @@ Atualizado em 2026-10-15. Este registro acompanha as issues abertas #13–#32. `
 | #16 FL-016 | Parcial | [#47](https://github.com/dreyvinixz/RobloxGame/pull/47) | Gerador modular preserva três rotas e núcleos colidíveis; trio urbano aprovado foi integrado como visual ancorado, sem colisão. Studio Play confirmou 3 props, 3 marcadores, zero AABB overlaps com colisores e navegação pelas rotas. PR aberto sobre FL-015; revisão e integração da pilha pendentes. |
 | #17 FL-017 | Parcial | [#48](https://github.com/dreyvinixz/RobloxGame/pull/48) | Baseline Studio local medida em host identificado (i5-11400H, GTX 1650 Max-Q disponível, 16 GB). FPS/memória/render/geom./rede/load documentados sem extrapolar. PR draft; confirmar que este é hardware-alvo e repetir no cliente standalone antes de definir orçamento. |
 | #18 FL-018 | Parcial | [#49](https://github.com/dreyvinixz/RobloxGame/pull/49) | Dois clientes simulados validaram FireWeapon→DamageService→MatchService, equipes, placar, respawn e proteção. Transição por tempo/score-win não foi acelerada no teste; revisão e integração empilhada pendentes. |
-| #19 FL-019 | Pendente | — | QA multiplayer e exploração de remotes. |
+| #19 FL-019 | Parcial | [#50](https://github.com/dreyvinixz/RobloxGame/pull/50) | Dois clientes confirmaram dano válido, score inalterado em hit não letal e 2 respostas a 50 pedidos de reload. Isolamento runtime de HP e comparação simultânea entre clientes pendentes. |
 | #20 FL-020 | Pendente | — | Pistola e balanceamento inicial. |
 | #21 FL-021 | Pendente | — | Cobertura destrutível com estado replicado. |
 | #22 FL-022 | Pendente | — | HUD de equipe, munição e resultado. |
@@ -64,6 +64,14 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - Sample idle de 30.008 s: 120.03 FPS média, 100.94 FPS p1, 29 draw calls, 46,779 triângulos, 2,104.39 MB processo, CPU/GPU render 7.17/2.49 ms médios. Rates de rede ficaram quase nulos; ping/data ping são locais do Studio. Start-to-ready via MCP levou 3.612 s com overhead de ferramenta.
 - Gargalo CPU/render é hipótese por frame-time relativo e p1, ainda precisa MicroProfiler; não fixar budget do jogo a partir desse sample. O hardware-alvo não foi confirmado. Método/dados em `docs/PERFORMANCE.md` e `docs/TEST_REPORTS/FL-017.md`.
 - PR draft [#48](https://github.com/dreyvinixz/RobloxGame/pull/48), branch `feat/FL-017-performance-baseline`, base `feat/FL-016-modular-arena`.
+
+## Validação parcial da FL-019 — 2026-10-15
+
+- Revisão de `FireWeapon`: chaves exatas, vetores finitos, arma permitida, direção unitária e coerente com alvo, alcance, origem próxima à cabeça, cooldown e rejeição de argumentos extras. Dano permanece calculado por configuração do servidor.
+- Teste Studio sincronizado com servidor e dois clientes: `PASS | fire validation, valid damage and reload spam throttle | reload responses=2`. Dano válido aplicado, score não alterado em hit não letal; 50 pedidos de reload geraram duas respostas WeaponState.
+- O teste não capturou HP entre requisições inválidas e o tiro válido nem comparou HP simultaneamente entre clientes. A simulação não variou latência real.
+- Tentativas posteriores com snapshot de HP foram excluídas: Rojo desconectou e Studio executou o harness anterior. Scripts temporários foram removidos do root e não estão no branch.
+- `DamageService` limita reload a um pedido por 0.25 s/jogador e limpa o relógio ao sair. Critérios pendentes e limites em `docs/TEST_REPORTS/FL-019.md`. PR draft #50 empilhado sobre FL-018.
 
 ## Implementação da FL-018 — 2026-10-15
 
