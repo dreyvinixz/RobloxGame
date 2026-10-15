@@ -109,8 +109,15 @@ end
 function TrainingTargetService.Start()
 	if started then return end
 	started = true
-	assert(Workspace:FindFirstChild("GreyboxArena"), "Construa a GreyboxArena antes do TrainingTarget")
-	targetModel = createTarget()
+	assert(Workspace:FindFirstChild("FrontlineArena"), "Construa a FrontlineArena antes do TrainingTarget")
+
+	local existingTarget = Workspace:FindFirstChild(TARGET_NAME)
+	if Workspace:GetAttribute("EnableTrainingTarget") == true then
+		targetModel = createTarget()
+	elseif existingTarget and existingTarget:IsA("Model") and existingTarget:GetAttribute("ArenaRole") == "TrainingTarget" then
+		existingTarget:Destroy()
+		print("[Frontline][FL-011] alvo de treino desativado na arena de batalha")
+	end
 
 	local resetEvent = getOrCreateResetEvent()
 	resetEvent.OnServerEvent:Connect(function(player: Player, ...: any)

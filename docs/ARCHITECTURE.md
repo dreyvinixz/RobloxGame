@@ -18,7 +18,7 @@ Codex / agente IA ── MCP oficial ── Roblox Studio (assets, inspeção, p
 - `ReplicatedStorage/Remotes`: pasta reservada a eventos; eventos específicos serão criados pelo código servidor nas issues de rede.
 - `ServerScriptService/GameServer` ← `src/server`: autenticação implícita de jogador e regras autoritativas.
 - `StarterPlayer/StarterPlayerScripts/GameClient` ← `src/client`: câmera, inputs, HUD, render FX.
-- `Workspace`: mapa e assets autorados no Studio; a arena e seus módulos de pavimento, fachada e cobertura são gerados pelo servidor a partir de `src/server/ArenaBuilder.luau`. Os módulos decorativos não colidem nem participam de raycasts; os núcleos mantêm as colisões do layout. Não limpar o Workspace via Rojo.
+- `Workspace`: o mapa é a `FrontlineArena`, gerada pelo servidor a partir de `src/server/ArenaBuilder.luau`; fachadas, ruínas, pavimento, fumaça distante e cobertura usam partes controladas pela fonte. Props aprovados podem ser clonados da quarentena após auditoria. Geometria decorativa não colide nem participa de raycasts; paredes e coberturas mantêm colisões de gameplay. Não limpar o Workspace via Rojo.
 
 ## Rede e autoridade
 Cliente envia intenção (`FireWeapon`, `RequestReload`, `EnterVehicle`); servidor valida player, cadência, arma, alcance, cooldown, estado, posição coerente e aplica dano. Servidor replica resultado e estados. Não confiar em campos de HP, kills ou velocidade informados pelo cliente.

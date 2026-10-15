@@ -105,3 +105,9 @@ Os limites por asset continuam **hipóteses de trabalho**, não resultados medid
 - [Roblox — montagem de ambientes modulares](https://create.roblox.com/docs/tutorials/use-case-tutorials/modeling/assemble-modular-environments)
 - [New York City Corner Apartment Building — Creator Store](https://create.roblox.com/store/asset/14243660153/New-York-City-Corner-Apartment-Building)
 - [City Props Pack — Creator Store](https://create.roblox.com/store/asset/6370681139)
+
+## Primeira arena de batalha — FrontlineArena
+
+A próxima composição substitui o greybox por um distrito urbano compacto sob cerco: três corredores de combate conectados por cruzamentos, fachadas parcialmente abertas para combate e flanqueio, barricadas nas rotas, destroços junto às entradas e fumaça apenas no horizonte. A geometria de colisão fica explícita e separada dos detalhes visuais; spawns continuam nas extremidades opostas.
+
+O ambiente usa formas, paleta e disposição originais do Project Frontline. A referência geral de atmosfera é a variedade de cenários urbanos danificados e campos de batalha descrita na [página de mapas de Battlefield 6](https://www.ea.com/pt-br/games/battlefield/battlefield-6/features/maps); nenhum mapa, nome, layout, asset ou marca da EA é reutilizado. A arena é composta por geometria própria em escala de distrito: quatro estruturas de ruína com interior e brechas jogáveis, três corredores conectados, linhas de defesa, posto avançado, crateramento, barricadas, veículos destruídos e fumaça de horizonte. O trio `StreetLightPole_01_A`, `Bus_Stop_01_A` e `FireHydrant_01_A` funciona como detalhe ambiental dentro dessa composição, não como substituto do mapa. Os mapas completos recém-descobertos permanecem fora da arena até revisão de scripts, desempenho e direitos.
