@@ -31,6 +31,11 @@ local cfg         = Config.Player
 local pitchAngle  = 0   -- rotação vertical acumulada (graus)
 local yawAngle    = 0   -- rotação horizontal acumulada (graus)
 local isSprinting = false
+local isFirstPerson = true
+
+local cameraRayParams = RaycastParams.new()
+cameraRayParams.FilterType = Enum.RaycastFilterType.Exclude
+cameraRayParams.FilterDescendantsInstances = { character }
 
 -- ─── Câmera: definir modo scriptable ─────────────────────────────────────────
 
@@ -53,6 +58,24 @@ local function unlockMouse()
 	UserInputService.MouseIconEnabled = true
 end
 
+local function setCharacterVisibility()
+	local localTransparency = if isFirstPerson then 1 else 0
+	for _, descendant in character:GetDescendants() do
+		if descendant:IsA("BasePart") then
+			descendant.LocalTransparencyModifier = localTransparency
+		end
+	end
+end
+
+local function setFirstPerson(enabled: boolean)
+	if isFirstPerson == enabled then
+		return
+	end
+
+	isFirstPerson = enabled
+	setCharacterVisibility()
+end
+
 lockMouse()
 
 -- ─── Helpers de personagem ───────────────────────────────────────────────────
@@ -63,13 +86,8 @@ local function onCharacterAdded(newChar: Model)
 	humanoid  = newChar:WaitForChild("Humanoid") :: Humanoid
 	rootPart  = newChar:WaitForChild("HumanoidRootPart") :: BasePart
 	head      = newChar:WaitForChild("Head") :: BasePart
-
-	-- Oculta o próprio personagem da câmera FPS (transparência local)
-	for _, part in newChar:GetDescendants() do
-		if part:IsA("BasePart") or part:IsA("MeshPart") then
-			(part :: BasePart).LocalTransparencyModifier = 1
-		end
-	end
+	cameraRayParams.FilterDescendantsInstances = { newChar }
+	setCharacterVisibility()
 
 	-- Reset de ângulos ao respawn
 	pitchAngle = 0
@@ -81,13 +99,20 @@ end
 localPlayer.CharacterAdded:Connect(onCharacterAdded)
 
 -- Aplica transparência ao personagem atual também
-do
-	for _, part in character:GetDescendants() do
-		if part:IsA("BasePart") or part:IsA("MeshPart") then
-			(part :: BasePart).LocalTransparencyModifier = 1
-		end
+setCharacterVisibility()
+
+-- Scroll para baixo afasta a câmera; scroll para cima retorna à primeira pessoa.
+UserInputService.InputChanged:Connect(function(input: InputObject, _gameProcessed: boolean)
+	if input.UserInputType ~= Enum.UserInputType.MouseWheel then return end
+	if UserInputService.MouseBehavior ~= Enum.MouseBehavior.LockCenter then return end
+	if UserInputService:GetFocusedTextBox() then return end
+
+	if input.Position.Z > 0 then
+		setFirstPerson(true)
+	elseif input.Position.Z < 0 then
+		setFirstPerson(false)
 	end
-end
+end)
 
 -- ─── Detecção de sprint ──────────────────────────────────────────────────────
 
@@ -149,7 +174,18 @@ RunService.RenderStepped:Connect(function()
 	local cameraRotation = CFrame.Angles(0, math.rad(yawAngle), 0)
 		* CFrame.Angles(math.rad(pitchAngle), 0, 0)
 
-	camera.CFrame = CFrame.new(eyePosition) * cameraRotation
+	if isFirstPerson then
+		camera.CFrame = CFrame.new(eyePosition) * cameraRotation
+	else
+		local desiredPosition = eyePosition - cameraRotation.LookVector * cfg.ThirdPersonDistance
+		local cameraPosition = desiredPosition
+		local obstruction = workspace:Raycast(eyePosition, desiredPosition - eyePosition, cameraRayParams)
+		if obstruction then
+			cameraPosition = obstruction.Position + obstruction.Normal * 0.5
+		end
+		camera.CFrame = CFrame.lookAt(cameraPosition, eyePosition)
+	end
+	camera.Focus = CFrame.new(eyePosition)
 
 	-- ── 4. Orientar o RootPart ao yaw da câmera ──────────────────────────────
 	-- Permite que o personagem vire junto com a visão horizontal.
