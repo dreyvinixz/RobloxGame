@@ -50,7 +50,8 @@ local hitMarker = makeLabel("ConfirmedHitMarker", UDim2.fromOffset(44, 44), UDim
 hitMarker.BackgroundTransparency = 1
 hitMarker.Text = ""
 
-local endPanel = makeLabel("RoundResult", UDim2.fromScale(0.42, 0.16), UDim2.fromScale(0.5, 0.38), Vector2.new(0.5, 0.5), 30)
+local endPanel = makeLabel("RoundResult", UDim2.fromScale(0.64, 0.16), UDim2.fromScale(0.5, 0.38), Vector2.new(0.5, 0.5), 30)
+endPanel.TextWrapped = false
 endPanel.BackgroundTransparency = 0.08
 endPanel.Visible = false
 
