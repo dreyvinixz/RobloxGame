@@ -121,13 +121,13 @@ local function buildArena(): Model
 		for _, z in { -66, 66 } do
 			makePart(
 				arena,
-				("Building_%d_%d"):format(x, z),
+				("TestBlock_%d_%d"):format(x, z),
 				Vector3.new(42, 24, 34),
 				Vector3.new(x, 12, z),
 				Enum.Material.Concrete,
 				Color3.fromRGB(139, 133, 119),
 				true,
-				"Building"
+				"TestBlock"
 			)
 		end
 	end
