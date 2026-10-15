@@ -22,6 +22,15 @@ local Config = {
 		MaxOriginOffset = 6,
 		RejectLogInterval = 2,
 	},
+
+	-- FL-018: regras públicas da partida; pontuação é alterada apenas no servidor.
+	Match = {
+		ScoreToWin = 5,
+		RoundDurationSeconds = 300,
+		IntermissionSeconds = 8,
+		SpawnProtectionSeconds = 3,
+		RespawnSeconds = 5,
+	},
 }
 
 return table.freeze(Config)

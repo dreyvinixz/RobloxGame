@@ -21,6 +21,7 @@ local started = false
 local states: {[Player]: WeaponState} = {}
 local stateEvent: RemoteEvent
 local worldExclusions: {Instance} = {}
+local matchService: any
 
 local function getOrCreateRemote(name: string): RemoteEvent
 	local remotes = ReplicatedStorage:WaitForChild(NetProtocol.RemoteFolderName)
@@ -108,18 +109,26 @@ local function applyShot(shooter: Player, shot: ShotPayload)
 	local model = result.Instance:FindFirstAncestorOfClass("Model")
 	local humanoid = model and model:FindFirstChildOfClass("Humanoid")
 	if not model or model == character or not humanoid or humanoid.Health <= 0 then return end
+	local targetPlayer = Players:GetPlayerFromCharacter(model)
+	if targetPlayer and not matchService.CanDamage(shooter, targetPlayer) then return end
 	local damage = def.damage * (if result.Instance.Name == "Head" then def.headshotMultiplier else 1)
+	local healthBefore = humanoid.Health
 	local ok, err = pcall(function() humanoid:TakeDamage(damage) end)
 	if not ok then
 		warn("[Frontline][FL-010] erro ao aplicar dano:", err)
 		return
 	end
+	if targetPlayer and healthBefore > 0 and humanoid.Health <= 0 then
+		matchService.RecordElimination(shooter, targetPlayer)
+	end
 	print(string.format("[Frontline][FL-010] HIT | %s -> %s | dmg=%.0f%s", shooter.Name, model.Name, damage,
 		if result.Instance.Name == "Head" then " [HEADSHOT]" else ""))
 end
 
-function DamageService.Start(combatRequestService: any)
+function DamageService.Start(combatRequestService: any, matchServiceArg: any)
 	if started then return end
+	assert(matchServiceArg, "MatchService ausente")
+	matchService = matchServiceArg
 	started = true
 	stateEvent = getOrCreateRemote(NetProtocol.WeaponStateEvent)
 	local reloadEvent = getOrCreateRemote(NetProtocol.ReloadWeaponEvent)

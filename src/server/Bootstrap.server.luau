@@ -6,12 +6,14 @@ local TrainingTargetService = require(script.Parent:WaitForChild("TrainingTarget
 local CombatRequestService = require(script.Parent:WaitForChild("CombatRequestService"))
 local DamageService = require(script.Parent:WaitForChild("DamageService"))
 local ViewmodelAssetService = require(script.Parent:WaitForChild("ViewmodelAssetService"))
+local MatchService = require(script.Parent:WaitForChild("MatchService"))
 
-ArenaBuilder.Build()
+local arena = ArenaBuilder.Build()
+MatchService.Start(arena)
 TrainingTargetService.Start()
 CombatRequestService.Start()
-DamageService.Start(CombatRequestService)
+DamageService.Start(CombatRequestService, MatchService)
 ViewmodelAssetService.Start()
 
--- Arena greybox (FL-007) | contrato de disparo (FL-009) | rifle (FL-010) | alvo (FL-011)
+-- Arena (FL-007) | combate (FL-009/010) | alvo (FL-011) | partida (FL-018)
 print("[Frontline][server] bootstrap ok | " .. Config.ProjectName)
