@@ -12,9 +12,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Config       = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
 local NetProtocol  = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("NetProtocol"))
 local WeaponConfig = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("WeaponConfig"))
+local ViewmodelController = require(script.Parent:WaitForChild("FirstPersonViewmodel"))
 
 local localPlayer  = Players.LocalPlayer
-local camera       = workspace.CurrentCamera
+local viewmodel    = ViewmodelController.new(localPlayer)
+viewmodel:Start()
 
 -- ─── RemoteEvent ──────────────────────────────────────────────────────────────
 
@@ -143,6 +145,8 @@ local function tryFire()
 	lastShotAt = now
 
 	-- Construir payload
+	local camera = workspace.CurrentCamera
+	if not camera then return end
 	local unitRay    = camera:ScreenPointToRay(
 		camera.ViewportSize.X / 2,
 		camera.ViewportSize.Y / 2
@@ -159,6 +163,7 @@ local function tryFire()
 	local targetPosition = if localRayResult
 		then localRayResult.Position
 		else origin + direction * weaponDef.maxRange
+	viewmodel:PlayFireAnimation()
 
 	-- Envia intenção ao servidor — servidor valida e aplica dano se aprovado
 	fireWeaponEvent:FireServer({
@@ -187,8 +192,14 @@ end
 
 weaponStateEvent.OnClientEvent:Connect(function(serverAmmo: number, serverReloading: boolean)
 	if typeof(serverAmmo) ~= "number" or typeof(serverReloading) ~= "boolean" then return end
+	local wasReloading = isReloading
 	ammo = math.clamp(math.floor(serverAmmo), 0, weaponDef.magazineSize)
 	isReloading = serverReloading
+	if isReloading and not wasReloading then
+		viewmodel:PlayReloadAnimation(weaponDef.reloadTime)
+	elseif not isReloading and wasReloading then
+		viewmodel:StopReloadAnimation()
+	end
 	updateHUD()
 	if ammo == 0 and not isReloading then
 		task.defer(function() startReload() end)
@@ -227,8 +238,13 @@ localPlayer.CharacterAdded:Connect(function()
 	isReloading = false
 	lastShotAt  = -math.huge
 	isTriggerHeld = false
+	viewmodel:StopReloadAnimation()
 	updateHUD()
 	showStatus("Rifle pronto")
+end)
+
+script.Destroying:Connect(function()
+	viewmodel:Destroy()
 end)
 
 -- ─── Init ────────────────────────────────────────────────────────────────────

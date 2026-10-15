@@ -282,7 +282,7 @@
       "FL-007",
       "FL-010"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-012",
@@ -307,7 +307,7 @@
     "dependencies": [
       "FL-011"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-013",
@@ -333,7 +333,7 @@
       "FL-005",
       "FL-012"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-014",
@@ -360,7 +360,7 @@
     "dependencies": [
       "FL-013"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-015",
