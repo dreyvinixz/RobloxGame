@@ -3,6 +3,7 @@
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
+local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
 local WeaponConfig = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("WeaponConfig"))
 local NetProtocol = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("NetProtocol"))
 
@@ -19,6 +20,7 @@ type WeaponState = { ammo: number, reloading: boolean, generation: number }
 local DamageService = {}
 local started = false
 local states: {[Player]: WeaponState} = {}
+local lastReloadRequestAt: {[Player]: number} = {}
 local stateEvent: RemoteEvent
 local worldExclusions: {Instance} = {}
 local matchService: any
@@ -139,6 +141,10 @@ function DamageService.Start(combatRequestService: any, matchServiceArg: any)
 	end
 	reloadEvent.OnServerEvent:Connect(function(player: Player, ...: any)
 		if select("#", ...) > 0 then return end
+		local now = os.clock()
+		local lastRequest = lastReloadRequestAt[player] or -math.huge
+		if now - lastRequest < Config.Combat.ReloadRequestInterval then return end
+		lastReloadRequestAt[player] = now
 		beginReload(player)
 	end)
 	combatRequestService.OnShotAccepted(function(player: Player, shot: ShotPayload)
@@ -155,7 +161,10 @@ function DamageService.Start(combatRequestService: any, matchServiceArg: any)
 		player.CharacterAdded:Connect(function() task.defer(resetState, player) end)
 		if player.Character then task.defer(sendState, player) end
 	end
-	Players.PlayerRemoving:Connect(function(player) states[player] = nil end)
+	Players.PlayerRemoving:Connect(function(player)
+		states[player] = nil
+		lastReloadRequestAt[player] = nil
+	end)
 	print("[Frontline][FL-010] dano e estado autoritativo do rifle ativos")
 end
 

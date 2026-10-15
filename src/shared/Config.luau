@@ -18,6 +18,7 @@ local Config = {
 	Combat = {
 		TestWeaponId = "TestRifle",
 		FireInterval = 0.12,
+		ReloadRequestInterval = 0.25,
 		MaxRange = 500,
 		MaxOriginOffset = 6,
 		RejectLogInterval = 2,
