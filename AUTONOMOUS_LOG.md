@@ -67,11 +67,10 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 
 ## Validação parcial da FL-019 — 2026-10-15
 
-- Revisão de `FireWeapon`: chaves exatas, vetores finitos, arma permitida, direção unitária e coerente com alvo, alcance, origem próxima à cabeça, cooldown e rejeição de argumentos extras. Dano permanece calculado por configuração do servidor.
-- Teste Studio sincronizado com servidor e dois clientes: `PASS | fire validation, valid damage and reload spam throttle | reload responses=2`. Dano válido aplicado, score não alterado em hit não letal; 50 pedidos de reload geraram duas respostas WeaponState.
-- O teste não capturou HP entre requisições inválidas e o tiro válido nem comparou HP simultaneamente entre clientes. A simulação não variou latência real.
-- Tentativas posteriores com snapshot de HP foram excluídas: Rojo desconectou e Studio executou o harness anterior. Scripts temporários foram removidos do root e não estão no branch.
-- `DamageService` limita reload a um pedido por 0.25 s/jogador e limpa o relógio ao sair. Critérios pendentes e limites em `docs/TEST_REPORTS/FL-019.md`. PR draft #50 empilhado sobre FL-018.
+- Revisão de `FireWeapon`: chaves exatas, vetores finitos, arma permitida, direção unitária e coerente com alvo, alcance, origem próxima à cabeça, cooldown e rejeição de argumentos extras. Dano permanece calculado por configuração do servidor. `DamageService` limita reload a um pedido por 0.25 s/jogador e limpa o relógio ao sair.
+- Retry Studio com 2 clientes reportado pelo responsável: extra `damage`, argumento extra e origem forjada deixaram HP em 100; tiro válido alterou HP server/cliente 100→75, observador também 75 e score permaneceu igual; 50 pedidos de reload geraram quatro respostas `WeaponState`.
+- Tentativa de latência configurou 120 ms mínimo em cada sentido e jitter de 20 ms em cada direção. `ExecuteMultiplayerTestAsync` não iniciou porque já havia outra sessão ativa. Não interrompi os testes FL-023 em andamento. O harness e sync temporários foram removidos, fontes restauradas ao snapshot, settings voltaram a zero; uma tentativa de abrir build isolada não produziu janela/conexão Studio utilizável e o processo iniciado foi encerrado.
+- Sem resultado condicionado à latência. FL-019 permanece parcial até repetir a bateria de 2 clientes com latência/jitter não-zero. Relatório em `docs/TEST_REPORTS/FL-019.md`; PR draft #50 empilhado sobre FL-018.
 
 ## Implementação parcial da FL-021 — 2026-10-15
 
@@ -147,3 +146,8 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 
 - Após a validação inicial, obtive Rojo 7.7.1 oficial para Windows x86_64 e confirmei o SHA-256 do zip com o digest da release GitHub. `rojo build <branch> --output <temp>.rbxlx` passou nos heads das branches dos PRs #54–#63 (issues #23–#27 e #28–#32). Binário e builds ficaram em `%TEMP%`; nenhum foi adicionado ao projeto.
 - A validação de serialização não demonstra comportamento Luau/Studio nem substitui os playtests ainda pendentes. Selene e StyLua seguem indisponíveis.
+
+## Integração final — 2026-10-15
+
+- README atualizado para refletir o protótipo local e o gate de release NO-GO. PR draft [#64](https://github.com/dreyvinixz/RobloxGame/pull/64) agrupa o sumário do stack e docs/TEST_REPORTS/INTEGRATION.md; sem push em main e sem publicação Roblox.
+

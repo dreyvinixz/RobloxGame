@@ -1,6 +1,6 @@
 # Project Frontline — Roblox tactical FPS (projeto independente)
 
-> **Status:** planejamento e scaffold v0.1.0 · **Tipo:** projeto independente de FPS militar no Roblox · **Não afiliado à EA, Battlefield ou Roblox Corporation.**
+> **Status:** protótipo local em desenvolvimento · **Gate:** NO-GO para alfa/publicação · **Tipo:** projeto independente de FPS militar no Roblox · **Não afiliado à EA, Battlefield ou Roblox Corporation.**
 
 **Visão:** criar FPS multiplayer militar com referências de ritmo, balística e cenários de Battlefield 6, mas com modelos e código de procedência autorizada. **Sem modelagem manual obrigatória:** Creator Store + geração 3D autorizada + assets licenciados. Não há promessa de integrar diretamente os executáveis Roblox/BF6.
 
@@ -37,7 +37,9 @@ O repositório GitHub é [dreyvinixz/RobloxGame](https://github.com/dreyvinixz/R
 - IA **não** faz compras, publicação externa ou inclusão de assets sem licença sem aprovação explícita.
 
 ## Estado atual
-Inclui documentação, planejamento, templates, scripts mínimos de bootstrap e verificador de consistência. **Não é um jogo jogável ainda.** O primeiro loop combatível é a meta da Sprint 1.
+O projeto tem um protótipo local com arena greybox modular, movimento FPS, rifle/pistola hitscan validados no servidor, alvo de treino, equipes/placar, cobertura destrutível, HUD e scout procedural dirigido no servidor. Esses sistemas foram desenvolvidos e verificados em etapas, mas a sessão integrada de aceitação multiplayer ainda não foi aprovada. Consulte [`docs/TEST_REPORTS/INTEGRATION.md`](docs/TEST_REPORTS/INTEGRATION.md) e o gate NO-GO em [`docs/TEST_REPORTS/FL-023.md`](docs/TEST_REPORTS/FL-023.md).
+
+O ciclo de dano/destruição/reset do veículo e o perfil de desempenho S4 seguem sem validação completa de Studio. A classificação de conteúdo, configurações finais, controles em smartphone real, bots, segundo mapa e pacote de áudio/efeitos também não foram aceitos. Portanto, este repositório descreve um protótipo de desenvolvimento, **não** uma versão alfa pronta para jogadores ou publicação.
 
 ## Referências oficiais
 - Roblox MCP: https://create.roblox.com/docs/studio/mcp
