@@ -4,8 +4,8 @@ Atualizado em 2026-10-15. Este registro acompanha as issues abertas #13–#32. `
 
 | Issue | Estado | PR | Decisão e pendência principal |
 |---|---|---|---|
-| #13 FL-013 | Parcial | [#43](https://github.com/dreyvinixz/RobloxGame/pull/43) | Direção visual, guia, seleção e procedência registrados; validação estática, 3 testes Python e Rojo build passaram. PR aguarda revisão; assets seguem em quarentena para FL-014. |
-| #14 FL-014 | Parcial | [#44](https://github.com/dreyvinixz/RobloxGame/pull/44), PR de aprovação pendente | Aprovados para prototipagem o rifle visual limpo, rig R15 e três props. Studio confirmou 4/31/10 conteúdos carregados; bus stop reposicionado em X=112 e percurso local sem bloqueio. Dependências fora desta experiência local e integração final ficam registradas como limites. |
+| #13 FL-013 | Parcial | [#43](https://github.com/dreyvinixz/RobloxGame/pull/43) | Direção visual, guia, seleção e procedência registrados; validação estática, 3 testes Python e Rojo build passaram. PR #43 foi integrado à branch FL-012; a pilha ainda aguarda integração à `main`. |
+| #14 FL-014 | Parcial | [#44](https://github.com/dreyvinixz/RobloxGame/pull/44), [#45](https://github.com/dreyvinixz/RobloxGame/pull/45) | Aprovados para prototipagem o rifle visual limpo, rig R15 e três props. Studio confirmou 4/31/10 conteúdos carregados; bus stop reposicionado em X=112 e percurso local sem bloqueio. PR #45 está aberto sobre a branch de dependência; integração final e permissões fora desta experiência local permanecem pendentes. |
 | #15 FL-015 | Pendente | — | Viewmodel R15 depende do kit aprovado. |
 | #16 FL-016 | Parcial | Pendente | Há branch com arena modular nativa; integrar os três props escolhidos sem sobreposição após FL-014. Fachada importada é condicional. |
 | #17 FL-017 | Pendente | — | Medir arena persistida em hardware-alvo. |
@@ -42,4 +42,4 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - Aprovados apenas os clones sem scripts: rifle visual, rig técnico R15 e três props urbanos. Os originais e o sistema de arma importado seguem em quarentena.
 - O ponto de ônibus sobrepunha o bloco de teste em X=84; foi movido no Place1 salvo para X=112. A caixa AABB não cruza estruturas e o personagem percorreu a rota lateral no Play com 100 HP.
 - PreloadAsync em instâncias reais: 4/4 conteúdos do rifle, 31/31 do rig e 10/10 do kit urbano com Success. Isso não comprova acesso numa experiência publicada diferente.
-- PR de follow-up usa feat/FL-014-approve-assets sobre a branch de dependência FL-014. A issue permanece aberta até integração na main; FL-016 ainda deve versionar as posições e colisões finais.
+- PR [#45](https://github.com/dreyvinixz/RobloxGame/pull/45) usa `feat/FL-014-approve-assets` sobre a branch de dependência FL-014. A issue permanece aberta até integração na `main`; FL-016 ainda deve versionar as posições e colisões finais.
