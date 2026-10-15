@@ -142,3 +142,8 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 ## Preparação parcial FL-032 — 2026-10-15
 
 - Inspeção encontrou sprint/fire/reload/equip/vehicle control mapeados a teclado/mouse. HUD tem apenas Device Simulator layout evidence da FL-022. Plano de touch e aceitação física registrado; nenhum smartphone real foi usado e nenhum código de controle foi adicionado.
+
+## Verificação retrospectiva de build Rojo — 2026-10-15
+
+- Após a validação inicial, obtive Rojo 7.7.1 oficial para Windows x86_64 e confirmei o SHA-256 do zip com o digest da release GitHub. `rojo build <branch> --output <temp>.rbxlx` passou nos heads das branches dos PRs #54–#63 (issues #23–#27 e #28–#32). Binário e builds ficaram em `%TEMP%`; nenhum foi adicionado ao projeto.
+- A validação de serialização não demonstra comportamento Luau/Studio nem substitui os playtests ainda pendentes. Selene e StyLua seguem indisponíveis.
