@@ -73,7 +73,9 @@ local function createVehicle(arena: Model): (Model, VehicleSeat)
 	model:SetAttribute("AssetSource", "Procedural primitives; no external assets")
 	model:SetAttribute("DriverUserId", 0)
 	model:SetAttribute("Speed", 0)
-	local pivot = CFrame.new(0, 1.15, -8)
+	-- The modular road surface is at Y=2.12 and remains raycast-queryable. Keep
+	-- the chassis/wheels above it so valid weapon rays can reach the vehicle.
+	local pivot = CFrame.new(0, 3.15, -8)
 	model:SetAttribute("VehicleMaxHealth", vehicleConfig.MaxHealth)
 	model:SetAttribute("VehicleHealth", vehicleConfig.MaxHealth)
 	model:SetAttribute("VehicleState", "Active")
