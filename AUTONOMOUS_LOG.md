@@ -23,7 +23,7 @@ Atualizado em 2026-10-15. Este registro acompanha as issues abertas #13–#32. `
 | #29 FL-029 | Parcial / bloqueado | [#60](https://github.com/dreyvinixz/RobloxGame/pull/60) | Plano server-authoritative e experimento em `docs/AI_BOT_READINESS.md`; implementação aguardará FL-023 NO-GO e perfil S4. |
 | #30 FL-030 | Parcial / bloqueado | [#61](https://github.com/dreyvinixz/RobloxGame/pull/61) | Plano de reuso e rotação server-owned em `docs/MAP_2_READINESS.md`; aguardando FL-027 NO-GO. |
 | #31 FL-031 | Parcial / bloqueado | [#62](https://github.com/dreyvinixz/RobloxGame/pull/62) | Design de assets, mix e pool cosmetic em `docs/AUDIO_VFX_READINESS.md`; aguarda FL-027. Nenhum efeito importado. |
-| #32 FL-032 | Pendente | — | Controles mobile e teste em aparelho real. |
+| #32 FL-032 | Parcial / bloqueado | [#63](https://github.com/dreyvinixz/RobloxGame/pull/63) | Gaps desktop-only e plano touch/dispositivo físico em `docs/MOBILE_READINESS.md`; aguarda FL-027 e smartphone real. |
 
 ## Decisões de FL-013
 
@@ -138,3 +138,12 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 ## Preparação parcial FL-031 — 2026-10-15
 
 - Definidos gates de licença, pool de partículas limitado, feedback cosmetic e teste A/B com duas sessões e dois clientes. Nenhum audio/efeito adicionado, sem compras e sem medida A/B.
+
+## Preparação parcial FL-032 — 2026-10-15
+
+- Inspeção encontrou sprint/fire/reload/equip/vehicle control mapeados a teclado/mouse. HUD tem apenas Device Simulator layout evidence da FL-022. Plano de touch e aceitação física registrado; nenhum smartphone real foi usado e nenhum código de controle foi adicionado.
+
+## Verificação retrospectiva de build Rojo — 2026-10-15
+
+- Após a validação inicial, obtive Rojo 7.7.1 oficial para Windows x86_64 e confirmei o SHA-256 do zip com o digest da release GitHub. `rojo build <branch> --output <temp>.rbxlx` passou nos heads das branches dos PRs #54–#63 (issues #23–#27 e #28–#32). Binário e builds ficaram em `%TEMP%`; nenhum foi adicionado ao projeto.
+- A validação de serialização não demonstra comportamento Luau/Studio nem substitui os playtests ainda pendentes. Selene e StyLua seguem indisponíveis.
