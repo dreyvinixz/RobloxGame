@@ -8,10 +8,10 @@
 
 | Issues | PRs | State at integration review |
 |---|---|---|
-| #13–#22 | #43–#53 | Partial; targeted reports exist, several video/standalone/latency/integrated acceptance details remain open. |
+| #13–#22 | #43–#53 | Partial; #19 retry confirmed invalid requests leave HP 100, valid server/client/observer HP 100→75, steady score, and four responses to 50 reloads. Explicit latency/jitter run remains open; other video, standalone, and integrated acceptance details remain open. |
 | #23 | #54 | NO-GO. Integrated QA-01–QA-11, QA-10's ten-minute run, latency variation, HUD reset proof, zero P0 blockers, and human MVP acceptance are not demonstrated. |
 | #28 | #55 | Research partial; recommends no-go for live cross-process BF6 integration and documents safe official alternatives. |
-| #24 | #56 | Partial; player driving route and observer/video checks remain open. A valid rifle request exposed `Street_EW_0` occluding the vehicle ray; the scout pivot was raised to Y=3.15. Post-fix Play verification remains open. |
+| #24 | #56 | Partial; player driving route and observer/video checks remain open. A valid rifle request exposed `Street_EW_0` occluding the vehicle ray; the scout pivot was raised to Y=3.15. Post-fix single-client Play confirmed the raycast hit and health 300→275. Full driving route and observer/video checks remain open. |
 | #25 | #57 | Partial; single-client Studio confirmed valid shot damage, destruction/ejection/seat lockout, rejected re-entry, and nearby reset to one healthy scout. A temporary queryable obstacle caused collision damage 300→290.4 and stopped the vehicle; after obstacle removal the same driver resumed movement. Two-client replication, spam/cooldown, and late-join checks remain open. |
 | #26 | #58 | Partial; only an S2 idle baseline is numeric. Comparable S4/MicroProfiler/standalone and leak/warning evidence absent. |
 | #27 | #59 | NO-GO; checklist/changelog/rollback prepared, owner content/privacy/settings review and upstream P0 gates remain open. No publication occurred. |
