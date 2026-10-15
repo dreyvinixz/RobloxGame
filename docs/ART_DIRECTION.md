@@ -1,6 +1,6 @@
-# Direção de arte — FL-013 (rascunho condicionado à FL-012)
+# Direção de arte — FL-013
 
-**Estado:** pesquisa e comparação iniciadas; seleção final aguarda benchmark no Studio.
+**Estado:** direção aprovada pelo proprietário; dois assets gratuitos selecionados para inspeção em quarentena. Auditoria e benchmark no Studio pendentes.
 
 **Data da consulta ao Creator Store:** 2026-10-15.
 **Objetivo aprovado:** FPS militar urbano contemporâneo, original, legível e compatível com a escala Roblox. Sem reproduzir marcas, mapas, uniformes ou trade dress identificável de Battlefield.
@@ -21,9 +21,11 @@ Contagens são as mostradas nas páginas públicas do Creator Store na data acim
 |---|---|---|---|---|
 | [Modular Building Kit — Modern City](https://create.roblox.com/store/asset/13168370735/Modular-Building-Kit-Modern-City) | `@Roblox` | 796.055 triângulos, 3.025 MeshParts, 36 decals, 4 áudios e 8 scripts | Get Model no Creator Store; seguir os termos vigentes e conferir dependências | Modular e útil como referência, mas o pacote inteiro excede o orçamento preliminar e os scripts exigem auditoria; não selecionar completo. |
 | [Synty City Pack](https://create.roblox.com/store/asset/6933556508/Synty-City-Pack) | `@Roblox` | 256.709 triângulos e 332 MeshParts | Get Model no Creator Store; descrição informa licença da versão Roblox para uso em jogos Roblox; confirmar dependências e termos no momento da ingestão | Escala moderada, conteúdo modular e estilo low-poly consistente; destoa da direção de realismo estilizado contemporâneo. Manter como alternativa estilizada, sem aprovação. |
-| [Realistic Urban City](https://create.roblox.com/store/asset/95798439683690/Realistic-Urban-City) | `@2XQUISITE_DESIGNS` | 23.119 triângulos, 45 MeshParts e 11 decals; a página não informa contagem de scripts | US$ 3,99 na consulta; Creator Store e termos aplicáveis. Compra não autorizada nem realizada | Melhor correspondência aparente com a direção e pacote pequeno, porém recente, com poucas avaliações e script count não publicado. Candidato condicionado a aprovação de compra, auditoria e teste. |
+| [New York City Corner Apartment Building](https://create.roblox.com/store/asset/14243660153/New-York-City-Corner-Apartment-Building) | `@Lihtsameelseke` | A listagem não expõe contagem de triângulos, MeshParts ou scripts | Get Model gratuito; Creator Store ToU aplicam-se; confirmar permissões das dependências na ingestão | **Escolhido pelo proprietário para inspeção.** Fachada urbana contemporânea que parece compatível com a direção. Escala, scripts, geometria e desempenho ainda precisam ser verificados no Studio. |
+| [City Props Pack](https://create.roblox.com/store/asset/6370681139) | `@Roblox` | 66.318 triângulos, 94 MeshParts e 2 scripts; inclui props urbanos e materiais PBR | Get Model gratuito; Creator Store ToU aplicam-se; confirmar permissões das dependências na ingestão | **Escolhido pelo proprietário para inspeção.** Complementa a fachada com detalhes urbanos; auditar os 2 scripts e selecionar somente os props coerentes com a paleta. |
+| [Realistic Urban City](https://create.roblox.com/store/asset/95798439683690/Realistic-Urban-City) | `@2XQUISITE_DESIGNS` | 23.119 triângulos, 45 MeshParts e 11 decals; a página não informa contagem de scripts | US$ 3,99 na consulta; não cabe no orçamento disponível | Descartado pelo proprietário por ser pago. Não comprar nem usar. |
 
-O Creator Store informa que a página do asset apresenta distribuidor, tipo, descrição e detalhes técnicos; assets podem conter scripts. A política da Roblox exige aderência aos Termos de Uso e recomenda auditoria antes de usar itens de terceiros. Os três itens ficam em `DISCOVERED`: nenhum foi inserido no jogo, auditado ou aprovado para uso.
+O Creator Store informa distribuidor, tipo, descrição e dados técnicos quando disponíveis; alguns modelos incluem scripts. A política da Roblox exige aderência aos Termos de Uso e recomenda auditoria antes do uso. Os dois itens escolhidos permanecem `DISCOVERED` na quarentena planejada: ainda não foram inseridos, auditados ou aprovados para a arena.
 
 ## Qualidade e orçamento preliminares
 
@@ -36,7 +38,7 @@ Direção proposta: **realismo estilizado contido**. Manter formas, escala e des
 | Elemento de destaque | até 25.000 | até 8 MeshParts | até 2 mapas 1024²; usar com parcimônia |
 | Cena visível da arena inicial | alvo provisório até 250.000 no total | alvo provisório até 300 MeshParts | reusar atlas/material sempre que possível |
 
-Estes números são **hipóteses de trabalho**, não limites finais nem resultados medidos. A FL-012 deve registrar FPS e memória na arena greybox primeiro. Rever o orçamento se o baseline não sustentar a meta hipotética de 60 FPS desktop indicada no PRD.
+Os limites por asset continuam **hipóteses de trabalho**, não resultados medidos. No baseline de greybox informado pelo proprietário para a FL-012 foram observados 60 FPS e 1,6 GB de memória; isso não mede o impacto dos novos assets. Comparar novamente no Studio após inserir os itens em quarentena e remover qualquer peça/scripts desnecessários. A meta de 60 FPS desktop é inicial e deve ser avaliada em hardware semelhante ao do playtest.
 
 ## Guia de materiais
 
@@ -48,13 +50,15 @@ Estes números são **hipóteses de trabalho**, não limites finais nem resultad
 
 ## Gate de seleção e ingestão
 
-1. Concluir a FL-012 e substituir os orçamentos hipotéticos pelo baseline observado.
-2. Confirmar preço, autor, permissões e termos atuais da coleção escolhida.
-3. Para item pago, obter autorização explícita antes de comprar.
-4. Importar o candidato para quarentena; auditar scripts, dependências, meshes, texturas, colisões e escala.
-5. Registrar a evidência no `assets/registry.csv`; só marcar `APPROVED` após revisão e teste de performance.
+1. Registrar o baseline greybox da FL-012: 60 FPS e 1,6 GB, conforme relato do proprietário; comparar após a auditoria no Studio.
+2. Conferir na inserção o autor, Get Model, permissões e termos vigentes dos dois assets escolhidos.
+3. Inserir somente em um lugar/cena de quarentena; inspecionar descendentes, scripts, dependências, meshes, texturas, colisões e escala antes de habilitar código.
+4. Harmonizar os props selecionados com a paleta e os materiais da direção visual.
+5. Registrar evidência no `assets/registry.csv`; só marcar `APPROVED` depois da revisão e do teste de desempenho. O pacote pago está descartado por falta de orçamento.
 
 ## Fontes
 
 - [Roblox Creator Store — documentação e segurança de assets](https://create.roblox.com/docs/production/creator-store)
 - [Roblox — montagem de ambientes modulares](https://create.roblox.com/docs/tutorials/use-case-tutorials/modeling/assemble-modular-environments)
+- [New York City Corner Apartment Building — Creator Store](https://create.roblox.com/store/asset/14243660153/New-York-City-Corner-Apartment-Building)
+- [City Props Pack — Creator Store](https://create.roblox.com/store/asset/6370681139)
