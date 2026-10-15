@@ -22,7 +22,7 @@ Atualizado em 2026-10-15. Este registro acompanha as issues abertas #13–#32. `
 | #27 FL-027 | Parcial / NO-GO | [#59](https://github.com/dreyvinixz/RobloxGame/pull/59) | Checklist e changelog draft, runbook de rollback e revisão estática de assets/privacidade em `docs/ALPHA_RELEASE_CHECKLIST.md`. FL-023, FL-025 e FL-026 mantêm gates abertos; nada foi publicado. |
 | #28 FL-028 | Parcial | [#55](https://github.com/dreyvinixz/RobloxGame/pull/55) | ADR-0002 recomenda NO-GO para ponte com processo BF6 ao vivo; GO somente para Roblox independente, workflow Portal dentro do escopo oficial ou mock sintético. Fontes oficiais, obstáculos e política anticheat documentados; sem alteração de executáveis. |
 | #29 FL-029 | Parcial / bloqueado | [#60](https://github.com/dreyvinixz/RobloxGame/pull/60) | Plano server-authoritative e experimento em `docs/AI_BOT_READINESS.md`; implementação aguardará FL-023 NO-GO e perfil S4. |
-| #30 FL-030 | Parcial / bloqueado | — | Plano de reuso e rotação server-owned em `docs/MAP_2_READINESS.md`; aguardando FL-027 NO-GO. |
+| #30 FL-030 | Parcial / bloqueado | [#61](https://github.com/dreyvinixz/RobloxGame/pull/61) | Plano de reuso e rotação server-owned em `docs/MAP_2_READINESS.md`; aguardando FL-027 NO-GO. |
 | #31 FL-031 | Pendente | — | Áudio e efeitos após alpha. |
 | #32 FL-032 | Pendente | — | Controles mobile e teste em aparelho real. |
 
