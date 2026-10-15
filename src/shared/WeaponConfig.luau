@@ -12,17 +12,35 @@ export type WeaponDef = {
 	reloadTime: number,     -- segundos para recarregar
 	maxRange: number,       -- studs — igual ao Config.Combat.MaxRange por enquanto
 	headshotMultiplier: number, -- multiplicador de dano em headshot
+	dropoffStart: number, -- distância em studs onde começa a redução de dano
+	dropoffEnd: number, -- distância em studs onde chega ao dano mínimo
+	minimumDamage: number, -- HP mínimo por hit antes do multiplicador de headshot
 }
 
 local WeaponConfig: { [string]: WeaponDef } = {
 	TestRifle = {
 		id                = "TestRifle",
-		damage            = 25,   -- 4 hits para matar (100 HP padrão)
-		fireInterval      = 0.12, -- ~500 RPM — deve coincidir com Config.Combat.FireInterval
+		damage            = 25,   -- 4 hits para matar antes do dropoff (100 HP padrão)
+		fireInterval      = 0.12, -- 500 RPM
 		magazineSize      = 30,
 		reloadTime        = 2.2,
 		maxRange          = 500,
 		headshotMultiplier = 2.0,
+		dropoffStart      = 150,
+		dropoffEnd        = 500,
+		minimumDamage     = 12.5,
+	},
+	ServicePistol = {
+		id                = "ServicePistol",
+		damage            = 34, -- 3 hits para matar antes do dropoff
+		fireInterval      = 0.28, -- ~214 RPM
+		magazineSize      = 12,
+		reloadTime        = 1.6,
+		maxRange          = 350,
+		headshotMultiplier = 1.8,
+		dropoffStart      = 80,
+		dropoffEnd        = 350,
+		minimumDamage     = 17,
 	},
 }
 

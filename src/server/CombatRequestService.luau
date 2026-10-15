@@ -5,6 +5,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
 local NetProtocol = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("NetProtocol"))
+local WeaponConfig = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("WeaponConfig"))
 
 type ShotPayload = {
 	weaponId: string,
@@ -17,7 +18,10 @@ type ShotPayload = {
 local CombatRequestService = {}
 local lastRequestAt: {[Player]: number} = {}
 local lastRejectLogAt: {[Player]: {[string]: number}} = {}
+local equippedWeapon: {[Player]: string} = {}
+local lastEquipRequestAt: {[Player]: number} = {}
 local shotAccepted = Instance.new("BindableEvent")
+local weaponEquipped = Instance.new("BindableEvent")
 local started = false
 
 local function getOrCreateFireEvent(): RemoteEvent
@@ -32,6 +36,19 @@ local function getOrCreateFireEvent(): RemoteEvent
 	fireEvent.Name = NetProtocol.FireWeaponEvent
 	fireEvent.Parent = remotes
 	return fireEvent
+end
+
+local function getOrCreateRemote(name: string): RemoteEvent
+	local remotes = ReplicatedStorage:WaitForChild(NetProtocol.RemoteFolderName)
+	local existing = remotes:FindFirstChild(name)
+	if existing then
+		assert(existing:IsA("RemoteEvent"), name .. " precisa ser RemoteEvent")
+		return existing
+	end
+	local event = Instance.new("RemoteEvent")
+	event.Name = name
+	event.Parent = remotes
+	return event
 end
 
 local function reject(player: Player, reason: string)
@@ -69,9 +86,10 @@ local function validateShot(player: Player, payload: any): (ShotPayload?, string
 	if typeof(payload) ~= "table" or not hasExactPayloadKeys(payload) then
 		return nil, "payload_shape"
 	end
-	if typeof(payload.weaponId) ~= "string" or payload.weaponId ~= Config.Combat.TestWeaponId then
+	if typeof(payload.weaponId) ~= "string" or not WeaponConfig[payload.weaponId] then
 		return nil, "weapon_id"
 	end
+	if payload.weaponId ~= equippedWeapon[player] then return nil, "weapon_not_equipped" end
 	if typeof(payload.origin) ~= "Vector3" or not isFiniteVector3(payload.origin) then
 		return nil, "origin_type_or_value"
 	end
@@ -86,12 +104,13 @@ local function validateShot(player: Player, payload: any): (ShotPayload?, string
 	if directionMagnitude < 0.99 or directionMagnitude > 1.01 then
 		return nil, "direction_not_unit"
 	end
-	if Config.Combat.MaxRange <= 0 then
+	local weapon = WeaponConfig[payload.weaponId]
+	if not weapon or weapon.maxRange <= 0 then
 		return nil, "weapon_range_invalid"
 	end
 	local targetOffset = payload.targetPosition - payload.origin
 	local targetDistance = targetOffset.Magnitude
-	if targetDistance < 0.01 or targetDistance > Config.Combat.MaxRange then
+	if targetDistance < 0.01 or targetDistance > weapon.maxRange then
 		return nil, "target_out_of_range"
 	end
 	if payload.direction.Unit:Dot(targetOffset.Unit) < 0.98 then
@@ -115,7 +134,7 @@ local function validateShot(player: Player, payload: any): (ShotPayload?, string
 		origin = payload.origin,
 		direction = payload.direction.Unit,
 		targetPosition = payload.targetPosition,
-		maxRange = Config.Combat.MaxRange,
+		maxRange = weapon.maxRange,
 	}, nil
 end
 
@@ -126,10 +145,31 @@ function CombatRequestService.Start()
 	started = true
 
 	local fireEvent = getOrCreateFireEvent()
+	local equipEvent = getOrCreateRemote(NetProtocol.EquipWeaponEvent)
+	local function assignDefault(player: Player)
+		equippedWeapon[player] = Config.Combat.TestWeaponId
+	end
+	Players.PlayerAdded:Connect(assignDefault)
+	for _, player in Players:GetPlayers() do assignDefault(player) end
+	equipEvent.OnServerEvent:Connect(function(player: Player, weaponId: any, ...: any)
+		if select("#", ...) > 0 or typeof(weaponId) ~= "string" or not WeaponConfig[weaponId] then
+			reject(player, "equip_weapon_id")
+			return
+		end
+		local now = os.clock()
+		if now - (lastEquipRequestAt[player] or -math.huge) < Config.Combat.EquipRequestInterval then return end
+		lastEquipRequestAt[player] = now
+		if equippedWeapon[player] == weaponId then return end
+		equippedWeapon[player] = weaponId
+		weaponEquipped:Fire(player, weaponId)
+	end)
 	fireEvent.OnServerEvent:Connect(function(player: Player, payload: any, ...: any)
 		local now = os.clock()
 		local lastRequest = lastRequestAt[player] or -math.huge
-		if now - lastRequest < Config.Combat.FireInterval then
+		local weaponId = if typeof(payload) == "table" and typeof(payload.weaponId) == "string" then payload.weaponId else ""
+		local weapon = WeaponConfig[weaponId]
+		if not weapon then reject(player, "weapon_id"); return end
+		if now - lastRequest < weapon.fireInterval then
 			reject(player, "fire_interval")
 			return
 		end
@@ -154,6 +194,8 @@ function CombatRequestService.Start()
 	Players.PlayerRemoving:Connect(function(player)
 		lastRequestAt[player] = nil
 		lastRejectLogAt[player] = nil
+		equippedWeapon[player] = nil
+		lastEquipRequestAt[player] = nil
 	end)
 
 	print("[Frontline][FL-009] contrato FireWeapon ativo | validação server-side")
@@ -161,6 +203,10 @@ end
 
 function CombatRequestService.OnShotAccepted(callback: (Player, ShotPayload) -> ()): RBXScriptConnection
 	return shotAccepted.Event:Connect(callback)
+end
+
+function CombatRequestService.OnWeaponEquipped(callback: (Player, string) -> ()): RBXScriptConnection
+	return weaponEquipped.Event:Connect(callback)
 end
 
 return CombatRequestService

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="680" viewBox="0 0 1200 680" role="img" aria-labelledby="title desc">
+  <title id="title">Project Frontline — moodboard de direção artística</title>
+  <desc id="desc">Moodboard original de uma rua urbana militar estilizada, com fachadas modulares, cobertura clara e paleta dessaturada.</desc>
+  <rect width="1200" height="680" fill="#20272d"/>
+  <text x="52" y="56" fill="#f0eee8" font-family="Arial, sans-serif" font-size="28" font-weight="700">PROJECT FRONTLINE</text>
+  <text x="52" y="88" fill="#b8b7b0" font-family="Arial, sans-serif" font-size="16" letter-spacing="2">DIREÇÃO VISUAL · URBANO CONTEMPORÂNEO · RASCUNHO FL-013</text>
+
+  <rect x="52" y="118" width="1096" height="390" rx="8" fill="#697983"/>
+  <rect x="52" y="118" width="1096" height="184" rx="8" fill="#8a9aa1"/>
+  <path d="M52 300 L1148 300 L1148 508 L52 508Z" fill="#77766f"/>
+  <path d="M52 372 L1148 372 L1148 508 L52 508Z" fill="#373b3e"/>
+  <path d="M52 416 L1148 416" stroke="#b79d70" stroke-width="3" stroke-dasharray="28 22" opacity=".75"/>
+
+  <g fill="#555f63">
+    <path d="M95 300V205H270V300Z"/><path d="M112 205V173H250V205Z"/>
+    <path d="M330 300V158H493V300Z"/><path d="M352 158V135H470V158Z"/>
+    <path d="M760 300V191H922V300Z"/><path d="M782 191V164H901V191Z"/>
+    <path d="M972 300V220H1113V300Z"/><path d="M994 220V196H1093V220Z"/>
+  </g>
+  <g fill="#a79572" opacity=".72">
+    <rect x="123" y="225" width="27" height="38"/><rect x="166" y="225" width="27" height="38"/><rect x="211" y="225" width="27" height="38"/>
+    <rect x="363" y="182" width="31" height="42"/><rect x="416" y="182" width="31" height="42"/>
+    <rect x="794" y="215" width="29" height="39"/><rect x="845" y="215" width="29" height="39"/><rect x="895" y="215" width="14" height="39"/>
+    <rect x="1000" y="239" width="27" height="32"/><rect x="1045" y="239" width="27" height="32"/>
+  </g>
+  <g fill="#46535b">
+    <rect x="615" y="270" width="72" height="102" rx="2"/>
+    <rect x="600" y="263" width="102" height="15" rx="2"/>
+  </g>
+  <rect x="706" y="246" width="18" height="46" rx="2" fill="#c28b49"/>
+  <path d="M716 250V227" stroke="#d9d5ca" stroke-width="4"/>
+  <circle cx="716" cy="221" r="7" fill="#d9d5ca"/>
+
+  <text x="78" y="476" fill="#ece9df" font-family="Arial, sans-serif" font-size="14" letter-spacing="1.5">RUA COMPACTA · FACHADAS MODULARES · COBERTURA DESTACADA · SINALIZAÇÃO CONTIDA</text>
+
+  <text x="52" y="552" fill="#d6d3ca" font-family="Arial, sans-serif" font-size="16" font-weight="700" letter-spacing="1">PALETA ORIGINAL</text>
+  <g font-family="Arial, sans-serif" font-size="13" fill="#e5e2d9">
+    <rect x="52" y="570" width="154" height="58" rx="5" fill="#77766f"/><text x="64" y="650">CONCRETO · #77766F</text>
+    <rect x="233" y="570" width="154" height="58" rx="5" fill="#373b3e"/><text x="245" y="650">ASFALTO · #373B3E</text>
+    <rect x="414" y="570" width="154" height="58" rx="5" fill="#46535b"/><text x="426" y="650">AÇO · #46535B</text>
+    <rect x="595" y="570" width="154" height="58" rx="5" fill="#60634d"/><text x="607" y="650">OLIVE · #60634D</text>
+    <rect x="776" y="570" width="154" height="58" rx="5" fill="#a79572"/><text x="788" y="650">POEIRA · #A79572</text>
+    <rect x="957" y="570" width="154" height="58" rx="5" fill="#c28b49"/><text x="969" y="650">SINAL · #C28B49</text>
+  </g>
+</svg>

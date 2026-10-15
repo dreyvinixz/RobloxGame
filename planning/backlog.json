@@ -282,7 +282,7 @@
       "FL-007",
       "FL-010"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-012",
@@ -307,7 +307,7 @@
     "dependencies": [
       "FL-011"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-013",
@@ -333,7 +333,7 @@
       "FL-005",
       "FL-012"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-014",
@@ -360,7 +360,7 @@
     "dependencies": [
       "FL-013"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-015",
@@ -593,7 +593,7 @@
       "FL-021",
       "FL-022"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-024",
@@ -605,11 +605,11 @@
     "title": "Integrar primeiro veículo terrestre dirigido",
     "goal": "Validar sistema de veículo sem física avançada prematura.",
     "implementation": [
-      "Selecionar chassi com licença",
-      "auditar scripts",
-      "conectar controle",
-      "câmera",
-      "entrar/sair."
+      "Usar chassi procedural autorado, sem custo ou dependência externa",
+      "auditar proveniência e scripts",
+      "conectar controles com validação no servidor",
+      "câmera de acompanhamento local",
+      "entrar/sair com validação de proximidade e ocupação."
     ],
     "acceptance": [
       "Um jogador entra, dirige, sai",
@@ -620,7 +620,7 @@
       "FL-014",
       "FL-023"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-025",
@@ -646,7 +646,7 @@
     "dependencies": [
       "FL-024"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-026",
@@ -671,7 +671,7 @@
       "FL-025",
       "FL-017"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-027",
@@ -699,7 +699,7 @@
       "FL-023",
       "FL-026"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-028",
@@ -745,7 +745,7 @@
     "dependencies": [
       "FL-023"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-030",
@@ -768,7 +768,7 @@
     "dependencies": [
       "FL-027"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-031",
@@ -791,7 +791,7 @@
     "dependencies": [
       "FL-027"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-032",
@@ -813,6 +813,6 @@
     "dependencies": [
       "FL-027"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   }
 ]

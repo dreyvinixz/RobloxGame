@@ -21,13 +21,13 @@ FL-019,S3,P0,security,network,5,TODO,Validar combate multiplayer e resistência 
 FL-020,S3,P0,feature,weapons,3,TODO,Adicionar pistola e balancear rifle,FL-019
 FL-021,S3,P1,feature,destruction,5,TODO,Implementar cobertura destrutível autoritativa,FL-019
 FL-022,S3,P1,feature,ui,3,TODO,"Criar HUD básico de HP, munição e placar","FL-018,FL-020"
-FL-023,S3,P0,test,quality,3,TODO,Conduzir teste de aceitação multiplayer MVP,"FL-019,FL-020,FL-021,FL-022"
-FL-024,S4,P1,feature,vehicles,5,TODO,Integrar primeiro veículo terrestre dirigido,"FL-014,FL-023"
-FL-025,S4,P1,feature,vehicles,5,TODO,Sincronizar dano e estado do veículo no servidor,FL-024
-FL-026,S4,P1,test,performance,3,TODO,Realizar profiling e estabilização,"FL-025,FL-017"
-FL-027,S4,P0,chore,release,3,TODO,Preparar pacote alfa e checklist de publicação,"FL-023,FL-026"
+FL-023,S3,P0,test,quality,3,IN_PROGRESS,Conduzir teste de aceitação multiplayer MVP,"FL-019,FL-020,FL-021,FL-022"
+FL-024,S4,P1,feature,vehicles,5,IN_PROGRESS,Integrar primeiro veículo terrestre dirigido,"FL-014,FL-023"
+FL-025,S4,P1,feature,vehicles,5,IN_PROGRESS,Sincronizar dano e estado do veículo no servidor,FL-024
+FL-026,S4,P1,test,performance,3,IN_PROGRESS,Realizar profiling e estabilização,"FL-025,FL-017"
+FL-027,S4,P0,chore,release,3,IN_PROGRESS,Preparar pacote alfa e checklist de publicação,"FL-023,FL-026"
 FL-028,LATER,P2,research,reverse-engineering,3,TODO,Investigar viabilidade de mashup real entre processos,FL-004
-FL-029,LATER,P2,feature,ai,5,TODO,Protótipo de bots táticos,FL-023
-FL-030,LATER,P2,feature,world,5,TODO,Segundo mapa modular,FL-027
-FL-031,LATER,P2,feature,audio,3,TODO,"Pacote de áudio, partículas e feedback",FL-027
-FL-032,LATER,P2,feature,platform,5,TODO,Controles para dispositivos móveis,FL-027
+FL-029,LATER,P2,feature,ai,5,IN_PROGRESS,Protótipo de bots táticos,FL-023
+FL-030,LATER,P2,feature,world,5,IN_PROGRESS,Segundo mapa modular,FL-027
+FL-031,LATER,P2,feature,audio,3,IN_PROGRESS,"Pacote de áudio, partículas e feedback",FL-027
+FL-032,LATER,P2,feature,platform,5,IN_PROGRESS,Controles para dispositivos móveis,FL-027

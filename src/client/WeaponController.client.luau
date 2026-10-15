@@ -12,9 +12,11 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Config       = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
 local NetProtocol  = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("NetProtocol"))
 local WeaponConfig = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("WeaponConfig"))
+local ViewmodelController = require(script.Parent:WaitForChild("FirstPersonViewmodel"))
 
 local localPlayer  = Players.LocalPlayer
-local camera       = workspace.CurrentCamera
+local viewmodel    = ViewmodelController.new(localPlayer)
+viewmodel:Start()
 
 -- ─── RemoteEvent ──────────────────────────────────────────────────────────────
 
@@ -23,12 +25,13 @@ local remotesFolder = ReplicatedStorage:WaitForChild(NetProtocol.RemoteFolderNam
 local fireWeaponEvent: RemoteEvent = remotesFolder:WaitForChild(NetProtocol.FireWeaponEvent) :: RemoteEvent
 local reloadWeaponEvent: RemoteEvent = remotesFolder:WaitForChild(NetProtocol.ReloadWeaponEvent) :: RemoteEvent
 local weaponStateEvent: RemoteEvent = remotesFolder:WaitForChild(NetProtocol.WeaponStateEvent) :: RemoteEvent
+local equipWeaponEvent: RemoteEvent = remotesFolder:WaitForChild(NetProtocol.EquipWeaponEvent) :: RemoteEvent
 
 -- ─── Estado da arma ──────────────────────────────────────────────────────────
 
-local WEAPON_ID  = Config.Combat.TestWeaponId
-local weaponDef  = WeaponConfig[WEAPON_ID]
-assert(weaponDef, "[Frontline][FL-010] WeaponConfig não encontrado para: " .. WEAPON_ID)
+local weaponId = Config.Combat.TestWeaponId
+local weaponDef = WeaponConfig[weaponId]
+assert(weaponDef, "[Frontline][FL-010] WeaponConfig não encontrado para: " .. weaponId)
 
 local ammo         = weaponDef.magazineSize  -- balas no pente atual
 local isReloading  = false
@@ -48,15 +51,21 @@ screenGui.Parent = localPlayer.PlayerGui
 
 local ammoLabel = Instance.new("TextLabel")
 ammoLabel.Name = "AmmoLabel"
-ammoLabel.Size = UDim2.new(0, 200, 0, 40)
-ammoLabel.Position = UDim2.new(1, -220, 1, -70)
+ammoLabel.Size = UDim2.fromScale(0.36, 0.075)
+ammoLabel.Position = UDim2.fromScale(0.975, 0.69)
+ammoLabel.AnchorPoint = Vector2.new(1, 1)
 ammoLabel.BackgroundTransparency = 0.5
 ammoLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 ammoLabel.TextColor3 = Color3.fromRGB(230, 230, 230)
 ammoLabel.TextScaled = true
+ammoLabel.TextWrapped = false
 ammoLabel.Font = Enum.Font.GothamBold
 ammoLabel.Text = ammo .. " / " .. weaponDef.magazineSize
 ammoLabel.Parent = screenGui
+local ammoTextConstraint = Instance.new("UITextSizeConstraint")
+ammoTextConstraint.MinTextSize = 14
+ammoTextConstraint.MaxTextSize = 22
+ammoTextConstraint.Parent = ammoLabel
 
 -- Crosshair central
 local crosshair = Instance.new("Frame")
@@ -79,23 +88,29 @@ end
 
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Name = "StatusLabel"
-statusLabel.Size = UDim2.new(0, 200, 0, 30)
-statusLabel.Position = UDim2.new(1, -220, 1, -110)
+statusLabel.Size = UDim2.fromScale(0.36, 0.06)
+statusLabel.Position = UDim2.fromScale(0.975, 0.60)
+statusLabel.AnchorPoint = Vector2.new(1, 1)
 statusLabel.BackgroundTransparency = 1
 statusLabel.TextColor3 = Color3.fromRGB(255, 200, 60)
 statusLabel.TextScaled = true
+statusLabel.TextWrapped = false
 statusLabel.Font = Enum.Font.Gotham
 statusLabel.Text = ""
 statusLabel.Parent = screenGui
+local statusTextConstraint = Instance.new("UITextSizeConstraint")
+statusTextConstraint.MinTextSize = 14
+statusTextConstraint.MaxTextSize = 18
+statusTextConstraint.Parent = statusLabel
 
 -- ─── Helpers ─────────────────────────────────────────────────────────────────
 
 local function updateHUD()
 	if isReloading then
-		ammoLabel.Text = "RECARREGANDO..."
+		ammoLabel.Text = weaponId .. " | RECARREGANDO..."
 		ammoLabel.TextColor3 = Color3.fromRGB(255, 200, 60)
 	else
-		ammoLabel.Text = ammo .. " / " .. weaponDef.magazineSize
+		ammoLabel.Text = weaponId .. " | " .. ammo .. " / " .. weaponDef.magazineSize
 		ammoLabel.TextColor3 = if ammo == 0
 			then Color3.fromRGB(255, 80, 80)
 			else Color3.fromRGB(230, 230, 230)
@@ -143,6 +158,8 @@ local function tryFire()
 	lastShotAt = now
 
 	-- Construir payload
+	local camera = workspace.CurrentCamera
+	if not camera then return end
 	local unitRay    = camera:ScreenPointToRay(
 		camera.ViewportSize.X / 2,
 		camera.ViewportSize.Y / 2
@@ -159,10 +176,11 @@ local function tryFire()
 	local targetPosition = if localRayResult
 		then localRayResult.Position
 		else origin + direction * weaponDef.maxRange
+	viewmodel:PlayFireAnimation()
 
 	-- Envia intenção ao servidor — servidor valida e aplica dano se aprovado
 	fireWeaponEvent:FireServer({
-		weaponId       = WEAPON_ID,
+		weaponId       = weaponId,
 		origin         = origin,
 		direction      = direction,
 		targetPosition = targetPosition,
@@ -185,10 +203,19 @@ startReload = function()
 	reloadWeaponEvent:FireServer()
 end
 
-weaponStateEvent.OnClientEvent:Connect(function(serverAmmo: number, serverReloading: boolean)
-	if typeof(serverAmmo) ~= "number" or typeof(serverReloading) ~= "boolean" then return end
+weaponStateEvent.OnClientEvent:Connect(function(serverWeaponId: string, serverAmmo: number, serverReloading: boolean)
+	local serverWeapon = WeaponConfig[serverWeaponId]
+	if not serverWeapon or typeof(serverAmmo) ~= "number" or typeof(serverReloading) ~= "boolean" then return end
+	weaponId = serverWeaponId
+	weaponDef = serverWeapon
+	local wasReloading = isReloading
 	ammo = math.clamp(math.floor(serverAmmo), 0, weaponDef.magazineSize)
 	isReloading = serverReloading
+	if isReloading and not wasReloading then
+		viewmodel:PlayReloadAnimation(weaponDef.reloadTime)
+	elseif not isReloading and wasReloading then
+		viewmodel:StopReloadAnimation()
+	end
 	updateHUD()
 	if ammo == 0 and not isReloading then
 		task.defer(function() startReload() end)
@@ -205,6 +232,10 @@ UserInputService.InputBegan:Connect(function(input: InputObject, gameProcessed: 
 		tryFire()
 	elseif input.KeyCode == Enum.KeyCode.R then
 		startReload()
+	elseif input.KeyCode == Enum.KeyCode.One then
+		equipWeaponEvent:FireServer("TestRifle")
+	elseif input.KeyCode == Enum.KeyCode.Two then
+		equipWeaponEvent:FireServer("ServicePistol")
 	end
 end)
 
@@ -227,8 +258,13 @@ localPlayer.CharacterAdded:Connect(function()
 	isReloading = false
 	lastShotAt  = -math.huge
 	isTriggerHeld = false
+	viewmodel:StopReloadAnimation()
 	updateHUD()
 	showStatus("Rifle pronto")
+end)
+
+script.Destroying:Connect(function()
+	viewmodel:Destroy()
 end)
 
 -- ─── Init ────────────────────────────────────────────────────────────────────
@@ -237,5 +273,5 @@ updateHUD()
 showStatus("Rifle pronto")
 print(string.format(
 	"[Frontline][FL-010] WeaponController | arma=%s | mag=%d | cadência=%.2fs | range=%d",
-	WEAPON_ID, weaponDef.magazineSize, weaponDef.fireInterval, weaponDef.maxRange
+	weaponId, weaponDef.magazineSize, weaponDef.fireInterval, weaponDef.maxRange
 ))

@@ -1,0 +1,43 @@
+# Integration review — issues #13–#32
+
+**Date:** 2026-10-15  
+**Branch:** `docs/integration-issues-13-32`, stacked after per-issue draft PRs  
+**Decision:** **NO-GO for alpha/publication.**
+
+## Current stack
+
+| Issues | PRs | State at integration review |
+|---|---|---|
+| #13–#22 | #43–#53 | Partial; #19 retry confirmed invalid requests leave HP 100, valid server/client/observer HP 100→75, steady score, and four responses to 50 reloads. Explicit latency/jitter run remains open; other video, standalone, and integrated acceptance details remain open. |
+| #23 | #54 | NO-GO. Integrated QA-01–QA-11, QA-10's ten-minute run, latency variation, HUD reset proof, zero P0 blockers, and human MVP acceptance are not demonstrated. |
+| #28 | #55 | Research partial; recommends no-go for live cross-process BF6 integration and documents safe official alternatives. |
+| #24 | #56 | Partial; one-client keyboard Play confirmed E entry, W forward movement (server pivot z -8→-40.04), throttle release to speed 0, W+D steering, S reverse (sampled -24 studs/s), E exit, and camera restoration. The FL-025 damage source was in Place1; only the stale spawn pivot was temporarily changed to Y=3.15, then restored to its original source snapshot after Play. A reverse probe contacted an unidentified collidable and stopped, so controlled obstacle testing is still open. Arena bounds, second-client observation, route video, and integrated-build repeat remain open. Post-fix rifle raycast evidence recorded health 300→275. |
+| #25 | #57 | Partial; single-client Studio confirmed valid shot damage, destruction/ejection/seat lockout, rejected re-entry, and nearby reset to one healthy scout. A temporary queryable obstacle caused collision damage 300→290.4 and stopped the vehicle; after obstacle removal the same driver resumed movement. Two-client replication, spam/cooldown, and late-join checks remain open. |
+| #26 | #58 | Partial; S2 baseline plus a 30.022 s preliminary S4 idle sample (56.21 mean / 8.91 p1 FPS, 62 LibMP frames) are recorded. Nine other Studio sessions were in Play and the scene/viewport were not matched, so this is not a regression comparison. Controlled S4/MicroProfiler, standalone, and leak/warning evidence remain absent. |
+| #27 | #59 | NO-GO; checklist/changelog/rollback prepared, owner content/privacy/settings review and upstream P0 gates remain open. No publication occurred. |
+| #29–#32 | #60–#63 | Planning-only drafts; blocked/deferred until stability/release gates, suitable assets, and physical-device evidence are available. |
+
+The stack preserves one issue branch/PR and `Closes #N` per issue. The latest metadata check showed PRs #54–#63 open, draft where acceptance is incomplete, and mergeable. No branch was force-pushed and `main` was not modified.
+
+## Validation executed
+
+- `python scripts/validate_project.py` — passed (32 issue/dependency/path/doc/asset checks).
+- `python -m unittest discover -s tests -v` — 9 passed, including the vehicle road-raycast spawn contract.
+- `git diff --check` — passed.
+- Official Rojo 7.7.1 Windows x86_64 release zip digest matched the published GitHub SHA-256. `rojo build <branch> --output <temp>.rbxlx` passed on the branch heads for PRs #54–#63 (issues #23–#27 and #28–#32). Builds are serialization checks, not gameplay tests.
+- Selene and StyLua are unavailable. No Luau lint or format pass is claimed.
+
+## Integrated runtime test not completed
+
+No full logical playtest was completed for the exact stacked artifact. The StudioTestService previously refused a new multiplayer run because a previous test was still in progress. The full stacked integration artifact has not been loaded for QA-01–QA-11, and QA-10's ten-minute observation is still required.
+
+A follow-up probe temporarily synchronized the four FL-025 source files into the Studio Edit DataModel and attempted to start Play. The start call stalled; `execute_luau` reported the Server DataModel unavailable because Studio remained in Edit. After stopping the attempt, I restored the previous source for all four scripts and verified that `VehicleService` again begins with the FL-024 implementation and has no `VehicleHealth` attribute code. No runtime pass was claimed for that earlier attempt. The later bounded single-client Studio Play probe loaded the exact FL-025 source after the FL-024 Y=3.15 fix. Server raycast found the scout chassis first; one valid shot changed health 300→275. Eleven rate-spaced shots produced health 0 and `Destroyed`, driver 0, speed 0, no occupant, and disabled seat. An `Enter` request was rejected; nearby `Reset` produced exactly one active vehicle with health 300 and pivot Y=3.15. A temporary queryable obstacle reduced health 300→290.4 and speed to 0; after removing it the still-seated driver moved from Z=-14.10 to Z=-24.36. The obstacle was removed. Play was stopped and the four Studio Edit scripts were restored exactly to their pre-probe source snapshot; Studio is in Edit. This is targeted single-client evidence only, not multiplayer/integrated acceptance. The final integration branch passes the validator, 9 Python tests, diff check, and Rojo 7.7.1 serialization build.
+
+A separate FL-024 route follow-up used Place1's FL-025 damage-enabled vehicle source. Config, NetProtocol, server Bootstrap, and client VehicleController matched the FL-025 branch; I temporarily changed the stale vehicle spawn pivot from Y=1.15 to the committed Y=3.15 value. Real client keyboard input confirmed seat entry, forward movement (server pivot z -8→-40.04), speed returning to 0 after releasing W, steering with W+D (LookVector changed to -0.553, 0, -0.833), reverse with S (sampled -24 studs/s), and E exit with camera restored. During reverse the vehicle contacted an unidentified collidable, stopped, and health fell 300→272.08; this was not a controlled obstacle test. Play stopped, the exact pre-probe VehicleService source was restored and verified, and Place1 returned to Edit. This closes only the basic one-player control route; no second-client observer, controlled obstacle/bounds test, or integrated-build repeat is claimed.
+
+## Required next actions
+
+1. Load one exact stacked build into a clean Studio test session, then complete QA-01–QA-11 with two clients (third client for late-join QA-09), including explicit network-latency variation.
+2. Run a full ten-minute session and record server/client logs, HUD/screenshots, and gameplay video.
+3. Repeat the FL-024 keyboard route on the exact integrated build with a second-client observer; check controlled obstacle and arena-bound behavior, complete FL-025's lifecycle with an observer, and collect comparable S4 performance/MicroProfiler samples.
+4. Resolve P0 findings and request human acceptance. Then finish FL-027 owner review, mobile physical-device work, and the deferred feature gates before changing README status or preparing a release.

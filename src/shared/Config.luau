@@ -18,9 +18,40 @@ local Config = {
 	Combat = {
 		TestWeaponId = "TestRifle",
 		FireInterval = 0.12,
+		ReloadRequestInterval = 0.25,
+		EquipRequestInterval = 0.3,
 		MaxRange = 500,
 		MaxOriginOffset = 6,
 		RejectLogInterval = 2,
+	},
+
+	-- FL-018: regras públicas da partida; pontuação é alterada apenas no servidor.
+	Match = {
+		ScoreToWin = 5,
+		RoundDurationSeconds = 300,
+		IntermissionSeconds = 8,
+		SpawnProtectionSeconds = 3,
+		RespawnSeconds = 5,
+	},
+
+	-- FL-021: saúde de núcleo de cobertura; somente o servidor altera esse valor.
+	Destruction = {
+		CoverMaxHealth = 100,
+	},
+
+	-- FL-024: prototype kinematic vehicle; server owns every movement step.
+	Vehicle = {
+		MaxHealth = 300,
+		ResetCooldown = 5,
+		DamageInterval = 0.08,
+		MaxSpeed = 24,
+		Acceleration = 14,
+		TurnRateDegrees = 58,
+		InputInterval = 0.05,
+		InputTimeout = 0.35,
+		InteractionDistance = 12,
+		BoundaryX = 125,
+		BoundaryZ = 100,
 	},
 }
 
