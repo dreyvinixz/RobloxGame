@@ -12,7 +12,7 @@ Atualizado em 2026-10-15. Este registro acompanha as issues abertas #13–#32. `
 | #18 FL-018 | Parcial | [#49](https://github.com/dreyvinixz/RobloxGame/pull/49) | Dois clientes simulados validaram FireWeapon→DamageService→MatchService, equipes, placar, respawn e proteção. Transição por tempo/score-win não foi acelerada no teste; revisão e integração empilhada pendentes. |
 | #19 FL-019 | Parcial | [#50](https://github.com/dreyvinixz/RobloxGame/pull/50) | Retry Studio de 2 clientes (comentário do responsável): três payloads inválidos deixaram HP 100; tiro válido levou HP server/cliente 100→75, observador também 75, score inalterado; 50 reloads geraram 4 respostas. Variação de latência pendente: tentativa 120 ms por sentido + jitter 20 ms não iniciou por sessão StudioTestService anterior ativa; settings/harness temporários restaurados. Ver relatório. |
 | #20 FL-020 | Parcial | [#51](https://github.com/dreyvinixz/RobloxGame/pull/51) | Rifle/pistola, troca validada, munição por arma e falloff implementados; validator, 3 testes e Rojo build passaram. TTK é aritmético; teste Studio de equip/munição/falloff e comparação de tempos ainda pendente devido a sync desconectado. |
-| #21 FL-021 | Pendente | — | Cobertura destrutível com estado replicado. |
+| #21 FL-021 | Parcial | [#52](https://github.com/dreyvinixz/RobloxGame/pull/52) | Estado Intact/Damaged/Destroyed, 100 HP, dano somente por tiro validado server-side, visibilidade/colisão em estado quebrado implementados. Validator, 3 testes e Rojo build passaram. Multiplayer, tentativa de destruição client-side e late join ainda sem evidência Studio. |
 | #22 FL-022 | Pendente | — | HUD de equipe, munição e resultado. |
 | #23 FL-023 | Pendente | — | Aceite do MVP com dois clientes. |
 | #24 FL-024 | Pendente | — | Protótipo de veículo após MVP. |
@@ -72,6 +72,13 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - O teste não capturou HP entre requisições inválidas e o tiro válido nem comparou HP simultaneamente entre clientes. A simulação não variou latência real.
 - Tentativas posteriores com snapshot de HP foram excluídas: Rojo desconectou e Studio executou o harness anterior. Scripts temporários foram removidos do root e não estão no branch.
 - `DamageService` limita reload a um pedido por 0.25 s/jogador e limpa o relógio ao sair. Critérios pendentes e limites em `docs/TEST_REPORTS/FL-019.md`. PR draft #50 empilhado sobre FL-018.
+
+## Implementação parcial da FL-021 — 2026-10-15
+
+- `DestructibleCoverService` inicializa núcleos com 100 HP e estados `Intact`, `Damaged` (≤50 HP) e `Destroyed` (0 HP). Só tiros aprovados pelo `CombatRequestService` chegam ao serviço via `DamageService`.
+- A destruição oculta núcleo e painéis e desativa colisão e raycast. Atributos e propriedades replicam pelo servidor; não existe remote de destruição para o cliente.
+- Validator, 3 testes Python, Rojo build e diff check passaram. Playtest de dano em estágios, colisão/visual em dois clientes, tentativa client-only e late join permanece pendente por falta de sync estável.
+- Detalhes em `docs/TEST_REPORTS/FL-021.md`; PR draft #52 empilhado sobre FL-020.
 
 ## Implementação da FL-018 — 2026-10-15
 

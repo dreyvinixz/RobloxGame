@@ -33,6 +33,11 @@ local Config = {
 		SpawnProtectionSeconds = 3,
 		RespawnSeconds = 5,
 	},
+
+	-- FL-021: saúde de núcleo de cobertura; somente o servidor altera esse valor.
+	Destruction = {
+		CoverMaxHealth = 100,
+	},
 }
 
 return table.freeze(Config)
