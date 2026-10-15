@@ -51,18 +51,19 @@ screenGui.Parent = localPlayer.PlayerGui
 
 local ammoLabel = Instance.new("TextLabel")
 ammoLabel.Name = "AmmoLabel"
-ammoLabel.Size = UDim2.fromScale(0.22, 0.055)
-ammoLabel.Position = UDim2.fromScale(0.975, 0.925)
+ammoLabel.Size = UDim2.fromScale(0.36, 0.075)
+ammoLabel.Position = UDim2.fromScale(0.975, 0.69)
 ammoLabel.AnchorPoint = Vector2.new(1, 1)
 ammoLabel.BackgroundTransparency = 0.5
 ammoLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 ammoLabel.TextColor3 = Color3.fromRGB(230, 230, 230)
 ammoLabel.TextScaled = true
+ammoLabel.TextWrapped = false
 ammoLabel.Font = Enum.Font.GothamBold
 ammoLabel.Text = ammo .. " / " .. weaponDef.magazineSize
 ammoLabel.Parent = screenGui
 local ammoTextConstraint = Instance.new("UITextSizeConstraint")
-ammoTextConstraint.MinTextSize = 12
+ammoTextConstraint.MinTextSize = 14
 ammoTextConstraint.MaxTextSize = 22
 ammoTextConstraint.Parent = ammoLabel
 
@@ -87,17 +88,18 @@ end
 
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Name = "StatusLabel"
-statusLabel.Size = UDim2.fromScale(0.22, 0.04)
-statusLabel.Position = UDim2.fromScale(0.975, 0.86)
+statusLabel.Size = UDim2.fromScale(0.36, 0.06)
+statusLabel.Position = UDim2.fromScale(0.975, 0.60)
 statusLabel.AnchorPoint = Vector2.new(1, 1)
 statusLabel.BackgroundTransparency = 1
 statusLabel.TextColor3 = Color3.fromRGB(255, 200, 60)
 statusLabel.TextScaled = true
+statusLabel.TextWrapped = false
 statusLabel.Font = Enum.Font.Gotham
 statusLabel.Text = ""
 statusLabel.Parent = screenGui
 local statusTextConstraint = Instance.new("UITextSizeConstraint")
-statusTextConstraint.MinTextSize = 12
+statusTextConstraint.MinTextSize = 14
 statusTextConstraint.MaxTextSize = 18
 statusTextConstraint.Parent = statusLabel
 

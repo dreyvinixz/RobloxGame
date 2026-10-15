@@ -43,7 +43,8 @@ local function makeLabel(name: string, size: UDim2, position: UDim2, anchor: Vec
 end
 
 local scoreLabel = makeLabel("TeamScore", UDim2.fromScale(0.28, 0.065), UDim2.fromScale(0.5, 0.035), Vector2.new(0.5, 0), 26)
-local roundLabel = makeLabel("RoundStatus", UDim2.fromScale(0.22, 0.045), UDim2.fromScale(0.5, 0.105), Vector2.new(0.5, 0), 18)
+local roundLabel = makeLabel("RoundStatus", UDim2.fromScale(0.38, 0.06), UDim2.fromScale(0.5, 0.105), Vector2.new(0.5, 0), 18)
+roundLabel.TextWrapped = false
 local healthLabel = makeLabel("Health", UDim2.fromScale(0.18, 0.055), UDim2.fromScale(0.025, 0.92), Vector2.new(0, 1), 22)
 local hitMarker = makeLabel("ConfirmedHitMarker", UDim2.fromOffset(44, 44), UDim2.fromScale(0.5, 0.5), Vector2.new(0.5, 0.5), 36)
 hitMarker.BackgroundTransparency = 1
