@@ -4,7 +4,7 @@ Atualizado em 2026-10-15. Este registro acompanha as issues abertas #13–#32. `
 
 | Issue | Estado | PR | Decisão e pendência principal |
 |---|---|---|---|
-| #13 FL-013 | Parcial | Pendente | Direção visual, guia, seleção e procedência registrados; validar documentação e abrir PR. Assets seguem em quarentena para FL-014. |
+| #13 FL-013 | Parcial | [#43](https://github.com/dreyvinixz/RobloxGame/pull/43) | Direção visual, guia, seleção e procedência registrados; validação estática, 3 testes Python e Rojo build passaram. PR aguarda revisão; assets seguem em quarentena para FL-014. |
 | #14 FL-014 | Pendente | — | Aprovar rifle, rig e kit urbano gratuitos após auditoria de dependências, colisão e desempenho. |
 | #15 FL-015 | Pendente | — | Viewmodel R15 depende do kit aprovado. |
 | #16 FL-016 | Parcial | Pendente | Há branch com arena modular nativa; integrar os três props escolhidos sem sobreposição após FL-014. Fachada importada é condicional. |
