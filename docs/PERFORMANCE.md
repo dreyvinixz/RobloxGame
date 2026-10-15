@@ -51,3 +51,28 @@
 Amostra única de 30.008 s, câmera/parada após o load, sem movimento, combate ou dois clientes. O FPS foi calculado com `1/dt` por frame; p1 e mínimo são sensíveis a uma amostra curta. Studio pode distorcer FPS em relação ao cliente standalone. GPU em uso e configuração de qualidade manual máxima não foram confirmadas. Não comparar diretamente com sessões FL-013/FL-014 de duração/cena distintas. Repetir em cliente publicado, percurso ativo, máquina-alvo definida e sessão multiplayer antes de fixar metas.
 
 Relatório e evidência de execução: [FL-017](TEST_REPORTS/FL-017.md). O Roblox expõe essas métricas por meio do [Stats API](https://create.roblox.com/docs/reference/engine/classes/Stats); a orientação oficial sobre FPS em Studio e load-time está em [Identify performance issues](https://create.roblox.com/docs/performance-optimization/identify). Os campos vêm de leituras ao vivo; nenhum valor foi estimado para preencher lacunas.
+
+## Comparação FL-026 (S2 → S4)
+
+| Métrica | S2, 2026-10-15 | S4, FL-025 | Comparabilidade |
+|---|---:|---:|---|
+| FPS médio / p1 | 120.03 / 100.94 | 56.21 / 8.91, amostra preliminar | Não comparável: 9 outras sessões Studio estavam em Play; cena, viewport e qualidade não foram igualados |
+| MicroProfiler CPU frame | Não capturado | 62 frames: 15.71 ms média, 14.94 ms mediana, 23.04 ms máximo | Janela curta; host sob carga de outras sessões |
+| Render CPU / GPU | 7.17 / 2.49 ms | Não medido | Sem campo equivalente nesta captura |
+| Draw calls / triângulos | 29 / 46,779 | Não medido | Cena S4 inclui sistemas e veículo; outras sessões ativas |
+| Memória total (`Stats:GetTotalMemoryUsageMb()`) | 2,104.39 MB média | 1,544.68 MB média | Mesmo método; conteúdo e carga do host diferem, não concluir redução |
+| Warnings e conexões ao longo do tempo | Não coletados | Não coletados | Sem conclusão de leak/warning |
+
+### Amostra S4 preliminar — Place1, 2026-10-15
+
+O cliente ficou idle por 30.022 s depois do load, com FL-025 vehicle code presente e o spawn pivot temporariamente elevado para Y=3.15. Foram coletadas 1,348 amostras de `RenderStepped`: 56.21 FPS médio, 58.06 mediano, 8.91 p1 e 5.24 mínimo. LibMP estava pronto; a captura continha 62 frames CPU, com 15.71 ms média, 14.94 ms mediana e 23.04 ms máximo. `Stats:GetTotalMemoryUsageMb()` variou de 1,531.89 a 1,550.27 MB (média 1,544.68 MB), o mesmo método usado em S2; Stats PerformanceStats reportou CPU 21.53, GPU 1.22 e Ping 1.47 em média (unidades conforme a API). Scene draw calls, triangles, RenderCPU/GPU frame time e warnings não foram coletados.
+
+Nove outros Studio instances estavam em Play antes e depois da amostra. Place1 continha também `FL013_TestArena` e o veículo S4, enquanto o S2 baseline usa FL-016 mais três props. Portanto, esta é uma leitura preliminar sob carga externa e conteúdo diferente; não demonstra regressão, não orienta otimização e não satisfaz a comparação S2/S4. O script de veículo foi restaurado ao snapshot anterior depois da captura.
+
+### Revisão estática e próximo ciclo
+
+- `VehicleService` cria uma conexão Heartbeat e conexões de eventos de jogador durante `Start`, que é idempotente. `PlayerRemoving` limpa tabelas por jogador. O reset substitui o model/seat; o sinal do prompt antigo deixa de ter instância ativa. Isso é revisão de fonte, não evidência de coleta de memória ou contagem estável de conexões em runtime.
+- O movimento só faz os três raycasts de obstáculo enquanto existe motorista e intenção. Não há perfil que indique que essa seja a maior despesa, então nenhum aumento de complexidade/otimização foi feito sem medir.
+- Repetir a cena S2 em Studio com a branch S4 carregada, modo gráfico e viewport iguais, coletar 30 s idle e 30 s no percurso/combate, e registrar FPS p50/p1, RenderCPU/GPU, draw calls, triângulos e memória a cada 10 frames. Usar MicroProfiler nos piores picos; observar Output e contagem de conexões/instâncias após cinco ciclos enter/drive/exit/destroy/reset. Fazer a comparação em cliente standalone antes de definir regressão crítica.
+- O S4 sample não substitui o repeat requerido: repetir a cena S2 em Studio com a branch S4 carregada, viewport e qualidade iguais, sem outras sessões concorrentes; registrar 30 s idle e 30 s no percurso/combate, FPS p50/p1, RenderCPU/GPU, draw calls, triângulos e memória a cada 10 frames. Usar MicroProfiler nos piores picos e observar Output/conexões/instâncias após cinco ciclos enter/drive/exit/destroy/reset. Repetir em cliente standalone antes de declarar regressão crítica.
+- Rojo 7.7.1 está disponível em `%TEMP%` e o build S4 passou na branch FL-026; Selene e StyLua não foram executados nesta sessão.
