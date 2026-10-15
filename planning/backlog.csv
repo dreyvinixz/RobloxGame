@@ -28,6 +28,6 @@ FL-026,S4,P1,test,performance,3,IN_PROGRESS,Realizar profiling e estabilização
 FL-027,S4,P0,chore,release,3,IN_PROGRESS,Preparar pacote alfa e checklist de publicação,"FL-023,FL-026"
 FL-028,LATER,P2,research,reverse-engineering,3,TODO,Investigar viabilidade de mashup real entre processos,FL-004
 FL-029,LATER,P2,feature,ai,5,IN_PROGRESS,Protótipo de bots táticos,FL-023
-FL-030,LATER,P2,feature,world,5,TODO,Segundo mapa modular,FL-027
+FL-030,LATER,P2,feature,world,5,IN_PROGRESS,Segundo mapa modular,FL-027
 FL-031,LATER,P2,feature,audio,3,TODO,"Pacote de áudio, partículas e feedback",FL-027
 FL-032,LATER,P2,feature,platform,5,TODO,Controles para dispositivos móveis,FL-027
