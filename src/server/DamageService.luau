@@ -27,6 +27,7 @@ local started = false
 local states: {[Player]: WeaponState} = {}
 local lastReloadRequestAt: {[Player]: number} = {}
 local stateEvent: RemoteEvent
+local hitConfirmedEvent: RemoteEvent
 local worldExclusions: {Instance} = {}
 local matchService: any
 local destructionService: any
@@ -157,6 +158,7 @@ local function applyShot(shooter: Player, shot: ShotPayload)
 	end
 	print(string.format("[Frontline][FL-010] HIT | %s -> %s | dmg=%.0f%s", shooter.Name, model.Name, damage,
 		if result.Instance.Name == "Head" then " [HEADSHOT]" else ""))
+	hitConfirmedEvent:FireClient(shooter, model.Name)
 end
 
 function DamageService.Start(combatRequestService: any, matchServiceArg: any, destructionServiceArg: any)
@@ -167,6 +169,7 @@ function DamageService.Start(combatRequestService: any, matchServiceArg: any, de
 	destructionService = destructionServiceArg
 	started = true
 	stateEvent = getOrCreateRemote(NetProtocol.WeaponStateEvent)
+	hitConfirmedEvent = getOrCreateRemote(NetProtocol.HitConfirmedEvent)
 	local reloadEvent = getOrCreateRemote(NetProtocol.ReloadWeaponEvent)
 	combatRequestService.OnWeaponEquipped(function(player: Player, weaponId: string)
 		local state = getState(player)
