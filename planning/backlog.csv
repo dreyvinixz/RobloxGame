@@ -14,7 +14,7 @@ FL-012,S1,P0,test,quality,3,TODO,Executar bateria de testes do vertical slice,FL
 FL-013,S2,P0,research,assets,3,TODO,Selecionar direção artística e orçamento de assets,"FL-005,FL-012"
 FL-014,S2,P0,feature,assets,5,TODO,Importar e aprovar kit militar mínimo,FL-013
 FL-015,S2,P1,feature,animation,3,TODO,"Integrar rig, animações e arma de primeira pessoa","FL-014,FL-010"
-FL-016,S2,P1,feature,world,5,TODO,Converter arena greybox para cenário militar modular,"FL-007,FL-014"
+FL-016,S2,P1,feature,world,5,IN_PROGRESS,Converter arena greybox para cenário militar modular,"FL-007,FL-014"
 FL-017,S2,P1,test,performance,3,TODO,Criar primeiro benchmark de desempenho,FL-016
 FL-018,S3,P0,feature,gameplay,3,TODO,"Criar equipes, spawns e placar",FL-012
 FL-019,S3,P0,security,network,5,TODO,Validar combate multiplayer e resistência a exploits,"FL-018,FL-009,FL-010"

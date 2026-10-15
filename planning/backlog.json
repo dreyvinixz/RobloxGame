@@ -397,23 +397,23 @@
     "area": "world",
     "points": 5,
     "title": "Converter arena greybox para cenário militar modular",
-    "goal": "Melhorar visual mantendo espaços e colisões testados.",
+    "goal": "Substituir o mapa de teste por um distrito de batalha autoral e navegável.",
     "implementation": [
-      "Substituir fachadas, cobertura e pavimento em pequenos lotes",
-      "preservar layout",
-      "organizar pastas."
+      "Gerar ruas conectadas, ruínas exploráveis, coberturas e defesas de campo",
+      "integrar somente props aprovados e registrar candidatos não aprovados",
+      "validar rotas, colisões, composição visual e desempenho no Studio."
     ],
     "acceptance": [
-      "Rotas principais preservadas",
-      "sem gaps ou colisões invisíveis críticas",
-      "assets aprovados."
+      "Mapa de batalha autoral substitui a arena de teste",
+      "rotas e colisões passam por revisão no Studio",
+      "assets externos usados estão aprovados e auditados."
     ],
-    "verification": "Comparação de trajetos antes/depois.",
+    "verification": "Playtest no Studio com capturas, checagem de rotas e relatório de desempenho.",
     "dependencies": [
       "FL-007",
       "FL-014"
     ],
-    "status": "TODO"
+    "status": "IN_PROGRESS"
   },
   {
     "id": "FL-017",
