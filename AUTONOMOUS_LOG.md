@@ -24,7 +24,7 @@ Atualizado em 2026-10-15. Este registro acompanha as issues abertas #13–#32. `
 | #29 FL-029 | Parcial / bloqueado | [#60](https://github.com/dreyvinixz/RobloxGame/pull/60) | Plano server-authoritative e experimento em `docs/AI_BOT_READINESS.md`; implementação aguardará FL-023 NO-GO e perfil S4. |
 | #30 FL-030 | Parcial / bloqueado | [#61](https://github.com/dreyvinixz/RobloxGame/pull/61) | Plano de reuso e rotação server-owned em `docs/MAP_2_READINESS.md`; aguardando FL-027 NO-GO. |
 | #31 FL-031 | Parcial / bloqueado | [#62](https://github.com/dreyvinixz/RobloxGame/pull/62) | Design de assets, mix e pool cosmetic em `docs/AUDIO_VFX_READINESS.md`; aguarda FL-027. Nenhum efeito importado. |
-| #32 FL-032 | Parcial / bloqueado | — | Gaps desktop-only e plano touch/dispositivo físico em `docs/MOBILE_READINESS.md`; aguarda FL-027 e smartphone real. |
+| #32 FL-032 | Parcial / bloqueado | [#63](https://github.com/dreyvinixz/RobloxGame/pull/63) | Gaps desktop-only e plano touch/dispositivo físico em `docs/MOBILE_READINESS.md`; aguarda FL-027 e smartphone real. |
 
 ## Decisões de FL-013
 
