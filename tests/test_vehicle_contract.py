@@ -39,6 +39,10 @@ class VehicleContractTests(unittest.TestCase):
         self.assertIn("vehicleConfig.BoundaryX", SERVER)
         self.assertIn("vehicleConfig.BoundaryZ", SERVER)
 
+    def test_vehicle_spawn_clears_queryable_road_surface(self):
+        # Arena road is queryable at Y=2.12; the scout chassis starts above it.
+        self.assertIn("CFrame.new(0, 3.15, -8)", SERVER)
+
 
 if __name__ == "__main__":
     unittest.main()
