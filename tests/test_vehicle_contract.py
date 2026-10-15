@@ -6,6 +6,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SERVER = (ROOT / "src/server/VehicleService.luau").read_text(encoding="utf-8")
 CLIENT = (ROOT / "src/client/VehicleController.client.luau").read_text(encoding="utf-8")
 CONFIG = (ROOT / "src/shared/Config.luau").read_text(encoding="utf-8")
+DAMAGE = (ROOT / "src/server/DamageService.luau").read_text(encoding="utf-8")
 
 
 class VehicleContractTests(unittest.TestCase):
@@ -38,6 +39,17 @@ class VehicleContractTests(unittest.TestCase):
         self.assertIn("Workspace:Raycast", SERVER)
         self.assertIn("vehicleConfig.BoundaryX", SERVER)
         self.assertIn("vehicleConfig.BoundaryZ", SERVER)
+
+    def test_vehicle_damage_and_reset_are_server_owned(self):
+        self.assertIn('SetAttribute("VehicleHealth", vehicleConfig.MaxHealth)', SERVER)
+        self.assertIn('SetAttribute("VehicleState", "Destroyed")', SERVER)
+        self.assertIn('currentVehicle:GetAttribute("VehicleState") ~= "Active" then return end', SERVER)
+        self.assertIn('action ~= "Reset"', SERVER)
+        self.assertIn("vehicleConfig.ResetCooldown", SERVER)
+        self.assertIn("vehicleConfig.DamageInterval", SERVER)
+        self.assertIn("vehicleService.ApplyHit(result.Instance, baseDamage, shooter)", DAMAGE)
+        self.assertIn("vehicleServiceArg", DAMAGE)
+        self.assertRegex(CONFIG, r"MaxHealth\s*=\s*300")
 
     def test_vehicle_spawn_clears_queryable_road_surface(self):
         # Arena road is queryable at Y=2.12; the scout chassis starts above it.

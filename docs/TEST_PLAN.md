@@ -34,3 +34,10 @@ Critério FPS inicial 60 desktop é **hipótese**; medir antes de travar meta. N
 - Attempt out-of-bounds movement and drive toward an obstacle. Confirm the server stops the anchored chassis within speed/acceleration/delta bounds.
 - Observe from a second client; server-replicated chassis motion must not jump or accept client-supplied positions.
 - Save Studio logs and a short route video before marking the issue accepted.
+
+## FL-025 vehicle damage lifecycle
+- Fire validated server-raycast hits at the scout from two clients; both must observe `VehicleHealth` decrease without any client-supplied HP field.
+- Drive into an obstacle at speed; server collision damage must replicate and a zero-health vehicle must eject its driver and stop.
+- Attempt Enter and movement after destruction; neither may drive the wreck.
+- Reset from within interaction distance, then verify exactly one active scout at the saved spawn pivot with full health and no old occupant; spam reset/damage requests and confirm cooldowns.
+- Save server and both client logs. Static contracts and source inspection are not multiplayer acceptance evidence.

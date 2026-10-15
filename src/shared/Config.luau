@@ -41,6 +41,9 @@ local Config = {
 
 	-- FL-024: prototype kinematic vehicle; server owns every movement step.
 	Vehicle = {
+		MaxHealth = 300,
+		ResetCooldown = 5,
+		DamageInterval = 0.08,
 		MaxSpeed = 24,
 		Acceleration = 14,
 		TurnRateDegrees = 58,

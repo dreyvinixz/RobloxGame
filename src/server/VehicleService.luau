@@ -21,6 +21,9 @@ local speed = 0
 local lastInputAt = 0
 local lastPacketAt: { [Player]: number } = {}
 local lastActionAt: { [Player]: number } = {}
+local lastDamageAt: { [Player]: number } = {}
+local lastResetAt = -math.huge
+local spawnPivot: CFrame
 local remotes: Folder
 local actionEvent: RemoteEvent
 local inputEvent: RemoteEvent
@@ -73,6 +76,9 @@ local function createVehicle(arena: Model): (Model, VehicleSeat)
 	-- The modular road surface is at Y=2.12 and remains raycast-queryable. Keep
 	-- the chassis/wheels above it so valid weapon rays can reach the vehicle.
 	local pivot = CFrame.new(0, 3.15, -8)
+	model:SetAttribute("VehicleMaxHealth", vehicleConfig.MaxHealth)
+	model:SetAttribute("VehicleHealth", vehicleConfig.MaxHealth)
+	model:SetAttribute("VehicleState", "Active")
 	local chassis = makePart(
 		model,
 		"Chassis",
@@ -149,13 +155,31 @@ local function clearDriver(player: Player?)
 end
 
 local function handleAction(player: Player, action: any, ...: any)
-	if select("#", ...) > 0 or (action ~= "Enter" and action ~= "Exit") then return end
+	if select("#", ...) > 0 or (action ~= "Enter" and action ~= "Exit" and action ~= "Reset") then return end
 	local now = os.clock()
 	if now - (lastActionAt[player] or -math.huge) < 0.35 then return end
 	lastActionAt[player] = now
 	local currentVehicle = vehicle
 	local currentSeat = seat
 	if not currentVehicle or not currentSeat or player.Parent ~= Players then return end
+	if action == "Reset" then
+		local _, _, root = getDriverCharacter(player)
+		if not root or (root.Position - currentSeat.Position).Magnitude > vehicleConfig.InteractionDistance then return end
+		if currentVehicle:GetAttribute("VehicleState") ~= "Destroyed" or now - lastResetAt < vehicleConfig.ResetCooldown then return end
+		lastResetAt = now
+		if driver then clearDriver(driver) end
+		currentSeat:Destroy()
+		local arena = currentVehicle.Parent
+		currentVehicle:Destroy()
+		if arena and arena:IsA("Model") then
+			vehicle, seat = createVehicle(arena)
+			vehicle:PivotTo(spawnPivot)
+			seat = vehicle:FindFirstChild("DriverSeat") :: VehicleSeat
+			local resetPrompt = seat:FindFirstChildOfClass("ProximityPrompt")
+			if resetPrompt then resetPrompt.Triggered:Connect(function(triggeringPlayer) handleAction(triggeringPlayer, "Enter") end) end
+		end
+		return
+	end
 	if action == "Exit" then
 		if driver ~= player or currentSeat.Occupant ~= (player.Character and player.Character:FindFirstChildOfClass("Humanoid")) then return end
 		local _, humanoid, root = getDriverCharacter(player)
@@ -165,6 +189,7 @@ local function handleAction(player: Player, action: any, ...: any)
 		clearDriver(player)
 		return
 	end
+	if currentVehicle:GetAttribute("VehicleState") ~= "Active" then return end
 	if driver then return end
 	local character, humanoid, root = getDriverCharacter(player)
 	if not character or not humanoid or not root or humanoid.Health <= 0 then return end
@@ -215,10 +240,26 @@ local function hasObstacle(currentVehicle: Model, currentSeat: VehicleSeat, dire
 	return false
 end
 
+local function applyCollisionDamage(currentVehicle: Model, amount: number)
+	local health = currentVehicle:GetAttribute("VehicleHealth")
+	if typeof(health) ~= "number" or currentVehicle:GetAttribute("VehicleState") ~= "Active" then return end
+	health = math.max(0, health - amount)
+	currentVehicle:SetAttribute("VehicleHealth", health)
+	if health <= 0 then
+		currentVehicle:SetAttribute("VehicleState", "Destroyed")
+		currentVehicle:SetAttribute("Speed", 0)
+		speed, throttle, steering = 0, 0, 0
+		local previousDriver = driver
+		if previousDriver then clearDriver(previousDriver) end
+		if seat then seat.Disabled = true end
+	end
+end
+
 local function stepVehicle(dt: number)
 	local currentVehicle = vehicle
 	local currentSeat = seat
 	if not currentVehicle or not currentSeat then return end
+	if currentVehicle:GetAttribute("VehicleState") ~= "Active" then return end
 	local currentDriver = driver
 	if not currentDriver or not currentSeat.Occupant then
 		speed = 0
@@ -245,11 +286,27 @@ local function stepVehicle(dt: number)
 	end
 	local displacement = nextPivot.Position - pivot.Position
 	if hasObstacle(currentVehicle, currentSeat, displacement.Unit, displacement.Magnitude) then
+		if math.abs(speed) >= 8 then applyCollisionDamage(currentVehicle, math.clamp(math.abs(speed) * 0.75, 6, 24)) end
 		speed = 0
 		return
 	end
 	currentVehicle:PivotTo(nextPivot)
 	currentVehicle:SetAttribute("Speed", math.round(speed * 10) / 10)
+end
+
+function VehicleService.ApplyHit(hit: Instance, damage: number, attacker: Player): boolean
+	local currentVehicle = vehicle
+	if not currentVehicle or not hit:IsDescendantOf(currentVehicle) or currentVehicle:GetAttribute("VehicleState") ~= "Active" then return false end
+	if typeof(damage) ~= "number" or damage ~= damage or damage <= 0 or damage == math.huge then return true end
+	local now = os.clock()
+	if now - (lastDamageAt[attacker] or -math.huge) < vehicleConfig.DamageInterval then return true end
+	lastDamageAt[attacker] = now
+	local health = currentVehicle:GetAttribute("VehicleHealth")
+	if typeof(health) ~= "number" then return true end
+	health = math.max(0, health - math.clamp(damage, 0, vehicleConfig.MaxHealth))
+	currentVehicle:SetAttribute("VehicleHealth", health)
+	if health <= 0 then applyCollisionDamage(currentVehicle, 0) end
+	return true
 end
 
 function VehicleService.Start(arena: Model)
@@ -262,6 +319,7 @@ function VehicleService.Start(arena: Model)
 	inputEvent = getOrCreateRemote(remotes, NetProtocol.VehicleInputEvent)
 	stateEvent = getOrCreateRemote(remotes, NetProtocol.VehicleStateEvent)
 	vehicle, seat = createVehicle(arena)
+	spawnPivot = vehicle:GetPivot()
 	local prompt = seat:FindFirstChildOfClass("ProximityPrompt")
 	assert(prompt, "Prompt de entrada do veículo ausente")
 	prompt.Triggered:Connect(function(player)
@@ -278,6 +336,7 @@ function VehicleService.Start(arena: Model)
 		if driver == player then clearDriver(player) end
 		lastPacketAt[player] = nil
 		lastActionAt[player] = nil
+		lastDamageAt[player] = nil
 	end)
 	RunService.Heartbeat:Connect(stepVehicle)
 	print("[Frontline][FL-024] veículo procedural ativo | velocidade máxima=" .. vehicleConfig.MaxSpeed .. " studs/s")
