@@ -147,3 +147,8 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 
 - Após a validação inicial, obtive Rojo 7.7.1 oficial para Windows x86_64 e confirmei o SHA-256 do zip com o digest da release GitHub. `rojo build <branch> --output <temp>.rbxlx` passou nos heads das branches dos PRs #54–#63 (issues #23–#27 e #28–#32). Binário e builds ficaram em `%TEMP%`; nenhum foi adicionado ao projeto.
 - A validação de serialização não demonstra comportamento Luau/Studio nem substitui os playtests ainda pendentes. Selene e StyLua seguem indisponíveis.
+
+## Integração final — 2026-10-15
+
+- README atualizado para refletir o protótipo local e o gate de release NO-GO. PR draft [#64](https://github.com/dreyvinixz/RobloxGame/pull/64) agrupa o sumário do stack e docs/TEST_REPORTS/INTEGRATION.md; sem push em main e sem publicação Roblox.
+
