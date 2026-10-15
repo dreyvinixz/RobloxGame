@@ -15,6 +15,8 @@ class VehicleContractTests(unittest.TestCase):
         self.assertRegex(CONFIG, r"MaxSpeed\s*=\s*24")
         self.assertRegex(CONFIG, r"Acceleration\s*=\s*14")
         self.assertRegex(CONFIG, r"InputTimeout\s*=\s*0\.35")
+        self.assertRegex(CONFIG, r"BoundaryX\s*=\s*125")
+        self.assertRegex(CONFIG, r"BoundaryZ\s*=\s*100")
         self.assertRegex(SERVER, r"dt\s*=\s*math\.clamp\(dt,\s*0,\s*0\.1\)")
 
     def test_remote_intent_is_authenticated_and_bounded(self):
