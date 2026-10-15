@@ -4,10 +4,12 @@ local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Co
 local ArenaBuilder = require(script.Parent:WaitForChild("ArenaBuilder"))
 local CombatRequestService = require(script.Parent:WaitForChild("CombatRequestService"))
 local DamageService = require(script.Parent:WaitForChild("DamageService"))
+local GameModeService = require(script.Parent:WaitForChild("GameModeService"))
 
 ArenaBuilder.Build()
+GameModeService.Start()
 CombatRequestService.Start()
-DamageService.Start(CombatRequestService)
+DamageService.Start(CombatRequestService, GameModeService)
 
--- Arena greybox (FL-007) | contrato de disparo (FL-009) | rifle hitscan (FL-010)
+-- FL-007 arena | FL-009 remotes | FL-010 rifle | FL-018 teams/rounds
 print("[Frontline][server] bootstrap ok | " .. Config.ProjectName)
