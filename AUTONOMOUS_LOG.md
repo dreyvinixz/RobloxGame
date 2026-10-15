@@ -19,9 +19,7 @@ Atualizado em 2026-10-15. Este registro acompanha as issues abertas #13–#32. `
 | #25 FL-025 | Parcial | [#57](https://github.com/dreyvinixz/RobloxGame/pull/57) | Saúde server-owned, dano por raycast válido e colisão, lockout após destruição, reset próximo com cooldown; validador, 8 testes Python e diff check passaram; playtest de 2 clientes não executado. Ver `docs/TEST_REPORTS/FL-025.md`. |
 | #26 FL-026 | Parcial | [#58](https://github.com/dreyvinixz/RobloxGame/pull/58) | Baseline S2 documentada; sem amostra S4 equivalente ou perfil MicroProfiler, não há conclusão de regressão/leak. Plano repetível em `docs/PERFORMANCE.md`; ver `docs/TEST_REPORTS/FL-026.md`. |
 | #27 FL-027 | Parcial / NO-GO | [#59](https://github.com/dreyvinixz/RobloxGame/pull/59) | Checklist e changelog draft, runbook de rollback e revisão estática de assets/privacidade em `docs/ALPHA_RELEASE_CHECKLIST.md`. FL-023, FL-025 e FL-026 mantêm gates abertos; nada foi publicado. |
-| #26 FL-026 | Pendente | — | Profiling posterior aos cenários e veículos. |
 | #27 FL-027 | Parcial / NO-GO | [#59](https://github.com/dreyvinixz/RobloxGame/pull/59) | Checklist e changelog draft, runbook de rollback e revisão estática de assets/privacidade em `docs/ALPHA_RELEASE_CHECKLIST.md`. FL-023, FL-025 e FL-026 mantêm gates abertos; nada foi publicado. |
-| #27 FL-027 | Pendente | — | Checklist alpha; publicação Roblox requer autorização humana. |
 | #28 FL-028 | Parcial | [#55](https://github.com/dreyvinixz/RobloxGame/pull/55) | ADR-0002 recomenda NO-GO para ponte com processo BF6 ao vivo; GO somente para Roblox independente, workflow Portal dentro do escopo oficial ou mock sintético. Fontes oficiais, obstáculos e política anticheat documentados; sem alteração de executáveis. |
 | #29 FL-029 | Pendente | — | Bots depois do MVP. |
 | #30 FL-030 | Pendente | — | Segundo mapa após alpha. |
