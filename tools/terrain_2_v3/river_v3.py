@@ -100,7 +100,7 @@ def model_river(flat, field, previous, config=None):
     bank_goal = water + 1.2 * np.clip((distance - half_width) / 1.5, 0, 1)
     carved[margin] = np.maximum(carved[margin], bank_goal[margin])
     cross_area = (2. / 3.) * widths * depth
-    volume = float(np.trapz(cross_area, s))
+    volume = float(np.trapezoid(cross_area, s))
     summary = {
         "length_source_pixels": float(s[-1]),
         "water_surface_upstream_relative": float(surface[0]),
