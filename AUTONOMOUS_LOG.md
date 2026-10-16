@@ -225,3 +225,10 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - Dez linhas de visão a 5 studs acima de cinco âncoras ficaram desobstruídas, abrangendo 112.28–554.88 studs. Isso confirma pouco cover do relevo isolado, não balanceamento de combate.
 - Captura CPU A/B de um cliente, câmera fixa, frame limit 256, warm-up 2 s, coleta 9 s, personagem ancorado. Campo: 109 frames completos, regular 6111–6219 / absoluto 776556–776664, mediana 16.675 ms, p95 17.712, máximo 18.110. Bounds vazios: 110 frames, regular 6771–6880 / absoluto 777693–777802, mediana 16.703 ms, p95 17.568, máximo 17.913. Variação permanece dentro do ruído; captura curta, sem conclusão de custo e sem GPU ou memória atribuída à candidata atual.
 - Atualizei os READMEs V5/V6/V7 para refletir a candidata atual e distinguir os gates restantes. A sessão Studio segue sem salvar/reabrir; nenhuma alteração em `main` ou no place de produção.
+
+## Terrain 2 — revisão visual manual e hipótese de proporção V5 — 2026-10-16
+
+- Revisei `orthographic_atlas.jpg` e `left_wireframe.png` frente à altura V5 atual. As referências mostram encostas largas e conectadas; a candidata tem picos de crista mais isolados e agudos. A fidelidade visual absoluta permanece NO-GO.
+- A silhueta em planta tem bbox aproximado de 1.696 (largura/altura) em pixels da imagem, enquanto o campo reconstruído e o mapeamento de Studio são quadrados. Essa razão pode refletir composição/câmera da referência e não é escala mundial calibrada.
+- A varredura exploratória de proporção comparou razões entre 0.6 e 2.0 e consultou também vistas atualmente usadas como holdout. Logo, os scores de holdout deixam de ser evidência independente para escolher proporção. Nenhuma razão foi promovida; o campo quadrado e hash atual permanecem como candidato.
+- Próximo estudo V5: tornar projeção/câmera e exportação X/Z conscientes da proporção; ajustar apenas em vistas de treino e reservar uma referência realmente intocada ou obter vista calibrada nova. Se a proporção mudar, reexportar/resamplear e repetir integração/readback e probes V6/V7 no Studio isolado. Sem mudança de código, terreno ou place nesta revisão.
