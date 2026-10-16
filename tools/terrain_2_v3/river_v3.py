@@ -119,7 +119,8 @@ def model_river(flat, field, previous, config=None):
         "raster_wet_pixels": int(wet.sum()),
         "bank_pixels": int(margin.sum()),
         "equal_sea_surface_elevation_at_both_ends": True,
-        "no_original_bathymetry": True,\n        "both_ends_ocean_connected_hypothesis": True
+        "no_original_bathymetry": True,
+        "both_ends_ocean_connected_hypothesis": True
     }
     k = max(1, len(s) // 100)
     hydro = {
