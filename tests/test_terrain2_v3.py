@@ -99,6 +99,24 @@ class TerrainV3(unittest.TestCase):
         self.assertTrue(np.isfinite(deep).all())
         self.assertFalse(low["summary"]["ABSOLUTE_CUBIC_METERS_AVAILABLE"])
 
+    def test_width_scenarios_change_relative_volume_without_claiming_bathymetry(self):
+        source,route = make_channel()
+        field = np.full((65,65),30,dtype=np.float32)
+        _,narrow,_ = model_river(source,field,{
+            "centerline_xy":route.tolist()},
+            {"width_multiplier":.8,"depth_multiplier":1.})
+        _,wide,_ = model_river(source,field,{
+            "centerline_xy":route.tolist()},
+            {"width_multiplier":1.2,"depth_multiplier":1.})
+        narrow_volume=narrow["summary"]["water_volume_relative_cubic_units"]
+        wide_volume=wide["summary"]["water_volume_relative_cubic_units"]
+        # The assumed depth profile also depends on channel width, so the volume
+        # ratio is not just the 1.2/.8 width ratio. Check direction and metadata.
+        self.assertGreater(wide_volume,narrow_volume)
+        self.assertEqual(narrow["summary"]["width_scenario_multiplier"],.8)
+        self.assertEqual(wide["summary"]["width_scenario_multiplier"],1.2)
+        self.assertFalse(wide["summary"]["ABSOLUTE_CUBIC_METERS_AVAILABLE"])
+
     def test_orthographic_mirroring(self):
         height = np.zeros((33,33),np.float32)
         height[11,5] = 40

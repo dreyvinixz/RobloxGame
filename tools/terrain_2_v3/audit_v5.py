@@ -58,23 +58,46 @@ def audit(sources, v2, v3, v4, output):
     components = np.bincount(labels.ravel())[1:]
     water_connected = bool(len(components) == 1)
     deltas = refined - base
+    avg_side_error = float(np.mean([x["v4_rmse_px_equivalent"]
+                                   for x in comparisons.values()]))
+    fit_view = iso["oblique_wireframe_1.jpg"]
+    heldout_view = iso["oblique_wireframe_2.jpg"]
+    fit_improved = fit_view["v4_normalized_rmse"] < fit_view["v3_normalized_rmse"]
+    heldout_regressed = heldout_view["v4_normalized_rmse"] > heldout_view["v3_normalized_rmse"]
+    cardinal_regressed = any(not x["v4_better_than_v3"] and
+        x["v4_rmse_px_equivalent"] > x["v3_rmse_px_equivalent"] + 1e-6
+        for x in comparisons.values())
+    # This is an image-space gate only. It deliberately does not certify a
+    # metric reconstruction or Roblox readiness.
+    image_delta_checks_pass = bool(water_connected and fit_improved and
+                                   not heldout_regressed and not cardinal_regressed)
     result = {
         "source": "original user AI-generated images, verified by SHA-256",
-        "status": "AUDITED_NOT_PHYSICALLY_VALIDATED",
+        "status": "IMAGE_AUDIT_NO_GO",
         "source_sha256": source_hashes,
         "grid": list(refined.shape),
         "cardinal": comparisons,
         "isometric": iso,
+        "cardinal_mean_v4_rmse_px_equivalent": avg_side_error,
         "water_single_connected_component": water_connected,
+        "image_delta_checks_pass": image_delta_checks_pass,
+        "visual_review": "NO_GO",
         "height_change_mean_absolute_relative": float(np.mean(np.abs(deltas))),
         "height_change_max_absolute_relative": float(np.max(np.abs(deltas))),
         "pass": False,
-        "reason": "Manual visual inspection and independently calibrated geometry still required",
+        "reason": "Visual review found material left/right and isometric silhouette mismatch; V4 is not accepted as a faithful reconstruction",
+        "review_findings": [
+            "Front and back profile errors are about 7.3 px-equivalent, while left and right remain about 17.6 and 20.2.",
+            "V3 and V4 cardinal profile predictions are identical by design; ridge detail cannot correct these existing mismatches.",
+            "The normalized isometric skyline overlays remain visibly misaligned; these diagnostics are uncalibrated and do not prove 3D geometry.",
+            "The short northern ocean connection is a three-cell image-space hypothesis, not recovered shoreline geometry."
+        ],
         "warnings": [
             "Pixel-equivalent side RMSE is not a physical 3D reprojection error.",
             "Isometric silhouette metrics use uncalibrated view heuristics.",
             "River depth and volume are scenarios, not measured bathymetry.",
-            "AI-generated references may be mutually inconsistent."
+            "AI-generated references may be mutually inconsistent.",
+            "A later isolated Studio prototype tested voxel collision and one-client traversal, but source-to-stud scale, visual acceptance, performance and production readiness remain unproven."
         ]
     }
     (out / "v5_reference_audit.json").write_text(json.dumps(result, indent=2) + "\n")

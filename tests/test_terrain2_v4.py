@@ -117,15 +117,22 @@ class TerrainV4Tests(unittest.TestCase):
             src,v2,v3,route,top,p=setup_inputs(Path(tmp))
             output=Path(tmp)/"out"
             result=run(src,v2,v3,output)
-            self.assertEqual(result["status"],"V4_REFINED_RELATIVE_2_5D_NOT_VALIDATED")
+            self.assertEqual(result["status"],"V4_IMAGE_CONSTRAINED_2_5D_NO_GO_VISUAL_FIDELITY")
             self.assertTrue(result["river_ocean"]["north_south_connected"])
             self.assertTrue(result["not_recovered_geometry"])
             self.assertEqual(result["vertices"],65*65)
             for name in ("mesh_refined_v4.obj","heightmap_refined_v4.png",
                          "river_ocean_join_v4.png","uncertainty_v4.png",
                          "final_report_v4.json","terrain_v4.html",
-                         "multiview_comparison_v4.png"):
+                         "multiview_comparison_v4.png",
+                         "isometric_comparison_v4.png"):
                 self.assertTrue((output/name).is_file(),name)
+            report=json.loads((output/"final_report_v4.json").read_text())
+            self.assertFalse(report["terrain_detail"]["held_out_isometric_2_used_for_selection"])
+            self.assertTrue(all(v["cardinal_profiles_unchanged"]
+                                for v in report["terrain_detail"]["candidates"]))
+            self.assertIn("oblique_wireframe_2.jpg",
+                          report["isometric_before_after_normalized_rmse"])
 
 
 if __name__=="__main__":

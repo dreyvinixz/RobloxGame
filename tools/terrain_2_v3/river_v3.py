@@ -67,6 +67,10 @@ def model_river(flat, field, previous, config=None):
     multiplier = float(config.get("depth_multiplier", 1.))
     if not .1 <= multiplier <= 6:
         raise ValueError("Invalid relative depth multiplier")
+    width_multiplier = float(config.get("width_multiplier", 1.))
+    if not .5 <= width_multiplier <= 2.:
+        raise ValueError("Invalid relative width multiplier")
+    widths = widths * width_multiplier
     # Scenario assumption, not recovered bathymetry.
     depth = (3. + 2.5 * np.clip(widths / 30, .3, 2.2) ** .7 + 1.2 * progress) * multiplier
     surface = np.zeros_like(progress, dtype=float)  # both ends open to sea, no invented river slope
@@ -113,6 +117,8 @@ def model_river(flat, field, previous, config=None):
         "volume_low_depth_scenario": volume * .5,
         "volume_high_depth_scenario": volume * 1.5,
         "volume_scenario_basis": "same source-pixel widths, half to one-and-half assumed depths",
+        "width_scenario_multiplier": width_multiplier,
+        "depth_scenario_multiplier": multiplier,
         "geometry_scale": "source horizontal pixels and arbitrary relative vertical units",
         "ABSOLUTE_CUBIC_METERS_AVAILABLE": False,
         "north_to_south_sea_channel_connected": connected,
