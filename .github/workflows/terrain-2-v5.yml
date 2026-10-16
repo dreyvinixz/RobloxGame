@@ -1,0 +1,43 @@
+name: Terrain 2 V5 geometry and hydrology QA
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - tools/terrain_2_v3/**
+      - tests/test_terrain2_v5.py
+      - .github/workflows/terrain-2-v5.yml
+  pull_request:
+    paths:
+      - tools/terrain_2_v3/**
+      - tests/test_terrain2_v5.py
+      - .github/workflows/terrain-2-v5.yml
+permissions:
+  contents: read
+jobs:
+  validate-v5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: tools/terrain_inverse/requirements.txt
+      - name: Install scientific Python
+        run: python -m pip install -r tools/terrain_inverse/requirements.txt
+      - name: Test V5 adaptive geometry, water scenarios and held-out scoring
+        run: python -m unittest discover -s tests -p 'test_terrain2_v5.py' -v
+      - name: Verify V5 source contract without original user imagery
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          assert Path('tools/terrain_2_v3/terrain_v5.py').is_file()
+          assert Path('tools/terrain_2_v3/audit_v5.py').is_file()
+          assert not Path('references/top_flat_semantic.jpg').exists()
+          print('V5 CI validates synthetic invariants; original-image fidelity requires the manual source-reference workflow.')
+          PY
