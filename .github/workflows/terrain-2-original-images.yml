@@ -40,8 +40,11 @@ jobs:
           case "$SOURCE_URL" in https://*) ;; *) echo 'Only HTTPS URLs allowed'; exit 1;; esac
           # GitHub release asset downloads may require repository access.
           if [[ "$SOURCE_URL" == https://github.com/*/releases/download/* ]]; then
-            gh release download "${SOURCE_URL##*/download/}" --repo "${GITHUB_REPOSITORY}" --pattern '*.zip' --dir work
-            find work -maxdepth 1 -name '*.zip' -print -quit | xargs -r -I{} mv '{}' work/references.zip
+            release_path="${SOURCE_URL#https://github.com/${GITHUB_REPOSITORY}/releases/download/}"
+            release_tag="${release_path%%/*}"
+            asset_name="${release_path#*/}"
+            gh release download "$release_tag" --repo "$GITHUB_REPOSITORY" --pattern "$asset_name" --dir work
+            mv "work/$asset_name" work/references.zip
           else
             curl --fail --location --retry 3 --max-time 300 "$SOURCE_URL" --output work/references.zip
           fi
