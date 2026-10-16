@@ -307,5 +307,97 @@
         534
       ]
     }
-  ]
+  ],
+  "hydrology": {
+    "lake_seed_px": [
+      550,
+      310
+    ],
+    "lake_to_port_waypoints_px": [
+      [
+        550,
+        310
+      ],
+      [
+        548,
+        281
+      ],
+      [
+        540,
+        273
+      ],
+      [
+        514,
+        282
+      ],
+      [
+        490,
+        292
+      ],
+      [
+        470,
+        302
+      ],
+      [
+        446,
+        308
+      ],
+      [
+        425,
+        336
+      ],
+      [
+        399,
+        346
+      ],
+      [
+        379,
+        355
+      ],
+      [
+        370,
+        367
+      ],
+      [
+        370,
+        391
+      ],
+      [
+        357,
+        412
+      ],
+      [
+        340,
+        427
+      ],
+      [
+        347,
+        446
+      ],
+      [
+        356,
+        458
+      ],
+      [
+        371,
+        468
+      ],
+      [
+        394,
+        476
+      ],
+      [
+        415,
+        494
+      ]
+    ],
+    "routing_corridor_px": 18,
+    "river_half_width_px": 5,
+    "bank_blend_px": 16,
+    "lake_surface_relative": 12,
+    "port_surface_relative": 0,
+    "water_depth_relative": 2.5,
+    "bank_rise_relative": 5,
+    "source_note": "Manual pixel annotations on AI-generated atlas top panel normalized to 906x726. Relative water elevation, NOT surveyed meters."
+  }
 }

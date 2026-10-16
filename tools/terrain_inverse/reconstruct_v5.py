@@ -215,8 +215,17 @@ def run(top_atlas,clean_oblique,original_wireframe,landmarks,output,grid=257,vie
     camera,camera_report=estimate_plane_camera(ties)
     peaks,rejected=estimate_peak_heights(ties,camera)
     field,mask=derive_heightfield(top,land,peaks,grid)
+    hydrology=None
+    if "hydrology" in ties:
+        from .hydrology_v5 import build_hydrology
+        hydrology=build_hydrology(top,field,ties["hydrology"])
+        field=hydrology["height"]
+        mask=mask | hydrology["water_mask"]
     out=Path(output)
     out.mkdir(parents=True,exist_ok=True)
+    if hydrology is not None:
+        from .hydrology_v5 import save_hydrology
+        save_hydrology(out,top,hydrology,ties["hydrology"])
     np.save(out/"height_relative.npy",field)
     Image.fromarray(np.rint(np.clip((field+8)/213,0,1)*65535).astype(np.uint16)).save(out/"heightmap_16bit.png")
     cv2.imwrite(str(out/"top_water_source_segmentation.png"),water.astype(np.uint8)*255)
@@ -233,6 +242,15 @@ def run(top_atlas,clean_oblique,original_wireframe,landmarks,output,grid=257,vie
         fig=go.Figure(go.Surface(x=np.linspace(0,1000,grid)[::step],
                     y=np.linspace(1000,0,grid)[::step],
                     z=field[::step,::step],colorscale="Earth",showscale=False))
+        if hydrology is not None:
+            river_points=hydrology["path_xy"]
+            water_levels=hydrology["river_level"]
+            fig.add_trace(go.Scatter3d(
+                x=river_points[:,0]/(top.shape[1]-1)*1000,
+                y=(1-river_points[:,1]/(top.shape[0]-1))*1000,
+                z=water_levels,mode="lines",
+                line=dict(color="deepskyblue",width=7),
+                name="Connected lake-to-harbor water"))
         fig.update_layout(title="V5 relative-height HYPOTHESIS (not original 3D mesh)",
                           scene=dict(aspectratio=dict(x=1,y=1,z=.28)),
                           margin=dict(l=0,r=0,b=0,t=35))
@@ -242,7 +260,10 @@ def run(top_atlas,clean_oblique,original_wireframe,landmarks,output,grid=257,vie
        "inputs_sha256":{"top_atlas":sha_atlas,"clean_oblique":sha_clean,
                         "original_wireframe":sha_original},
        "method":"Raw top-view RGB segmentation + manually marked cross-view shore/peak correspondences + robust affine sea-level registration + image-anchored RBF height interpolation",
-       "camera":camera_report,"peak_anchors_accepted":peaks,
+       "camera":camera_report,
+       "hydrology":hydrology["report"] if hydrology is not None else
+           {"status":"NO_SOURCE_HYDROLOGY_ANNOTATIONS"},
+       "peak_anchors_accepted":peaks,
        "peak_anchors_rejected":rejected,"reprojection_debug":reprojection,
        "grid":grid,"vertices":grid*grid,"triangles":2*(grid-1)*(grid-1),
        "height_min":float(field.min()),"height_max":float(field.max()),
@@ -255,6 +276,7 @@ def run(top_atlas,clean_oblique,original_wireframe,landmarks,output,grid=257,vie
           "This is regular-grid mesh, not recovered true wireframe triangle topology",
           "V4.2 candidate graph is NOT yet incorporated into 3D topology",
           "Color segmentation may misclassify sea or dark rocks",
+          "Lake-to-harbor hydrology uses manual pixel waypoints and relative water levels; not physics calibration",
           "Not ready for Roblox Studio terrain replacement or production"]
     }
     (out/"v5_report.json").write_text(json.dumps(report,indent=2)+"\n",encoding="utf-8")
