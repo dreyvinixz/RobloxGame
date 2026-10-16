@@ -71,6 +71,11 @@ def model_river(flat, field, previous, config=None):
     if not .5 <= width_multiplier <= 2.:
         raise ValueError("Invalid relative width multiplier")
     widths = widths * width_multiplier
+    bank_fraction = config.get("bank_margin_fraction_relative")
+    if bank_fraction is not None:
+        bank_fraction = float(bank_fraction)
+        if not .01 <= bank_fraction <= .5:
+            raise ValueError("Invalid relative bank-margin fraction")
     # Scenario assumption, not recovered bathymetry.
     depth = (3. + 2.5 * np.clip(widths / 30, .3, 2.2) ** .7 + 1.2 * progress) * multiplier
     surface = np.zeros_like(progress, dtype=float)  # both ends open to sea, no invented river slope
@@ -100,8 +105,17 @@ def model_river(flat, field, previous, config=None):
     section_depth = depth[near] * (1 - np.clip(distance / half_width, 0, 1) ** 2)
     carved = field.astype(np.float32).copy()
     carved[wet] = (water - section_depth)[wet]
-    margin = (distance > half_width) & (distance < half_width + 1.5)
-    bank_goal = water + 1.2 * np.clip((distance - half_width) / 1.5, 0, 1)
+    if bank_fraction is None:
+        # Preserve the V3 fixed-margin behavior unless a V5 scenario opts in.
+        margin_width = np.full_like(half_width, 1.5)
+    else:
+        # Relative design hypothesis, bounded to keep narrow channels visible
+        # and broad channels from receiving an unbounded terrestrial berm.
+        margin_width = np.clip(2 * half_width * bank_fraction, .5, 3.)
+    margin = ((distance > half_width) &
+              (distance < half_width + margin_width))
+    bank_goal = water + 1.2 * np.clip(
+        (distance - half_width) / margin_width, 0, 1)
     carved[margin] = np.maximum(carved[margin], bank_goal[margin])
     cross_area = (2. / 3.) * widths * depth
     volume = float(np.trapezoid(cross_area, s))
@@ -124,6 +138,10 @@ def model_river(flat, field, previous, config=None):
         "north_to_south_sea_channel_connected": connected,
         "raster_wet_pixels": int(wet.sum()),
         "bank_pixels": int(margin.sum()),
+        "bank_margin_fraction_relative": bank_fraction,
+        "bank_margin_width_min_grid_cells": float(margin_width.min()),
+        "bank_margin_width_median_grid_cells": float(np.median(margin_width)),
+        "bank_margin_width_max_grid_cells": float(margin_width.max()),
         "equal_sea_surface_elevation_at_both_ends": True,
         "no_original_bathymetry": True,
         "both_ends_ocean_connected_hypothesis": True
@@ -147,6 +165,7 @@ def model_river(flat, field, previous, config=None):
         "centerline_xy": route, "width_px": widths, "depth": depth,
         "surface_levels": surface, "river_water_mask": wet,
         "river_bank_mask": margin,
+        "bank_margin_width_grid_cells": margin_width,
         "depth_grid": np.where(wet, section_depth, 0).astype(np.float32)
     }
     return carved, hydro, geo

@@ -647,6 +647,53 @@ def _image_metrics(images, field, land, cameras):
             for name in ("oblique_wireframe_1.jpg", "oblique_wireframe_2.jpg")}
 
 
+def channel_evidence_metrics(predicted, observed, land, centerline, source_shape):
+    """Report plan-mask overlap and sea connectivity as image-relative diagnostics."""
+    predicted = np.asarray(predicted, dtype=bool)
+    observed = np.asarray(observed, dtype=bool)
+    if predicted.shape != observed.shape or predicted.shape != land.shape:
+        raise ValueError("Channel evidence masks must use the V5 grid")
+    intersection = int(np.count_nonzero(predicted & observed))
+    union = int(np.count_nonzero(predicted | observed))
+    predicted_count = int(predicted.sum())
+    observed_count = int(observed.sum())
+    outside_distance = cv2.distanceTransform(
+        (~observed).astype(np.uint8), cv2.DIST_L2, 3)
+    mean_prediction_to_observed = float(outside_distance[predicted].mean()) \
+        if predicted_count else None
+
+    sea = ~land
+    sea_count, sea_labels = cv2.connectedComponents(sea.astype(np.uint8), 8)
+    combined_count, combined_labels = cv2.connectedComponents(
+        (sea | predicted).astype(np.uint8), 8)
+    src_h, src_w = source_shape
+    n = predicted.shape[0]
+    coordinates = np.asarray(centerline, float) * np.array(
+        [(n - 1) / (src_w - 1), (n - 1) / (src_h - 1)])
+    endpoints = np.rint(coordinates[[0, -1]]).astype(int)
+    start_col, start_row = endpoints[0]
+    end_col, end_row = endpoints[1]
+    sea_start = int(sea_labels[start_row, start_col])
+    sea_end = int(sea_labels[end_row, end_col])
+    combined_start = int(combined_labels[start_row, start_col])
+    combined_end = int(combined_labels[end_row, end_col])
+    return {
+        "observed_source_mask": "V2 channel_corridor_observed, resized to the V5 grid",
+        "same_source_diagnostic_only": True,
+        "pixel_precision": intersection / max(1, predicted_count),
+        "pixel_recall": intersection / max(1, observed_count),
+        "pixel_iou": intersection / max(1, union),
+        "mean_predicted_to_observed_distance_grid_cells": mean_prediction_to_observed,
+        "source_sea_components_before_channel_union": int(sea_count - 1),
+        "sea_components_after_channel_union": int(combined_count - 1),
+        "north_endpoint_sea_component_before": sea_start,
+        "south_endpoint_sea_component_before": sea_end,
+        "north_south_endpoints_connected_after_union": bool(
+            combined_start > 0 and combined_start == combined_end),
+        "not_an_independent_validation_gate": True,
+    }
+
+
 def run(sources, v2_dir, v3_dir, v4_dir, output):
     sources, v2_dir, v3_dir, v4_dir, output = map(
         Path, (sources, v2_dir, v3_dir, v4_dir, output))
@@ -663,11 +710,16 @@ def run(sources, v2_dir, v3_dir, v4_dir, output):
     if not np.isfinite(base).all():
         raise ValueError("Non-finite V4 heightfield")
     land_img = cv2.imread(str(v2_dir / "land_all_components.png"), cv2.IMREAD_GRAYSCALE)
+    channel_observed_img = cv2.imread(
+        str(v2_dir / "channel_corridor_observed.png"), cv2.IMREAD_GRAYSCALE)
     water_img = cv2.imread(str(v4_dir / "river_ocean_join_v4.png"), cv2.IMREAD_GRAYSCALE)
-    if land_img is None or water_img is None:
-        raise ValueError("V5 requires V2 land and V4 water masks")
+    if land_img is None or water_img is None or channel_observed_img is None:
+        raise ValueError("V5 requires V2 land/channel and V4 water masks")
     land = cv2.resize((land_img > 0).astype(np.uint8), base.shape[::-1],
                       interpolation=cv2.INTER_NEAREST) > 0
+    channel_observed = cv2.resize(
+        (channel_observed_img > 0).astype(np.uint8), base.shape[::-1],
+        interpolation=cv2.INTER_NEAREST) > 0
     water = water_img > 0
     rock_img = cv2.imread(str(v2_dir / "rock_likelihood.png"), cv2.IMREAD_GRAYSCALE)
     if rock_img is None:
@@ -858,24 +910,39 @@ def run(sources, v2_dir, v3_dir, v4_dir, output):
     hydro_scenarios = []
     for width_factor in (.8, 1., 1.2):
         for depth_factor in (.5, 1., 1.5):
-            carved, hydro, geo = model_river(reference, selected_field, channel,
-                {"width_multiplier": width_factor, "depth_multiplier": depth_factor})
-            mask_name = f"water_width_{width_factor:.1f}_depth_{depth_factor:.1f}.png"
-            if not cv2.imwrite(str(output / mask_name),
-                               geo["river_water_mask"].astype(np.uint8) * 255):
-                raise OSError("Failed to write water scenario " + mask_name)
-            hydro_scenarios.append({
-                "width_multiplier_relative": width_factor,
-                "depth_multiplier_relative": depth_factor,
-                "water_mask": mask_name,
-                "summary": hydro["summary"],
-                "width_profile_source_pixels": hydro["width_profile_px"],
-                "depth_profile_relative_only": hydro["assumed_depth_profile_relative"],
-                "relative_volume_scenario_low": hydro["summary"]["volume_low_depth_scenario"],
-                "relative_volume_scenario_base": hydro["summary"]["water_volume_relative_cubic_units"],
-                "relative_volume_scenario_high": hydro["summary"]["volume_high_depth_scenario"],
-                "not_physical_bathymetry": True,
-            })
+            for bank_fraction in (.05, .10, .15):
+                carved, hydro, geo = model_river(reference, selected_field, channel,
+                    {"width_multiplier": width_factor,
+                     "depth_multiplier": depth_factor,
+                     "bank_margin_fraction_relative": bank_fraction})
+                mask_name = (f"water_width_{width_factor:.1f}_"
+                             f"depth_{depth_factor:.1f}_bank_{bank_fraction:.2f}.png")
+                bank_name = (f"bank_width_{width_factor:.1f}_"
+                             f"fraction_{bank_fraction:.2f}.png")
+                if not cv2.imwrite(str(output / mask_name),
+                                   geo["river_water_mask"].astype(np.uint8) * 255):
+                    raise OSError("Failed to write water scenario " + mask_name)
+                if not cv2.imwrite(str(output / bank_name),
+                                   geo["river_bank_mask"].astype(np.uint8) * 255):
+                    raise OSError("Failed to write bank-margin scenario " + bank_name)
+                evidence = channel_evidence_metrics(
+                    geo["river_water_mask"], channel_observed, land,
+                    channel["centerline_xy"], reference.shape[:2])
+                hydro_scenarios.append({
+                    "width_multiplier_relative": width_factor,
+                    "depth_multiplier_relative": depth_factor,
+                    "bank_margin_fraction_relative": bank_fraction,
+                    "water_mask": mask_name,
+                    "bank_margin_mask": bank_name,
+                    "source_channel_overlap_diagnostic": evidence,
+                    "summary": hydro["summary"],
+                    "width_profile_source_pixels": hydro["width_profile_px"],
+                    "depth_profile_relative_only": hydro["assumed_depth_profile_relative"],
+                    "relative_volume_scenario_low": hydro["summary"]["volume_low_depth_scenario"],
+                    "relative_volume_scenario_base": hydro["summary"]["water_volume_relative_cubic_units"],
+                    "relative_volume_scenario_high": hydro["summary"]["volume_high_depth_scenario"],
+                    "not_physical_bathymetry": True,
+                })
 
     features, feature_reports = classify_regions(
         selected_field, land, water, rock_likelihood)
