@@ -28,6 +28,17 @@ On the earlier V5 voxel candidate, a one-client character used a radius-2, heigh
 
 The repeated center-start route run ended within 3.3 studs of the east ridge marker with 100 health; server readback confirmed all four arrivals. Studio initially assigned `Workspace.FrontlineArena.EntryPoints.Spawn_WestEntry` as `RespawnLocation`, and the first character appeared at `(-124, 5.56, 0)` outside the terrain test area. In a separate Play probe, explicitly assigning `Workspace.V7_TestSpawn` and calling `LoadCharacterAsync()` twice placed both characters in the test spawn area at 100 health. Pathfinding found routes from that spawned position to all four markers, and one actual navigation to north beach ended 2.65 studs from its marker. The override was runtime-only; the place's default startup still chooses the production west spawn, so the spawn selection is not fixed in the saved place. These results establish basic one-client traversal only. The largest waypoint change is not a finished slope acceptance test. Multiplayer, combat, beach gameplay, and broader traversal remain open.
 
+A separate walkability-only query started at the test spawn area (`(-10, 107.5, -2)`) with `AgentRadius=2`, `AgentHeight=5`, `AgentCanJump=false`, and 4-stud waypoint spacing:
+
+| Destination | Pathfinding status | Waypoints | Path length |
+| --- | --- | ---: | ---: |
+| North beach | Success | 30 | 112.6 studs |
+| South beach | Success | 89 | 343.8 studs |
+| West ridge | Success | 97 | 373.9 studs |
+| East ridge | NoPath | — | — |
+
+This is a PathfindingService walkability query, not a completed human playtest. It supports basic no-jump access to both beaches and the west ridge; the east ridge still needs a walkable route or a deliberately jump-required gameplay decision.
+
 Performance remains **unaccepted**. A matched LibMP client CPU A/B used the same fixed camera, client, frame limit (256), 2-second warm-up, and 9-second collection interval. The terrain candidate capture contained 110 complete frames (regular IDs 2202–2311; absolute IDs 491968–492077), with median CPU frame interval 16.749 ms and p95 17.635 ms. The empty test-bounds capture contained 85 complete frames (regular IDs 2888–2972; absolute IDs 493053–493137), with median 16.699 ms and p95 17.750 ms. The differences are within sample noise; these short captures do not establish a terrain performance cost or sustained performance. GPU frame timing and memory counters were not compared. The earlier `TerrainVoxels` reading was 962.8 MB and did not release after a reversible region-clear A/B; that older memory figure was not remeasured after the profile-restored candidate was selected.
 
 ## Remaining gates
