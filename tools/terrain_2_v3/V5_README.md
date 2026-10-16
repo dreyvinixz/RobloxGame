@@ -30,7 +30,7 @@ python -m tools.terrain_2_v3.terrain_v5 --sources references --v2 output_v2 --v3
 
 ## Region hypotheses and open review
 
-The V5 preview exports west/east mountain, cliff, plateau, central plain, and beach masks. The current counts are 2,818/2,729 mountain cells, 862 cliff cells, 1,431 plateau cells, 6,282 central-plain cells, and 3,540 beach cells. Region hypotheses now use source rock evidence and smoothed V5 relief; they remain heuristics, not physical classifications. Manual contour review remains open because the heightfield still shows block-like ridge patches that do not fully follow the source render.
+The V5 preview exports west/east mountain, cliff, plateau, central plain, and beach masks. The latest original-reference run reports 2,818/2,729 mountain cells, 842 cliff cells, 1,357 plateau cells, 6,285 central-plain cells, and 3,540 beach cells. Region hypotheses use source rock evidence and smoothed V5 relief; they remain heuristics, not physical classifications. Manual contour review remains open because the heightfield still shows block-like ridge patches that do not fully follow the source render.
 
 A training-only local ridge-smoothing sweep tested 144 combinations of rock evidence threshold, region dilation, Gaussian radius, and blend amount against the fixed wireframe-1 and side-render cameras plus the cardinal profile constraints. Only one combination met the per-view gates; it gave a 12.58 px-equivalent cardinal mean and 0.58036 mean training error, versus 12.55 and 0.58096 for the selected field. The existing selection rule still favors the current field's lower cardinal mean, so no geometry or hash change was promoted. This small training gain does not resolve the manual slope/peak mismatch.
 

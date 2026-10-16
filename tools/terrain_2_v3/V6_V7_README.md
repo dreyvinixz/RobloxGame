@@ -28,6 +28,22 @@
 
 A separate `PathfindingService` query from `(-10, 107.5, -2)` with `AgentRadius=2`, `AgentHeight=5`, `AgentCanJump=false`, and 4-stud waypoint spacing found paths to north beach (30 waypoints, 112.57 studs) and south beach (89 waypoints, 343.85 studs). It returned `NoPath` to the west and east ridges. Jump-enabled traversal works for this one client, but no-jump ridge access and gameplay slope criteria remain open. This is not multiplayer acceptance.
 
+### Heightfield slope diagnostic
+
+I computed finite-difference slopes from the latest hash-verified 257×257 field over the 36,825 dry-land samples, using 4 studs per horizontal grid cell and the current assumed vertical mapping of 1 stud per relative height unit. This is a scale-dependent heightfield diagnostic; it does not reproduce Roblox Humanoid or PathfindingService traversal.
+
+| Region hypothesis | Cells | P90 slope | At or below 20° | At or below 30° | At or below 35° |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| All dry land | 36,825 | 45.00° | 78.63% | 81.62% | 83.80% |
+| Beaches | 3,485 | 54.74° | 65.25% | 65.37% | 65.42% |
+| Central plain | 6,285 | 0.00° | 99.87% | 100.00% | 100.00% |
+| West mountain | 2,818 | 48.47° | 78.53% | 81.69% | 84.21% |
+| East mountain | 2,729 | 53.19° | 74.90% | 77.87% | 79.77% |
+| Cliffs | 842 | 65.42° | 1.90% | 5.23% | 7.48% |
+| Plateau | 1,357 | 33.79° | 50.18% | 81.80% | 91.23% |
+
+The uncalibrated vertical scale materially changes the result: all-land P90 is 26.57° at 0.5 stud per relative unit and 63.43° at 2 studs per relative unit; beach P90 ranges from 35.26° to 70.53°. These values help set up gameplay criteria, but no threshold has been approved and the runtime routes remain the authoritative playability probes.
+
 ### Combat-zone sightlines
 
 Five terrain anchors were raycast at eye level (5 studs above the surface): central plain `(-2, 2)` Grass Y=102; north beach `(-10, -110)` Sand Y=102; south beach `(-54, -326)` Sand Y=100.40; west ridge `(-294, 10)` Rock Y=152.21; east ridge `(258, -30)` Rock Y=192.11. All 10 pairwise terrain rays were unobstructed, at ranges from 112.28 to 554.88 studs. This is a placement study only; it indicates that terrain alone offers limited hard cover. No combat assets were placed, and weapon ranges, cover standards, and future asset footprints remain unreviewed.
