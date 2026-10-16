@@ -74,6 +74,10 @@ jobs:
         run: python -m tools.terrain_2_v3.refine_v4 --sources work/references --v2 work/output_v2 --v3 work/output_v3 --output work/output_v4
       - name: Evaluate original-reference V5 audit
         run: python -m tools.terrain_2_v3.audit_v5 --sources work/references --v2 work/output_v2 --v3 work/output_v3 --v4 work/output_v4 --output work/output_v5
+      - name: Reconstruct V5 adaptive geometry, hydrology and multiview candidate
+        run: python -m tools.terrain_2_v3.terrain_v5 --sources work/references --v2 work/output_v2 --v3 work/output_v3 --v4 work/output_v4 --output work/output_v5
+      - name: Post-selection skyline diagnostic for the sparse-mesh reference
+        run: python -m tools.terrain_2_v3.audit_v5_extra_view --sources work/references --v2 work/output_v2 --v4 work/output_v4 --v5 work/output_v5 --output work/output_v5/extra_view_audit
       - name: Publish V2 original-source constraints
         if: always()
         uses: actions/upload-artifact@v4
@@ -98,11 +102,11 @@ jobs:
           path: work/output_v4/
           if-no-files-found: warn
           retention-days: 30
-      - name: Publish V5 audit
+      - name: Publish V5 geometry, hydrology and audit
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: terrain2-original-v5-audit
+          name: terrain2-original-v5
           path: work/output_v5/
           if-no-files-found: warn
           retention-days: 30

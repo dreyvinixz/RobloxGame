@@ -151,3 +151,175 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 
 - README atualizado para refletir o protótipo local e o gate de release NO-GO. PR draft [#64](https://github.com/dreyvinixz/RobloxGame/pull/64) agrupa o sumário do stack e docs/TEST_REPORTS/INTEGRATION.md; sem push em main e sem publicação Roblox.
 
+
+## Terrain 2 — pós-V5/V6/V7 evidência de perfil — 2026-10-16
+
+- Captura LibMP adicional apenas no candidato: 109 frames completos; CPU mediana 16.688 ms, p95 18.114 ms, máximo 18.760 ms. A captura vazia correspondente não foi concluída/obtida; resultado A/B e gate de desempenho continuam inconclusivos.
+- Para preparar baseline, os limites de teste foram limpos reversivelmente com `CopyRegion`; leitura do servidor confirmou 0 voxels e backup em memória presente. Após `PasteRegion`, leitura no servidor e no Edit confirmou 370,626 voxels (Water 146,120; Rock 195,768; Sand 3,485; Grass 25,253). A sessão Studio continua não salva.
+- `tools/terrain_2_v3/V6_V7_README.md` e atributos do modelo isolado registram a captura parcial e a restauração. Sem mudanças em `main` ou no lugar de produção; gates visuais V5, persistência V6 e aceitação V7 continuam abertos.
+- Alteração documental; nenhum teste automatizado executado nesta atualização.
+
+## Terrain 2 — experimento de resolução V5 513×513 — 2026-10-16
+
+- Reexecutei V3/V4/V5 com grade 513 usando as referências originais cujos hashes estão no relatório. A malha adaptativa selecionada produziu 75,248 vértices e 148,797 triângulos; o V4 da mesma grade produziu baseline consistente.
+- A V5 513 reduziu a média dos perfis cardinais de 13.41 para 12.96 px-equivalentes e melhorou o score do atlas, mas o holdout wireframe-2 regrediu de 0.87909 para 0.89932 (limite 0.88409). Resultado `V5_NO_GO_MULTIVIEW_GEOMETRY`; candidato não promovido. A V5 257 previamente selecionada permanece a candidata relativa.
+- O resultado e a razão da rejeição foram registrados em `tools/terrain_2_v3/V5_README.md`. Escala maior sozinha não resolve a discrepância multivista; fidelidade absoluta continua NO-GO.
+
+## Terrain 2 — métrica proxy de V6 field→voxel — 2026-10-16
+
+- Confirmei o hash da fonte V5 (`ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`) e comparei o heightfield Y=100+relief com o topo estimado por coluna do `ReadVoxels`, nas 37,818 colunas da máscara terrestre V2, respeitando o eixo Z invertido.
+- MAE 0.307 studs, RMSE 0.943 studs, máximo 9.3 studs; 97.2% das colunas ficaram dentro de 2 studs e 1.6% tiveram erro de 4 studs ou mais. O método é proxy de quantização/alinhamento; a revisão espacial dos outliers e a comparação direta da malha com os voxels seguem abertas.
+- Atualizei `tools/terrain_2_v3/V6_V7_README.md`. Sem alteração de terreno neste passo; sem testes automatizados.
+
+## Terrain 2 — correção da métrica proxy V6 — 2026-10-16
+
+- A primeira comparação usou toda a máscara terrestre e contou 993 células cobertas pela água do canal; nessas células, o topo de água foi incorretamente comparado ao terreno submerso. Essa estatística foi substituída.
+- Recalculei com a máscara `land_all_components` menos `water_width_1.0_depth_1.0.png`: 36,825 colunas secas, MAE 0.195 studs, RMSE 0.505, máximo 2.0; 99.4% dentro de 2 studs. Confirmada relação de coordenadas e fonte V5 com hash `ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`.
+- README atualizado; comparação direta com a malha adaptativa permanece aberta.
+
+## Terrain 2 — refinamento local da malha V5 — 2026-10-16
+
+- Acrescentei refinamento iterativo guiado pelo erro à exportação da malha adaptativa. O processo insere amostras terrestres onde a interpolação linear da triangulação excede 2 unidades relativas; não altera o campo de elevação escolhido, a seleção multivista, nem atribui escala física.
+- Reexportei diretamente o campo original V5 com SHA-256 `ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`: 19,070 vértices e 37,266 triângulos (145 vértices adicionais). Em 36,821 amostras terrestres cobertas, erro da malha contra o campo: RMSE 0.096 unidades relativas e máximo 1.994; quatro colunas secas não têm triângulo retido.
+- Contra o proxy de topo dos voxels lido do Studio, nos mesmos pontos cobertos: MAE 0.196 studs, RMSE 0.513, máximo 3.8; 99.1% até 2 studs. É comparação de amostras de grade, não uma auditoria integral da superfície de colisão. A malha refinada ainda não foi importada para o place.
+- Atualizados `tools/terrain_2_v3/V5_README.md` e `tools/terrain_2_v3/V6_V7_README.md`. O place permanece sem salvar e as validações visuais V5, persistência V6 e gates de jogabilidade/desempenho V7 continuam abertas. Nenhum teste automatizado local foi executado nesta atualização.
+
+## Terrain 2 — reconstrução original após refinamento V5 — 2026-10-16
+
+- Executei novamente o workflow com o URL e SHA-256 fornecidos para o ZIP. A verificação do arquivo passou, as 16 referências foram extraídas e as etapas V2, V3, V4 e V5 finalizaram com sucesso: [run 38904150817](https://github.com/dreyvinixz/RobloxGame/actions/runs/38904150817).
+- O artefato confirmou o mesmo heightfield selecionado (`ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`) e a malha refinada de 19,070 vértices / 37,266 triângulos; interpolação RMSE 0.096 relativo, máximo 1.994, quatro amostras secas sem triângulo. O status de fidelidade visual absoluta continua NO-GO.
+- Os checks de planejamento, V3, V4 e V5 passaram no commit `b17e1a0`. O place de Studio não foi salvo nem reaberto nesta etapa.
+
+## Terrain 2 — spawn padrão opt-in para V7 — 2026-10-16
+
+- `MatchService` agora aceita o atributo `Workspace.Terrain2TestMode=true` no place isolado e usa `Workspace.V7_TestSpawn` de forma neutra para ambos os times. Sem a flag, continuam os spawns normais das equipes.
+- Com o atributo setado antes do fluxo normal de Play, o bootstrap registrou `Terrain 2 test spawn enabled`; o jogador surgiu em `(-5.59, 107.56, -4.14)`, com 100 de vida e `RespawnLocation=Workspace.V7_TestSpawn`. Controle sem atributo preservou `Workspace.FrontlineArena.EntryPoints.Spawn_WestEntry` e a posição `(-124, 5.56, 0)`, ambos com 100 de vida.
+- Atualizados os READMEs V5/V6/V7 e o atributo de evidência no modelo de teste. Teste de um cliente apenas; multiplayer e os gates de jogabilidade/desempenho seguem abertos. A sessão continua sem salvar/reabrir.
+
+## Terrain 2 — rotas V7 desde o spawn padrão de teste — 2026-10-16
+
+- Com `Workspace.Terrain2TestMode=true`, executei Play pelo bootstrap normal e naveguei o personagem desde `Workspace.V7_TestSpawn` até os quatro marcadores do campo V5: praia norte (2.63 studs), praia sul (2.27), cume oeste (2.27) e cume leste (2.78). O servidor registrou 100 de vida em cada chegada.
+- Os resultados confirmam navegação individual a partir do spawn de teste, não aprovação multiplayer, critério completo de inclinação, cobertura de combate ou desempenho sustentado. Atualizados os atributos de evidência no modelo e os READMEs V5/V6/V7. A sessão permanece sem salvar/reabrir.
+
+## Terrain 2 — seleção V5 por perfis cardinais — 2026-10-16
+
+- Ajustei a regra de desempate entre candidatos dentro de 0.005 do melhor score de treino: selecionar a menor média de RMSE cardinal e, em empate, a menor diferença de campo para V4. O wireframe-2 independente e o isométrico do atlas continuam sendo medidos somente após a seleção.
+- O workflow original V2–V5 passou novamente com o ZIP e SHA fornecidos: [run 38906611785](https://github.com/dreyvinixz/RobloxGame/actions/runs/38906611785). A nova candidata 257×257 usa rock-weight floor 0.40, envelope blend 1.0, sigma 0.50, restauração de picos spread 4 / 4 rounds. Campo SHA-256 `37cd79eb4c0bbeb35e6b52a3803a5bcef9ba5279402ce4117107185297e24948`.
+- Média cardinal 12.55 px-equivalentes, contra 13.10 em V4 e 12.64 na candidata anterior. Score de treino 0.58096, dentro de 0.00498 do melhor treino aceito. Os dois holdouts independentes passaram: wireframe-2 0.91643 (limite 0.92199) e atlas-isométrico 0.52574 (baseline V4 0.57967). Fidelidade visual absoluta segue NO-GO devido aos resíduos e conflito entre referências esquerda/direita.
+- Malha adaptativa: 19,136 vértices / 37,399 triângulos; 77 vértices adicionados em três rodadas. Em 36,821 amostras secas cobertas, erro malha→campo RMSE 0.095 relativo, máximo 1.991; quatro amostras secas sem triângulo.
+- A nova candidata difere do campo importado anteriormente em Studio (`ba77bef3…`) em todos os 66,049 pontos: diferença absoluta média 0.1967 e máxima 28.2119 unidades relativas. Portanto, o readback V6 e as rotas V7 existentes estão obsoletos para esta candidata. Studio permanece sem importação da nova altura e sem salvar/reabrir; reimportar e repetir readback/rotas é o próximo passo técnico. Nenhuma alteração em `main` ou no place de produção.
+- Atualizei os READMEs V5/V6 para identificar a candidata atual e separar evidência recente de evidência ainda válida apenas para o campo anterior. `git diff --check` validado; nenhum teste automatizado foi executado nesta atualização documental.
+
+## Terrain 2 — sincronização do handoff V6/V7 — 2026-10-16
+
+- Corrigi o handoff no README V6/V7 para deixar claro que todo readback, rotas e capturas de desempenho do Studio são da candidata anterior (`ba77bef3…`). A candidata atual (`37cd79eb…`) ainda requer importação e repetição de V6/V7; persistência/reabertura segue sem evidência.
+- Checks do PR #78 passaram no commit `17d47e0`: planejamento, V3, V4 e ambas as validações V5.
+- Atualização documental; sem teste automatizado nesta mudança.
+
+## Terrain 2 — V6 import da candidata V5 atual e readback — 2026-10-16
+
+- Importei a candidata com hash verificado `37cd79eb4c0bbeb35e6b52a3803a5bcef9ba5279402ce4117107185297e24948` em `Workspace.Terrain`, usando o mapeamento X da imagem → +X, linhas → −Z e altura `Y=100+relevo relativo`, quantizada a 0.5 stud na grade de 4 studs. Preservei as classes de material superiores do campo anterior, Rock abaixo da superfície e os voxels de água existentes. A rotina temporária de importação foi removida após uso.
+- Criei um snapshot `TerrainRegion` em `ServerStorage` para rollback; usei-o também para restaurar o campo anterior depois do baseline CPU vazio. Reimportei a candidata após a captura, confirmei o readback final e removi snapshot e módulo temporário. Final Edit/Server: 377,149 voxels ocupados (Water 146,120; Rock 202,290; Sand 3,485; Grass 25,254). Os 36,825 topos secos coincidem com o alvo quantizado (MAE/max 0.000 studs); 29,224 colunas de água permanecem em um componente conectado.
+- Raycasts de colisão no campo atual atingiram praia norte (Sand Y=102), praia sul (Sand Y=100.40), crista oeste (Rock Y=152.21) e leste (Rock Y=192.11). Malha adaptativa ainda não importada; comparação malha→voxel/colisão permanece aberta.
+- Em Play, spawn opt-in iniciou com 100 HP. Navegação individual com salto alcançou as quatro âncoras: norte root `(-10.63,106.56,-109.85)`; sul `(-54.82,104.32,-325.35)`; oeste `(-294.83,156.50,10.05)`; leste `(257.50,196.98,-29.38)`, sempre 100 HP. Caminho sem salto: praias Success (30/89 waypoints, 112.57/343.85 studs); cumes oeste/leste `NoPath`.
+- Dez linhas de visão a 5 studs acima de cinco âncoras ficaram desobstruídas, abrangendo 112.28–554.88 studs. Isso confirma pouco cover do relevo isolado, não balanceamento de combate.
+- Captura CPU A/B de um cliente, câmera fixa, frame limit 256, warm-up 2 s, coleta 9 s, personagem ancorado. Campo: 109 frames completos, regular 6111–6219 / absoluto 776556–776664, mediana 16.675 ms, p95 17.712, máximo 18.110. Bounds vazios: 110 frames, regular 6771–6880 / absoluto 777693–777802, mediana 16.703 ms, p95 17.568, máximo 17.913. Variação permanece dentro do ruído; captura curta, sem conclusão de custo e sem GPU ou memória atribuída à candidata atual.
+- Atualizei os READMEs V5/V6/V7 para refletir a candidata atual e distinguir os gates restantes. A sessão Studio segue sem salvar/reabrir; nenhuma alteração em `main` ou no place de produção.
+
+## Terrain 2 — revisão visual manual e hipótese de proporção V5 — 2026-10-16
+
+- Revisei `orthographic_atlas.jpg` e `left_wireframe.png` frente à altura V5 atual. As referências mostram encostas largas e conectadas; a candidata tem picos de crista mais isolados e agudos. A fidelidade visual absoluta permanece NO-GO.
+- A silhueta em planta tem bbox aproximado de 1.696 (largura/altura) em pixels da imagem, enquanto o campo reconstruído e o mapeamento de Studio são quadrados. Essa razão pode refletir composição/câmera da referência e não é escala mundial calibrada.
+- A varredura exploratória de proporção comparou razões entre 0.6 e 2.0 e consultou também vistas atualmente usadas como holdout. Logo, os scores de holdout deixam de ser evidência independente para escolher proporção. Nenhuma razão foi promovida; o campo quadrado e hash atual permanecem como candidato.
+- Próximo estudo V5: tornar projeção/câmera e exportação X/Z conscientes da proporção; ajustar apenas em vistas de treino e reservar uma referência realmente intocada ou obter vista calibrada nova. Se a proporção mudar, reexportar/resamplear e repetir integração/readback e probes V6/V7 no Studio isolado. Sem mudança de código, terreno ou place nesta revisão.
+
+## Terrain 2 — cenários V5 de margem variável e conectividade do canal — 2026-10-16
+
+- O `model_river` mantém o comportamento V3 por padrão. V5 agora compara faixas de margem proporcionais à largura local: 5%, 10% e 15%, limitadas a 0.5–3.0 células da grade V5; exporta as máscaras de água e margem para 27 combinações de largura, profundidade relativa e fração de margem.
+- Baixei os artefatos exatos do run original 38906611785 e executei a pipeline local com as referências originais. A candidata geométrica foi reproduzida sem mudança: SHA-256 `37cd79eb4c0bbeb35e6b52a3803a5bcef9ba5279402ce4117107185297e24948`, status `V5_RELATIVE_GEOMETRY_IMPROVED_VISUAL_NO_GO`, média de perfil cardinal e parâmetros selecionados idênticos ao relatório da Actions.
+- Comparei as três larguras com `channel_corridor_observed` reamostrada para 257×257. IoU 0.4244/0.4812/0.5126 para multiplicadores 0.8/1.0/1.2; precisão 0.7238/0.6969/0.6634; recall 0.5064/0.6085/0.6928. Como a máscara observada vem do mesmo artwork usado pela estimativa de larguras, isso é diagnóstico de consistência interna, não holdout; nenhum cenário foi escolhido por essa comparação.
+- Sob a máscara-fonte, há dois componentes de mar antes da união com o canal e um depois; os endpoints norte/sul compartilham o componente final. Isso verifica conectividade raster relativa à segmentação, não hidrologia física ou bathimetria observada.
+- Atualizados `tools/terrain_2_v3/river_v3.py`, `tools/terrain_2_v3/terrain_v5.py` e `tools/terrain_2_v3/V5_README.md`. A geometria V5 hash-verificada permanece inalterada; Studio, `main` e place de produção não foram modificados nesta etapa.
+
+## Terrain 2 — busca exploratória de suavização local das cristas — 2026-10-16
+
+- Com os artefatos exatos do run 38906611785, explorei 144 combinações de limiar de evidência rochosa (.35/.50/.65), dilatação da região (3/7/11/15 células), raio Gaussiano (1/2/3) e blend (.25/.50/.75/1.0). Avaliei somente as duas vistas de treino (`oblique_wireframe_1` e `oblique_side_render`) e os quatro perfis cardinais; não usei métricas de holdout para escolher.
+- Apenas uma combinação satisfez as restrições cardinais e melhorou ambas as vistas de treino: limiar .65, dilatação 3, sigma 1.0 e blend .25. Ela obteve média cardinal 12.58 px-equivalentes e treino 0.58036, contra 12.55 e 0.58096 do campo selecionado.
+- Pela regra declarada, o pequeno ganho de treino não supera a média cardinal pior. Mantive o campo `37cd79eb…`; nenhum parâmetro ou artefato de geometria foi promovido. A discrepância visual de encostas/picos continua aberta e requer novas evidências ou um método melhor.
+
+## Terrain 2 — aumento localizado da resolução da malha V5 — 2026-10-16
+
+- O diagnóstico comparou `fine_step=2` e `fine_step=1` apenas nas regiões complexas selecionadas por curvatura, costa, canal e limites semânticos. Com `fine_step=1`, a malha aumenta de 19,136/37,399 para 20,923 vértices/40,974 triângulos (+9.3% vértices), reduz o erro campo→malha em 36,821 colunas cobertas de RMSE 0.09546 / máximo 1.99124 para 0.00439 / máximo 0.55938 unidades relativas. Permanecem quatro colunas sem triângulo retido.
+- Ativei `fine_step=1` somente na chamada V5 adaptativa e registrei a resolução no relatório. Reexecutei V5 com os artefatos exatos da Actions: status continua `V5_RELATIVE_GEOMETRY_IMPROVED_VISUAL_NO_GO`; o heightfield preserva o hash `37cd79eb4c0bbeb35e6b52a3803a5bcef9ba5279402ce4117107185297e24948`; 27 cenários hidrológicos seguem exportados.
+- A alteração melhora a aproximação da malha ao campo fixado, não muda o relevo nem resolve a discrepância visual absoluta. A malha permanece fora do Studio e aguarda comparação direta com voxels/colisão.
+
+## Terrain 2 — reconstrução original V2–V5 com malha refinada — 2026-10-16
+
+- Executei novamente o workflow autorizado com o URL e SHA-256 do ZIP original no branch da PR #78. A extração das 16 fontes, V2, V3, V4, auditoria V5, V5 e publicação dos quatro artefatos passaram: [run 38911594227](https://github.com/dreyvinixz/RobloxGame/actions/runs/38911594227).
+- Baixei o artefato publicado e validei o relatório e arquivos: heightfield SHA-256 `37cd79eb4c0bbeb35e6b52a3803a5bcef9ba5279402ce4117107185297e24948`; status `V5_RELATIVE_GEOMETRY_IMPROVED_VISUAL_NO_GO`; 27 cenários de água e nove máscaras de margem; malha 20,923 vértices/40,974 triângulos, RMSE 0.00439, máximo 0.55938 unidades relativas e quatro colunas descobertas; OBJ 1,324,339 bytes. Os gates de holdout relativos continuam passando, mas fidelidade visual absoluta continua NO-GO.
+- Atualizei o link do artefato atual em `tools/terrain_2_v3/V5_README.md`. A geometria importada no Studio usa o mesmo heightfield; a nova malha adaptativa ainda não foi importada e comparada com colisão.
+
+## Terrain 2 — diagnóstico de inclinações V7 — 2026-10-16
+
+- Calculei diferenças finitas no heightfield original da Actions, hash `37cd79eb…`, nas 36,825 amostras secas, usando a grade horizontal atual de 4 studs/célula e a hipótese vertical atual de 1 stud por unidade relativa. O P90 global é 45.00°; 78.63% fica até 20°, 81.62% até 30° e 83.80% até 35°. Praia: P90 54.74° e 65.25% até 20°. Planície central: 99.87% até 20°. Falésias: P90 65.42° e 1.90% até 20°.
+- A sensibilidade à escala vertical é material: P90 global vai de 26.57° (0.5 stud/unidade relativa) a 63.43° (2 studs/unidade); praia vai de 35.26° a 70.53°. Esses são proxies do heightfield, não inclinações medidas na superfície de colisão nem aprovação de Humanoid/Pathfinding.
+- Não defini critérios de inclinação sem calibração de escala ou requisito de gameplay. Rotas runtime continuam a evidência de jogabilidade: praias Success sem salto, cumes NoPath sem salto e quatro destinos Success com salto em uma sessão/um cliente.
+- Atualizei `tools/terrain_2_v3/V6_V7_README.md` com os percentuais por região e corrigi no `V5_README.md` as contagens heurísticas de região para o relatório atual do run 38911594227.
+
+## Terrain 2 — A/B LibMP com personagem ancorado — 2026-10-16
+
+- Repeti o perfil de 9 s em cliente único com câmera fixa (`(-6,113,12)` → `(-6,106,-95)`), limite 256 frames, 2 s de settle e `HumanoidRootPart.Anchored=true` nas duas condições. Candidata: 110 frames, IDs absolutos 899421–899530, CPU mediana/p95/máximo 16.699/17.474/18.189 ms. Bounds vazios: 109 frames, IDs 900987–901095, 16.680/17.308/17.707 ms. Diferenças candidato menos vazio: +0.019/+0.166/+0.482 ms; amostra curta não demonstra custo sustentado.
+- Thread GPU 1 presente nas duas condições: 12,871/12,754 entradas e 2,860/2,834 scopes completos; soma inclusiva 22.809/22.597 ms (aprox. 0.207 ms por frame em cada). `Scene`, `Scene2D` e `Id_Screen` dominam ambos de forma equivalente. Soma de scopes aninhados não é latência fim-a-fim da GPU; não se observou delta atribuível ao terreno. Memória LibMP não isolou a região.
+- `SceneAnalysisService` reportou os mesmos 480,234 triângulos/923 draws com terreno presente e após leitura de terreno vazia no cliente; métrica descartada como não responsiva neste A/B.
+- O snapshot reversível restaurou no servidor e cliente 377,149 voxels (Water 146,120; Rock 202,290; Sand 3,485; Grass 25,254), removeu o snapshot temporário e restaurou o `HumanoidRootPart.Anchored=false`. Studio retornou a Edit; place segue sem salvar/reabrir.
+- Atualizado `tools/terrain_2_v3/V6_V7_README.md`; nenhuma alteração em `main` ou no place de produção. Nenhum teste automatizado executado nesta atualização documental.
+
+## Terrain 2 — triagem de footprint V7 — 2026-10-16
+
+- Analisei o artefato oficial da candidata V5 (`37cd79eb…`) sem mudar o campo. Sob a escala assumida (4 studs/célula horizontal, 1 stud/unidade relativa), examinei footprints quadrados de 32×32 e 64×64 studs, exigindo terreno seco, variação vertical ≤2 unidades relativas e inclinação derivada ≤20°. A hipótese da planície central tem 5,413/4,034 centros candidatos; são centros sobrepostos, não quantidades de posições distintas.
+- Validei um footprint 64×64 em `X/Z=(-102,26)`: 16×16 células horizontais, amplitude e inclinação derivadas zero; o `ReadVoxels` do Studio confirmou 256 colunas secas de Grass no mesmo nível de voxel, sem água. Partindo do spawn, `PathfindingService` sem salto alcançou `(-102,102,26)` em 27 waypoints / 98.97 studs.
+- Não inseri assets nem alterei terreno. O resultado é uma triagem geométrica sob escala não calibrada; colisões/modelos de assets reais, cover, combate e balanceamento continuam sem validação. Atualizados os READMEs V5/V6/V7. Nenhum teste automatizado foi executado.
+
+## Terrain 2 — LibMP A/B estendido — 2026-10-16
+
+- Solicitei 27 s de captura por condição, com câmera fixa `(-6,113,12)` → `(-6,106,-95)`, limite de 256 frames e personagem ancorado. O buffer LibMP retornou 109 frames em cada lado: candidata IDs 936881–936989 e terreno vazio 939924–940032. CPU mediana/p95/máximo: 16.601/18.028/18.578 ms com terreno; 16.652/17.377/17.955 ms vazio. Como o buffer contém apenas 109 frames, não prova desempenho sustentado.
+- Thread GPU 1: 12,754 entradas/2,834 scopes completos em cada condição; soma inclusiva 22.524/22.596 ms, ou 0.2066/0.2073 ms por frame. `Scene`, `Scene2D` e `Id_Screen` quase iguais. São scopes aninhados, não latência fim-a-fim; nenhum delta mensurável apareceu nesta amostra. Memória específica do terreno continua sem atribuição.
+- Snapshot restaurou servidor e cliente para 377,149 voxels (Water 146,120; Rock 202,290; Sand 3,485; Grass 25,254), removeu-se, e o HRP voltou a `Anchored=false`. Studio retornou a Edit.
+- Atualizados READMEs V5/V6/V7. Nenhum teste automatizado foi executado.
+
+## Terrain 2 — auditoria de persistência V6 — 2026-10-16
+
+- Readback atual em Edit confirmou 377,149 voxels (Water 146,120; Rock 202,290; Sand 3,485; Grass 25,254).
+- Busquei `devtest3.rbxl*` no worktree, pasta do artefato temporário, Documents e caminhos do cache do Roblox Studio; nenhum arquivo de place foi encontrado. A lista do Studio MCP não tem ação de salvar e a documentação oficial de DataModel marca `SavePlace` como depreciada: https://create.roblox.com/docs/reference/engine/classes/DataModel#SavePlace.
+- A tentativa anterior de inicializar o controle de desktop falhou com `failed to write kernel assets: The system cannot find the path specified`. O place permanece apenas na sessão em memória; não há como comprovar save/reopen pelas ferramentas atuais. Atualizados os registros, sem alteração no terreno ou em `main`.
+
+## Terrain 2 — busca ampliada de cristas V5 — 2026-10-16
+
+- Com as referências originais extraídas do ZIP verificado do run 38911594227, ampliei localmente a busca de restauração de perfis: suportes de 4/5/6 para 4/5/6/8/10/12/16 células e rounds de 2/4/6 para 1/2/4/6. O relatório passou de 154 para 268 candidatos; os critérios e a folga de seleção de treinamento de 0.005 foram preservados.
+- 52 candidatos passaram os gates de perfil cardinal e vistas de treinamento; seis tinham suporte de pelo menos 8 células. O melhor amplo (8 células, 4 rounds) obteve média cardinal de 12.24 px-equivalentes, mas erro médio de treino 0.59206, acima do limite near-optimal 0.58099. Não foi selecionado e seus holdouts independentes não foram avaliados.
+- O candidato selecionado permanece spread 4 / 4 rounds, campo SHA-256 `37cd79eb4c0bbeb35e6b52a3803a5bcef9ba5279402ce4117107185297e24948`; status segue `V5_RELATIVE_GEOMETRY_IMPROVED_VISUAL_NO_GO`. O experimento não fecha a diferença visual manual das cristas. Atualizados o relatório local reproduzível e `tools/terrain_2_v3/V5_README.md`; Studio, `main` e o place de produção não foram alterados.
+
+## Terrain 2 — rechecagem V6/V7 na sessão Studio atual — 2026-10-16
+
+- Inspecionei o estado vivo em Edit. `Workspace.Terrain` confirma a candidata atual `37cd79eb4c0bbeb35e6b52a3803a5bcef9ba5279402ce4117107185297e24948`, readback de 377,149 voxels e erro de topo de 0.0 studs nas 36,825 colunas secas. Um modelo de anotações separado ainda dizia que o campo importado era o anterior (`ba77bef3…`); sincronizei em memória suas anotações V6/V7 com a leitura atual. A sessão continua sem salvar.
+- Em Play, um cliente surgiu perto de `(-9.15,107.56,-3.49)`, com 100 HP. Em novas consultas de `PathfindingService` (raio 2, altura 5, espaçamento 4), sem salto: praias norte/sul e pad central Success; cumes oeste/leste NoPath. Com salto: os cinco destinos foram Success; os cumes tiveram 5 e 4 waypoints de salto, respectivamente. Comprimentos de rota: norte 111.12, sul 342.74, oeste 347.23 e leste 418.38 studs.
+- A navegação individual chegou à praia norte (`-10.845,106.564,-109.827`), praia sul (`-54.756,104.401,-325.487`) e cume oeste (`-294.867,156.766,10.374`) com 100 HP. O cume leste foi alcançado de novo após retornar ao spawn (`257.487,196.268,-30.865`, 100 HP); uma tentativa de seguir oeste→leste terminou na água e não conta como rota válida. Studio voltou a Edit; não alterei os voxels do terreno. Atualizado `tools/terrain_2_v3/V6_V7_README.md`. `main` e o place de produção continuam intactos.
+
+## Terrain 2 — captura CPU A/B/A com janelas repetidas — 2026-10-16
+
+- Na sessão de um cliente, mantive câmera `(-6,113,12)` olhando para `(-6,106,-95)` e personagem ancorado; defini o limite LibMP em 256 e coletei três janelas de 6 s em cada condição: candidata, bounds V5 vazios, candidata restaurada. Foram 329/328/329 frames completos únicos.
+- Intervalos de frame CPU média/mediana/p95/p99/máximo (ms): candidata A 16.660/16.688/17.779/18.387/18.714; bounds vazios 16.670/16.655/17.737/18.109/18.892; candidata A2 16.663/16.669/17.708/18.007/18.162. Diferenças pequenas e inconsistentes; nenhum delta CPU atribuível ao terreno nesta amostra. Janelas estáticas curtas não provam desempenho sustentado nem substituem profiling durante combate/multiplayer.
+- Antes da condição vazia, copiei para `ServerStorage` um `TerrainRegion` temporário das células (-128,20,-128)–(129,52,129) e limpei somente os bounds de teste. `Terrain:CountCells()` aproximado caiu de 12,946,430 para 12,575,170 e voltou a 12,946,430 após `PasteRegion`; removi o backup. O hash atual continuou `37cd79eb…`, sem mudança residual no terreno. Capturei somente CPU nesta repetição; GPU e memória específica continuam abertas. Atualizado `tools/terrain_2_v3/V6_V7_README.md`.
+
+## Terrain 2 — auditoria adicional pós-seleção com top_sparse_mesh — 2026-10-16
+
+- Confirmei por busca no repositório que `top_sparse_mesh.jpg` não participa da seleção atual V2/V3/V4/V5. Calculei seu SHA-256 original (`41abb8789a1472cf16a96ff2169569f48c4cb99dc959af0297e3cc568b73f1f6`) e usei a câmera relativa ajustada uma vez no campo V4, depois fixa para o V4 e V5 selecionado.
+- O skyline normalizado do V4 pontuou 0.60833; o V5 selecionado (`37cd79eb…`) pontuou 0.54535, delta −0.06298. Inspecionei a curva e mantive a interpretação limitada: esta imagem é uma referência raster do mesmo ângulo superior oblíquo de `top_render`, não uma vista/câmera independente nem um heightmap.
+- Adicionei `tools/terrain_2_v3/audit_v5_extra_view.py` e uma etapa pós-seleção em `.github/workflows/terrain-2-original-images.yml`; ela publica o relatório e a curva junto ao artefato V5 sem alterar o ranking de candidatos ou a geometria. O gate de fidelidade visual absoluta continua NO-GO.
+- Executei o workflow original autorizado com o ZIP/SHA exatos no branch da PR: [run 38918407230](https://github.com/dreyvinixz/RobloxGame/actions/runs/38918407230), commit `cdf89b9`. Extração das 16 referências, V2, V3, V4, auditoria V5, geometria/hidrografia V5, nova auditoria e publicação dos quatro artefatos passaram. Baixei `terrain2-original-v5` e confirmei no JSON: hash de campo `37cd79eb…`, V4/V5 0.60833/0.54535, delta −0.06298, holdouts relativos passados e fidelidade visual absoluta ainda `V5_RELATIVE_GEOMETRY_IMPROVED_VISUAL_NO_GO`.
+
+## Terrain 2 — captura exploratória em navegação V7 — 2026-10-16
+
+- Confirmei no Studio que `Workspace.Terrain` segue ligado à candidata `37cd79eb4c0bbeb35e6b52a3803a5bcef9ba5279402ce4117107185297e24948`, com readback anterior de 377,149 voxels; o cliente manteve 100 HP ao chegar do litoral sul ao cume oeste.
+- Ativei o profiler LibMP com limite 256 e solicitei uma janela de 12 s após detectar movimento. O buffer retornou apenas 84 frames válidos, IDs 20120–20203. CPU média/mediana/p95/p99/máximo: 16.670/16.666/17.707/18.061/18.061 ms; 42 frames acima de 16.67 ms, nenhum acima de 33.33 ms.
+- Como a amostra não cobre a duração pedida e não caracteriza carga sustentada, classifiquei-a apenas como evidência exploratória de uma navegação individual. Não fecha gate de performance, GPU, memória ou multiplayer. Atualizados `tools/terrain_2_v3/V6_V7_README.md`; o place segue não salvo.

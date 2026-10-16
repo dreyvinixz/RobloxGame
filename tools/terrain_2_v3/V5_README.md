@@ -1,25 +1,64 @@
-# Terreno 2 — V5: audit before geometry refinement
+# Terrain 2 — V5 geometry and hydrology
 
-V5 starts from V4 on a **single branch**. This first stage is an **original-image fidelity audit**, not a claim that V4 reproduces the inaccessible original 3D mesh.
+V5 builds an adaptive heightfield from V4, explores image-relative water width/depth scenarios, and compares candidate silhouettes against the original reference images. It does not recover the inaccessible original 3D mesh or establish physical scale.
 
-## Inputs
-Extract the 16 user images from `RobloxGame_Terreno2_V2_analise_referencias.zip`, keeping their original bytes and names. V2/V3/V4 output directories must be generated from these images, not synthetic CI fixtures.
+## Inputs and reproduction
+
+Use the original images from `RobloxGame_Terreno2_V2_analise_referencias.zip`, preserving their bytes and names. Generate V2/V3/V4 from those files, then run the audit and V5 pipelines:
 
 ```bash
 python -m tools.terrain_2_v2.reconstruct_v2 --sources references --output output_v2
 python -m tools.terrain_2_v3.terrain_v3 --sources references --v2 output_v2 --output output_v3 --grid 257
 python -m tools.terrain_2_v3.refine_v4 --sources references --v2 output_v2 --v3 output_v3 --output output_v4
 python -m tools.terrain_2_v3.audit_v5 --sources references --v2 output_v2 --v3 output_v3 --v4 output_v4 --output output_v5
+python -m tools.terrain_2_v3.terrain_v5 --sources references --v2 output_v2 --v3 output_v3 --v4 output_v4 --output output_v5
 ```
 
-## Acceptance gates
-- Original-image SHA-256 checks must pass.
-- Report V3 and V4 errors **separately** for front/back/left/right and both isometrics. Isometric 2 is held out.
-- Water must form a single connected raster component; manually inspect both sea mouths and any uncertain bridge.
-- Check top-view island contour, coastline, river-bank width, mountain ridges, and cliff silhouette by overlay with source.
-- Do not treat water depth/volume as observed truth.
-- Mark visual review **NO-GO** until reviewed; tests on synthetic fixtures are only code correctness.
-- Only after evidence review proceed to V5 adaptive mesh, feature-edge constraints and optimization of side/isometric views; evaluate changes on held-out imagery.
-- Do not modify playable Roblox Studio place or `main`.
+## Current validation
 
-The audit script intentionally sets `pass: false` until manual and independent 3D geometry validation are completed.
+- Original reference SHA-256 checks pass, including `orthographic_atlas.jpg` (`c43bd976a24e5fd8f3340fad325cb7db65da7ac3bddfbeaeedc53ed6ce3a52ee`). The atlas's right panel is the isometric view; its upper-left plan view is excluded from skyline scoring.
+- V4 remains a reproducible visual **NO-GO** baseline. Its cardinal profile RMSEs are 7.27/7.34/17.61/20.17 px-equivalent; its isometric fit/holdout errors are 0.55741/0.91699.
+- The current 257×257 candidate uses rock-weight floor 0.40, envelope blend 1.0, local peak restoration spread 4 grid cells for 4 rounds, and final smoothing sigma 0.50. Selection uses cardinal constraints and training views only; among candidates within 0.005 mean normalized RMSE of the best training fit, it selects the lowest mean cardinal profile RMSE, breaking ties by smallest field deviation from V4. The independent isometric views are scored after selection.
+- Cardinal profile RMSEs are 7.44/7.39/16.65/18.71 px-equivalent. Their mean is 12.55, down from V4's 13.10 and the previous V5 candidate's 12.64; front/back change by +0.17/+0.05 while left/right improve by 0.96/1.46. Training errors are 0.54178 (`oblique_wireframe_1.jpg`) and 0.62015 (`oblique_side_render.jpg`), compared with V4's 0.55741 and 0.68018. The combined training score is 0.58096, within 0.00498 of the best accepted candidate's 0.57599.
+- The independent `oblique_wireframe_2.jpg` error is 0.91643 against the V4 baseline 0.91699 (limit 0.92199). The atlas isometric error is 0.52574 against 0.57967. Both image-relative holdout gates pass.
+- A separate candidate selected using cardinal RMSE and training scores (global blend 0.80, no smoothing) reduced mean cardinal RMSE to 11.98, but its independent wireframe-2 score was 0.93526 and failed the 0.92199 gate. It was rejected after holdout scoring; the passing candidate above remains selected. This records the orthographic/isometric trade-off without tuning to a holdout.
+- A source-rock-weighted candidate (rock-weight floor 0.0, envelope blend 1.0, smoothing 1.0) fit the training views better (0.52453 / 0.62070), but its front/back profile errors rose to 9.57 / 9.58 px-equivalent from V4's 7.27 / 7.34, so it fails the per-view profile gate. The current selected field remains the best candidate under the declared joint constraints.
+- A separate 513×513 resolution trial was reconstructed from the same SHA-256-verified references and evaluated against a V4 baseline generated at the same resolution. Its selected V5 field had 75,248 adaptive-mesh vertices and 148,797 triangles (versus 18,925/36,977 for the selected 257×257 field). Mean cardinal RMSE improved from 13.41 to 12.96 px-equivalent, and the atlas isometric score improved; however, the wireframe-2 holdout regressed from 0.87909 to 0.89932, exceeding the allowed V4+0.005 limit (0.88409). The run status was `V5_NO_GO_MULTIVIEW_GEOMETRY`, so the higher-resolution field is rejected and does not replace the 257×257 selected candidate. This shows that increasing grid density alone does not resolve the view conflict.
+- Absolute visual fidelity remains **NO-GO**. Cardinal residuals remain material and require manual contour review. Opposing left/right references disagree by 34.33 px-equivalent, giving a 17.16 px best-case RMSE floor for one shared orthographic 2.5D projection.
+- Water remains one connected component. Twenty-seven hydrology scenarios are exported: width multipliers 0.8/1.0/1.2 × relative depth multipliers 0.5/1.0/1.5 × bank-margin fractions 0.05/0.10/0.15 of local channel width. V5 bank widths are bounded to 0.5–3.0 grid cells. Depth, volume, and bank-margin values are relative assumptions, not observed bathymetry.
+- The selected 257×257 field is SHA-256 `37cd79eb4c0bbeb35e6b52a3803a5bcef9ba5279402ce4117107185297e24948`. Its adaptive mesh now has 20,923 vertices and 40,974 triangles: 8-cell coarse sampling, 1-cell sampling in complex regions, preserved coast/channel/semantic edges, and error-guided refinement. This is a 9.3% vertex increase from the previous mesh. On 36,821 covered dry-land grid samples, mesh-to-field RMSE is 0.0044 relative height units and maximum 0.559; four dry-land samples remain uncovered. The mesh represents the same heightfield; this improves interpolation fidelity, not source geometry or absolute visual fidelity. The source views' 500-u scale bar remains image-relative, not meters or Roblox studs.
+
+## Region hypotheses and open review
+
+The V5 preview exports west/east mountain, cliff, plateau, central plain, and beach masks. The latest original-reference run reports 2,818/2,729 mountain cells, 842 cliff cells, 1,357 plateau cells, 6,285 central-plain cells, and 3,540 beach cells. Region hypotheses use source rock evidence and smoothed V5 relief; they remain heuristics, not physical classifications. Manual contour review remains open because the heightfield still shows block-like ridge patches that do not fully follow the source render.
+
+A training-only local ridge-smoothing sweep tested 144 combinations of rock evidence threshold, region dilation, Gaussian radius, and blend amount against the fixed wireframe-1 and side-render cameras plus the cardinal profile constraints. Only one combination met the per-view gates; it gave a 12.58 px-equivalent cardinal mean and 0.58036 mean training error, versus 12.55 and 0.58096 for the selected field. The existing selection rule still favors the current field's lower cardinal mean, so no geometry or hash change was promoted. This small training gain does not resolve the manual slope/peak mismatch.
+
+Manual review of `orthographic_atlas.jpg` and `left_wireframe.png` confirms a visible shape gap: the source shows broad connected mountain slopes, while the current candidate has several sharp, isolated ridge peaks. The absolute-visual gate stays NO-GO. The source plan-view land silhouette has an approximate image-space bounding-box ratio of 1.696 (width/height), while the current reconstruction and Studio mapping use a square X/Z extent. This image ratio is a hypothesis only; the references do not establish a calibrated world aspect ratio.
+
+A local training-only sweep expanded profile-restoration supports from 4/5/6 to 4/5/6/8/10/12/16 grid cells and rounds from 2/4/6 to 1/2/4/6, increasing the report from 154 to 268 candidates. The existing selection rule and 0.005 training-fit slack were unchanged. Fifty-two candidates met the cardinal and training-view gates; six used supports of at least 8 cells. The best broad-support candidate (8 cells, 4 rounds) had a 12.24 px-equivalent cardinal mean and 0.59206 mean training error, above the unchanged near-optimal limit of 0.58099. No broad-support candidate was selected, and their independent isometric holdouts were not scored. The selected field and SHA-256 remain unchanged; this sweep did not close the manual shape gap or the absolute-visual NO-GO gate.
+
+An exploratory aspect sweep compared ratios from 0.6 to 2.0, including the same views currently labeled as multiview holdouts. Because those holdouts were inspected during the sweep, their scores are no longer independent evidence for choosing an aspect ratio. No swept ratio was selected and the 1.0 square field remains the current candidate. A future aspect-aware V5 revision must fit camera/aspect parameters on training views only, then validate on a genuinely untouched reference or a newly acquired calibrated view before updating the candidate or Studio bounds.
+
+The V5 hydrology run now also exports proportional bank-margin masks and compares each channel-width hypothesis with the V2 `channel_corridor_observed` mask after resizing it to the 257×257 V5 grid. The diagnostic IoUs are 0.4244/0.4812/0.5126 for width multipliers 0.8/1.0/1.2 (precision 0.7238/0.6969/0.6634; recall 0.5064/0.6085/0.6928). This mask comes from the same original plan artwork used to estimate channel width, so the overlap is an internal consistency check, not independent validation; no width scenario is selected from it. The source land mask has two exterior-sea components before adding the channel and one after each generated channel mask is unioned with the sea mask; both centerline endpoints share the resulting component. This confirms raster connectivity under the source-mask hypothesis, not real-world hydrology.
+
+An inventory of the extracted original reference package found no native terrain file (`.rbx*`, `.obj`, `.fbx`, `.glb`, `.gltf`, `.blend`, or `.stl`); `top_sparse_mesh.jpg` is a raster reference only. Recovering the original 3D shape therefore requires a new multi-view reconstruction or a separate source asset.
+
+The selected V5 field also has a supplemental **post-selection** skyline audit against `top_sparse_mesh.jpg`, a raster not used by the V2/V3/V4/V5 selection pipeline. The audit fits the relative camera once on V4 and fixes it for both fields; V4 scores 0.60833 and selected V5 scores 0.54535 (delta −0.06298). Source SHA-256 is `41abb8789a1472cf16a96ff2169569f48c4cb99dc959af0297e3cc568b73f1f6`. The image is a raster from nearly the same top-oblique view as `top_render.png`, so this is a correlated consistency check rather than an independent camera or proof of absolute fidelity. It did not affect candidate selection; the absolute-visual gate remains NO-GO.
+
+Reproduce the supplemental check against an already selected field with:
+
+```bash
+python -m tools.terrain_2_v3.audit_v5_extra_view --sources references --v2 output_v2 --v4 output_v4 --v5 output_v5 --output output_v5/extra_view_audit
+```
+
+`terrain_regions_v5.png`, `adaptive_mesh_preview_v5.png`, `multiview_comparison_v5.png`, `isometric_comparison_v5.png`, `side_render_training_v5.png`, `atlas_isometric_holdout_v5.png`, and `extra_view_audit/v5_extra_view_skyline.png` are the principal review artifacts. The latest original-reference reconstruction is [GitHub Actions run 38918407230](https://github.com/dreyvinixz/RobloxGame/actions/runs/38918407230); its V5 artifact contains the post-selection sparse-mesh report and curve, confirms the same selected field hash, and retains the relative-holdout pass / absolute-visual NO-GO status.
+
+## Roadmap after V4
+
+1. **V5 geometry/hydrology:** retain the adaptive mesh and relative water scenarios as candidates. Manually review or improve ridge, cliff, plateau, beach, and channel boundaries against the original views. Preserve source hashes.
+2. **V5 acceptance:** the relative multiview gate passes. Complete manual overlay review before accepting absolute visual fidelity or using the relief as final geometry.
+3. **V6 Studio test place:** the latest candidate (`37cd79eb4c0bbeb35e6b52a3803a5bcef9ba5279402ce4117107185297e24948`) is imported in the isolated `devtest3.rbxl` session. Readback confirms 377,149 occupied voxels, exact 0.5-stud-quantized heights across 36,825 dry columns, and one connected water component. Save/reopen and adaptive-mesh-to-collision comparison remain open.
+4. **V7 playability:** on the latest candidate, all four jump-enabled one-client routes from the opt-in spawn reached the beach/ridge targets with 100 health. No-jump pathfinding succeeds to both beaches but returns `NoPath` to both ridges. Ten current-field sightline checks are unobstructed, so terrain alone offers limited cover. A generic 64×64-stud flat-pad screen found one dry, level central-plain site reachable without jumping. The latest A/B requested 27 seconds per condition but LibMP returned only 109 frames each; CPU/GPU differences were small and do not establish sustained performance. Terrain-specific memory, multiplayer, slope criteria, combat, and object-specific asset footprints remain open.
+
+Current handoff: **V4 closed as visual NO-GO; latest V5 cardinal mean improves to 12.55 and both independent holdouts pass, but absolute visual fidelity remains NO-GO; V6 latest candidate is imported and readback-verified in the unsaved Studio session; V7 jump-enabled routes pass for one client, while save/reopen, ridge access without jumps, slope criteria, sustained performance, multiplayer, and combat gates remain open.** Production place and `main` remain untouched.
