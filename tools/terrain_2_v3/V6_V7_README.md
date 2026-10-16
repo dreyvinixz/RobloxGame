@@ -1,10 +1,10 @@
 # Terrain 2 — V6 Studio integration and V7 playability probes
 
-**Status: isolated engineering prototype.** The Studio session now contains the selected profile-restored V5 candidate with hash `ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`. Its terrain readback, four collision samples, and one-client route runs below are from this candidate. The session is unsaved. V5 absolute visual fidelity remains **NO-GO**; V6/V7 evidence does not approve production use.
+**Status: isolated engineering prototype.** The Studio session contains the prior profile-restored V5 candidate with hash `ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`. The latest V5 candidate is `37cd79eb4c0bbeb35e6b52a3803a5bcef9ba5279402ce4117107185297e24948` and has not yet been imported. All terrain readback and route evidence below belongs to the prior hash. The session is unsaved. V5 absolute visual fidelity remains **NO-GO**; V6/V7 evidence does not approve production use.
 
 ## V6 — isolated Studio integration
 
-The selected profile-restored V5 heightfield was written to `Workspace.Terrain` in the isolated `devtest3.rbxl` session under the Terrain 2 test bounds. Its input was `height_relative_v5.npy`, SHA-256 `ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`.
+The prior V5 heightfield was written to `Workspace.Terrain` in the isolated `devtest3.rbxl` session under the Terrain 2 test bounds. Its input was `height_relative_v5.npy`, SHA-256 `ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`. The Studio terrain is now stale relative to the latest V5 candidate and its readback must be repeated after import.
 
 - Coordinate mapping: image X → Roblox +X; image row increases → Roblox −Z; relative height starts at Y=100. The voxel bounds are `(-512, 80, -512)` to `(516, 208, 516)`, at 4-stud resolution: 257 × 32 × 257 cells. These are assumed relative coordinates.
 - The region uses one stud per source-image pixel as a working assumption and four studs per heightfield interval. The source reference bar is 245 pixels per labeled 500 units; neither the label nor mapping is a physical or gameplay scale calibration.
