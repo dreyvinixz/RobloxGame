@@ -12,6 +12,7 @@ local NetProtocol = {
 	VehicleActionEvent = "VehicleAction",
 	VehicleInputEvent = "VehicleInput",
 	VehicleStateEvent = "VehicleState",
+	EliminationEvent = "Elimination",
 }
 
 return table.freeze(NetProtocol)

@@ -6,9 +6,11 @@ local Teams = game:GetService("Teams")
 local Workspace = game:GetService("Workspace")
 
 local Config = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("Config"))
+local NetProtocol = require(ReplicatedStorage:WaitForChild("Shared"):WaitForChild("NetProtocol"))
 
 local MatchService = {}
 local started = false
+local eliminationEvent: RemoteEvent? = nil
 local blueTeam: Team
 local orangeTeam: Team
 local blueSpawn: SpawnLocation
@@ -38,9 +40,12 @@ local function getOrCreateTeam(name: string, color: BrickColor): Team
 	return team
 end
 
-local function requireSpawn(arena: Model, name: string): SpawnLocation
-	local instance = arena:FindFirstChild(name, true)
-	assert(instance and instance:IsA("SpawnLocation"), "spawn ausente: " .. name)
+local function requireSpawn(name: string): SpawnLocation
+	local island = Workspace:FindFirstChild("BR_Peninsula_Draft")
+	assert(island and island:IsA("Folder"), "BR_Peninsula_Draft ausente; spawns da arena de teste foram removidos")
+	local spawnFolder = island:FindFirstChild("SpawnPoints")
+	local instance = spawnFolder and spawnFolder:FindFirstChild(name)
+	assert(instance and instance:IsA("SpawnLocation"), "spawn da ilha ausente: " .. name)
 	return instance
 end
 
@@ -95,6 +100,16 @@ local function assignTeam(player: Player)
 	player.Team = if chooseBlue then blueTeam else orangeTeam
 	player.Neutral = false
 	player.RespawnLocation = if chooseBlue then blueSpawn else orangeSpawn
+	local assignedSpawn = player.RespawnLocation
+	task.defer(function()
+		if player.Parent ~= Players or player.RespawnLocation ~= assignedSpawn then return end
+		local character = player.Character
+		local root = character and character:FindFirstChild("HumanoidRootPart")
+		if root and root:IsA("BasePart") and (root.Position - assignedSpawn.Position).Magnitude > 48 then
+			local ok, err = pcall(function() player:LoadCharacterAsync() end)
+			if not ok then warn("[Frontline][FL-018] falha ao posicionar jogador no spawn da ilha:", player.Name, err) end
+		end
+	end)
 	getOrCreateStat(player, "KOs")
 	getOrCreateStat(player, "Deaths")
 	print(string.format("[Frontline][FL-018] %s -> %s", player.Name, player.Team.Name))
@@ -152,7 +167,7 @@ function MatchService.CanDamage(shooter: Player, target: Player): boolean
 	return true
 end
 
-function MatchService.RecordElimination(shooter: Player, target: Player)
+function MatchService.RecordElimination(shooter: Player, target: Player, weaponId: string?, isHeadshot: boolean?)
 	if not MatchService.CanDamage(shooter, target) then return end
 	local score: number
 	if shooter.Team == blueTeam then
@@ -167,16 +182,19 @@ function MatchService.RecordElimination(shooter: Player, target: Player)
 	getOrCreateStat(shooter, "KOs").Value += 1
 	getOrCreateStat(target, "Deaths").Value += 1
 	setState()
+	if eliminationEvent then
+		eliminationEvent:FireAllClients(shooter.Name, target.Name, weaponId or "TestRifle", isHeadshot or false)
+	end
 	print(string.format("[Frontline][FL-018] eliminação | %s -> %s | %d:%d", shooter.Name, target.Name, blueScore, orangeScore))
 	if score >= Config.Match.ScoreToWin then finishRound() end
 end
 
-function MatchService.Start(arena: Model)
+function MatchService.Start()
 	if started then return end
 	blueTeam = getOrCreateTeam("Azul", BrickColor.new("Bright blue"))
 	orangeTeam = getOrCreateTeam("Laranja", BrickColor.new("Bright orange"))
-	blueSpawn = requireSpawn(arena, "Spawn_WestEntry")
-	orangeSpawn = requireSpawn(arena, "Spawn_EastEntry")
+	blueSpawn = requireSpawn("Spawn_WestEntry")
+	orangeSpawn = requireSpawn("Spawn_EastEntry")
 	configureSpawn(blueSpawn, blueTeam)
 	configureSpawn(orangeSpawn, orangeTeam)
 	Players.RespawnTime = Config.Match.RespawnSeconds
@@ -188,6 +206,16 @@ function MatchService.Start(arena: Model)
 		state = Instance.new("Folder")
 		state.Name = "MatchState"
 		state.Parent = ReplicatedStorage
+	end
+	local remotes = ReplicatedStorage:WaitForChild(NetProtocol.RemoteFolderName)
+	local existingElim = remotes:FindFirstChild(NetProtocol.EliminationEvent)
+	if existingElim and existingElim:IsA("RemoteEvent") then
+		eliminationEvent = existingElim
+	else
+		local ev = Instance.new("RemoteEvent")
+		ev.Name = NetProtocol.EliminationEvent
+		ev.Parent = remotes
+		eliminationEvent = ev
 	end
 	started = true
 	setState()

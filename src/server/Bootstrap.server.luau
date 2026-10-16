@@ -11,7 +11,7 @@ local DestructibleCoverService = require(script.Parent:WaitForChild("Destructibl
 local VehicleService = require(script.Parent:WaitForChild("VehicleService"))
 
 local arena = ArenaBuilder.Build()
-MatchService.Start(arena)
+MatchService.Start()
 DestructibleCoverService.Start(arena)
 TrainingTargetService.Start()
 CombatRequestService.Start()

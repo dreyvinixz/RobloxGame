@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title desc">
+  <title id="title">Península BR — zonas e primeira rede de estradas</title>
+  <desc id="desc">Mapa conceitual visto de cima: cadeia de montanhas ao norte, zona militar a oeste, cidade central, indústria a leste, porto sudeste, dunas e praia ao sul, conectados por estradas de asfalto sinuosas.</desc>
+  <defs>
+    <pattern id="water" width="32" height="32" patternUnits="userSpaceOnUse"><rect width="32" height="32" fill="#07506d"/><path d="M0 15 Q8 10 16 15 T32 15 M-8 29 Q0 24 8 29 T24 29" fill="none" stroke="#16708a" stroke-width="2" opacity=".55"/></pattern>
+    <pattern id="land" width="28" height="28" patternUnits="userSpaceOnUse"><rect width="28" height="28" fill="#536b42"/><circle cx="7" cy="8" r="2" fill="#71854a"/><circle cx="22" cy="20" r="2.5" fill="#3e5f3d"/></pattern>
+    <pattern id="sand" width="24" height="24" patternUnits="userSpaceOnUse"><rect width="24" height="24" fill="#cfb982"/><circle cx="5" cy="7" r="1.3" fill="#e4d19e"/><circle cx="18" cy="17" r="1.5" fill="#b9a16c"/></pattern>
+    <pattern id="mountain" width="70" height="54" patternUnits="userSpaceOnUse"><rect width="70" height="54" fill="#666d70"/><path d="M0 47 19 12l12 22L48 4 70 46Z" fill="#747a7d" stroke="#858b8e" stroke-width="2"/><path d="m13 23 6-11 7 13m14 3L48 4l8 17" fill="none" stroke="#a8aa9e" stroke-width="2" opacity=".7"/></pattern>
+    <marker id="northArrow" markerWidth="12" markerHeight="12" refX="6" refY="2" orient="auto"><path d="M6 0 12 12 6 9 0 12Z" fill="#f2ead8"/></marker>
+    <style>
+      .label{font:700 18px Arial,sans-serif;fill:#f6f0e3;text-anchor:middle;paint-order:stroke;stroke:#15252a;stroke-width:4px;stroke-linejoin:round}.small{font:13px Arial,sans-serif;fill:#e3dfd3;text-anchor:middle;paint-order:stroke;stroke:#15252a;stroke-width:3px;stroke-linejoin:round}.roadEdge{fill:none;stroke:#24282a;stroke-width:20;stroke-linecap:round;stroke-linejoin:round}.road{fill:none;stroke:#5d6262;stroke-width:13;stroke-linecap:round;stroke-linejoin:round}.streetEdge{fill:none;stroke:#25292a;stroke-width:12;stroke-linecap:round}.street{fill:none;stroke:#666b69;stroke-width:7;stroke-linecap:round}.zone{stroke-width:4;stroke-dasharray:10 7;opacity:.29}.zoneLabel{font:700 15px Arial,sans-serif;fill:#f7f0df;text-anchor:middle;paint-order:stroke;stroke:#15252a;stroke-width:4px;stroke-linejoin:round}
+    </style>
+  </defs>
+  <rect width="1200" height="900" fill="url(#water)"/>
+  <path d="M260 105 Q370 52 520 82 Q690 48 845 95 Q967 128 1004 230 Q1048 310 982 378 Q1034 462 1007 565 Q1026 668 920 758 Q817 844 650 843 Q480 866 344 810 Q230 767 206 666 Q156 564 205 472 Q156 376 197 284 Q176 184 260 105Z" fill="url(#land)" stroke="#9b9a76" stroke-width="8"/>
+  <path d="M260 105 Q370 52 520 82 Q690 48 845 95 Q945 123 973 199 Q899 236 810 218 Q718 245 630 212 Q545 249 454 211 Q360 243 245 210 Q218 151 260 105Z" fill="url(#mountain)" stroke="#9ba09d" stroke-width="4"/>
+  <path d="M290 665 Q390 623 495 651 Q610 673 713 648 Q826 629 932 672 Q905 754 814 793 Q694 828 564 803 Q421 817 320 770 Q270 730 290 665Z" fill="url(#sand)" stroke="#e2ce9b" stroke-width="4"/>
+  <path d="M280 770 Q421 828 564 823 Q694 848 814 813 Q906 780 930 700 Q1006 773 922 830 Q815 882 654 873 Q475 887 340 841 Q277 815 280 770Z" fill="#e0cfaa" stroke="#f0e3c5" stroke-width="5"/>
+  <path class="zone" d="M300 332 Q370 283 479 321 L505 474 Q469 554 336 550 Q279 478 300 332Z" fill="#d34848" stroke="#ff625a"/>
+  <path class="zone" d="M524 332 Q648 289 761 330 L782 539 Q685 585 537 542 Q496 430 524 332Z" fill="#2089dc" stroke="#49aaff"/>
+  <path class="zone" d="M782 302 Q883 265 964 328 L974 488 Q913 541 807 501 Q755 412 782 302Z" fill="#a33ed0" stroke="#d174ed"/>
+  <path class="zone" d="M827 510 Q929 484 995 559 L970 672 Q883 706 806 646 Q779 578 827 510Z" fill="#d17b20" stroke="#efa447"/>
+  <path d="M380 303 Q520 271 650 298 Q775 278 879 304" fill="none" stroke="#667b53" stroke-width="16" stroke-dasharray="4 10" opacity=".9"/>
+
+  <!-- Main asphalt network -->
+  <path class="roadEdge" d="M570 250 Q510 286 467 329 Q423 370 449 414 Q471 452 531 459 Q591 467 654 445 Q724 422 784 390 Q840 360 885 400 Q924 440 902 494 Q880 548 833 590 Q781 638 703 661 Q619 683 530 677 Q433 668 357 628 Q307 603 279 565"/>
+  <path class="road" d="M570 250 Q510 286 467 329 Q423 370 449 414 Q471 452 531 459 Q591 467 654 445 Q724 422 784 390 Q840 360 885 400 Q924 440 902 494 Q880 548 833 590 Q781 638 703 661 Q619 683 530 677 Q433 668 357 628 Q307 603 279 565"/>
+  <path class="roadEdge" d="M570 250 Q624 302 634 352 Q645 404 618 449 Q588 496 620 545 Q650 591 703 661"/>
+  <path class="road" d="M570 250 Q624 302 634 352 Q645 404 618 449 Q588 496 620 545 Q650 591 703 661"/>
+  <path class="roadEdge" d="M449 414 Q397 405 348 429 Q308 452 320 497 Q330 531 357 554"/>
+  <path class="road" d="M449 414 Q397 405 348 429 Q308 452 320 497 Q330 531 357 554"/>
+  <path class="roadEdge" d="M784 390 Q820 339 857 314 Q892 293 925 320"/>
+  <path class="road" d="M784 390 Q820 339 857 314 Q892 293 925 320"/>
+  <path class="roadEdge" d="M885 400 Q947 435 965 490 Q976 526 947 560"/>
+  <path class="road" d="M885 400 Q947 435 965 490 Q976 526 947 560"/>
+
+  <!-- A readable street grid inside the city -->
+  <path class="streetEdge" d="M526 362 Q623 344 749 365 M514 411 Q633 391 767 408 M523 500 Q635 478 769 491 M552 535 Q648 517 773 526"/>
+  <path class="street" d="M526 362 Q623 344 749 365 M514 411 Q633 391 767 408 M523 500 Q635 478 769 491 M552 535 Q648 517 773 526"/>
+  <path class="streetEdge" d="M558 325 Q540 424 574 548 M704 331 Q683 424 714 554"/>
+  <path class="street" d="M558 325 Q540 424 574 548 M704 331 Q683 424 714 554"/>
+
+  <text x="615" y="38" class="small">NORTE ↑ · REFERÊNCIA DE COMPOSIÇÃO · RASCUNHO, NÃO ESTÁ EM ESCALA</text>
+  <text x="390" y="388" class="zoneLabel">ZONA MILITAR · OESTE</text>
+  <text x="627" y="444" class="zoneLabel">CIDADE · CENTRO</text>
+  <text x="868" y="379" class="zoneLabel">ZONA INDUSTRIAL</text>
+  <text x="899" y="586" class="zoneLabel">PORTO · SUDESTE</text>
+  <text x="625" y="726" class="zoneLabel">DUNAS</text>
+  <text x="625" y="853" class="zoneLabel">PRAIA · NÍVEL DO MAR</text>
+  <text x="614" y="178" class="label">MONTANHAS AO NORTE</text>
+  <text x="470" y="606" class="small">via costeira oeste</text>
+  <text x="750" y="608" class="small">ligação para o porto</text>
+  <g transform="translate(110 758)"><path d="M0 48V0" stroke="#f4eee0" stroke-width="4" marker-end="url(#northArrow)"/><text x="0" y="76" class="small">N</text></g>
+  <g transform="translate(76 826)"><path d="M0 0H54" stroke="#5d6262" stroke-width="13"/><text x="72" y="5" class="small" text-anchor="start">asfalto no Terrain</text></g>
+</svg>

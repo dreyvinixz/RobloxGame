@@ -3,6 +3,7 @@
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
+local Debris = game:GetService("Debris")
 
 local ARM_POSES: { [string]: CFrame } = {
 	RightUpperArm = CFrame.new(0.46, -0.60, -1.05) * CFrame.Angles(math.rad(84), 0, math.rad(-18)),
@@ -14,8 +15,13 @@ local ARM_POSES: { [string]: CFrame } = {
 }
 
 local RIFLE_OFFSET = CFrame.new(0.12, -0.43, -1.42)
+local PISTOL_OFFSET = CFrame.new(0.20, -0.48, -1.15) * CFrame.Angles(math.rad(-4), 0, 0)
 local RELOAD_DURATION_FALLBACK = 2.2
 local RIG_PART_TIMEOUT = 5
+local BULLET_SPEEDS: { [string]: number } = {
+	TestRifle = 1200,
+	ServicePistol = 850,
+}
 local ARM_SIZES: { [string]: Vector3 } = {
 	RightUpperArm = Vector3.new(0.22, 0.22, 0.55),
 	RightLowerArm = Vector3.new(0.19, 0.19, 0.50),
@@ -34,6 +40,8 @@ export type Controller = {
 	player: Player,
 	model: Model?,
 	rifle: Model?,
+	weaponId: string,
+	effectsFolder: Folder?,
 	arms: { [string]: ArmEntry },
 	started: boolean,
 	destroyed: boolean,
@@ -43,7 +51,8 @@ export type Controller = {
 	characterAddedConnection: RBXScriptConnection?,
 	characterRemovingConnection: RBXScriptConnection?,
 	Start: (self: Controller) -> (),
-	PlayFireAnimation: (self: Controller) -> (),
+	SetWeapon: (self: Controller, weaponId: string) -> (),
+	PlayFireAnimation: (self: Controller, targetPosition: Vector3, fallbackOrigin: Vector3) -> (),
 	PlayReloadAnimation: (self: Controller, duration: number?) -> (),
 	StopReloadAnimation: (self: Controller) -> (),
 	Destroy: (self: Controller) -> (),
@@ -60,6 +69,10 @@ local function preparePart(part: BasePart)
 	part.CastShadow = false
 	part.Massless = true
 	part.LocalTransparencyModifier = 0
+end
+
+local function getWeaponOffset(weaponId: string): CFrame
+	return if weaponId == "ServicePistol" then PISTOL_OFFSET else RIFLE_OFFSET
 end
 
 local function containsUnsafeInstance(model: Model): boolean
@@ -102,7 +115,38 @@ local function createProceduralRifle(): Model
 	return model
 end
 
-local function cloneRifle(): Model
+local function createProceduralPistol(): Model
+	local model = Instance.new("Model")
+	model.Name = "ProceduralServicePistol"
+
+	local function addPart(name: string, size: Vector3, offset: CFrame, color: Color3): Part
+		local part = Instance.new("Part")
+		part.Name = name
+		part.Size = size
+		part.CFrame = offset
+		part.Color = color
+		part.Material = Enum.Material.Metal
+		part.TopSurface = Enum.SurfaceType.Smooth
+		part.BottomSurface = Enum.SurfaceType.Smooth
+		preparePart(part)
+		part.Parent = model
+		return part
+	end
+
+	local receiver = addPart("Receiver", Vector3.new(0.24, 0.22, 0.64), CFrame.new(), Color3.fromRGB(50, 54, 54))
+	addPart("Slide", Vector3.new(0.22, 0.15, 0.72), CFrame.new(0, 0.14, -0.06), Color3.fromRGB(72, 76, 76))
+	addPart("Barrel", Vector3.new(0.11, 0.10, 0.22), CFrame.new(0, 0.15, -0.49), Color3.fromRGB(34, 38, 39))
+	addPart("Grip", Vector3.new(0.20, 0.42, 0.25), CFrame.new(0, -0.29, 0.16) * CFrame.Angles(math.rad(-8), 0, 0), Color3.fromRGB(43, 47, 45))
+	addPart("MagazineBase", Vector3.new(0.18, 0.06, 0.20), CFrame.new(0, -0.51, 0.16), Color3.fromRGB(63, 59, 48))
+	model.PrimaryPart = receiver
+	return model
+end
+
+local function cloneWeapon(weaponId: string): Model
+	if weaponId == "ServicePistol" then
+		return createProceduralPistol()
+	end
+
 	local assets = ReplicatedStorage:FindFirstChild("FrontlineAssets")
 	local candidate = assets and assets:FindFirstChild("TestRifleVisual")
 	local model: Model
@@ -137,6 +181,144 @@ local function cloneRifle(): Model
 		end
 	end
 	return model
+end
+
+local function createShotBullet(parent: Instance): Model
+	local bullet = Instance.new("Model")
+	bullet.Name = "LocalBullet"
+
+	local body = Instance.new("Part")
+	body.Name = "Jacket"
+	body.Shape = Enum.PartType.Cylinder
+	body.Size = Vector3.new(0.30, 0.055, 0.055)
+	body.Color = Color3.fromRGB(122, 105, 72)
+	body.Material = Enum.Material.Metal
+	preparePart(body)
+	body.Parent = bullet
+
+	local tip = Instance.new("Part")
+	tip.Name = "ProjectileTip"
+	tip.Shape = Enum.PartType.Ball
+	tip.Size = Vector3.new(0.065, 0.055, 0.055)
+	tip.Color = Color3.fromRGB(180, 115, 55)
+	tip.Material = Enum.Material.Metal
+	preparePart(tip)
+	tip.CFrame = CFrame.new(0.16, 0, 0)
+	tip.Parent = bullet
+
+	local trailBack = Instance.new("Attachment")
+	trailBack.Position = Vector3.new(-0.12, 0, 0)
+	trailBack.Parent = body
+	local trailFront = Instance.new("Attachment")
+	trailFront.Position = Vector3.new(-0.12, 0.025, 0)
+	trailFront.Parent = body
+
+	local trail = Instance.new("Trail")
+	trail.Name = "BulletTrail"
+	trail.Attachment0 = trailBack
+	trail.Attachment1 = trailFront
+	trail.Lifetime = 0.08
+	trail.MinLength = 0.01
+	trail.LightEmission = 0.8
+	trail.Color = ColorSequence.new(Color3.fromRGB(255, 220, 145), Color3.fromRGB(255, 120, 48))
+	trail.Transparency = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.2),
+		NumberSequenceKeypoint.new(1, 1),
+	})
+	trail.WidthScale = NumberSequence.new({
+		NumberSequenceKeypoint.new(0, 0.035),
+		NumberSequenceKeypoint.new(1, 0),
+	})
+	trail.Parent = body
+
+	bullet.PrimaryPart = body
+	bullet.Parent = parent
+	return bullet
+end
+
+local function getWeaponPoints(model: Model): (Vector3, Vector3)
+	local pivot = model:GetPivot()
+	local forward = pivot.LookVector
+	local furthestForward = -math.huge
+	for _, descendant in model:GetDescendants() do
+		if descendant:IsA("BasePart") then
+			local halfSize = descendant.Size * 0.5
+			for _, xSign in { -1, 1 } do
+				for _, ySign in { -1, 1 } do
+					for _, zSign in { -1, 1 } do
+						local corner = descendant.CFrame:PointToWorldSpace(Vector3.new(
+							halfSize.X * xSign,
+							halfSize.Y * ySign,
+							halfSize.Z * zSign
+						))
+						furthestForward = math.max(furthestForward, (corner - pivot.Position):Dot(forward))
+					end
+				end
+			end
+		end
+	end
+
+	local muzzle = pivot.Position + forward * (furthestForward + 0.025)
+	local ejectPort = pivot.Position + pivot.RightVector * 0.15 + pivot.UpVector * 0.08 + forward * 0.12
+	return muzzle, ejectPort
+end
+
+local function spawnBullet(parent: Instance, origin: Vector3, targetPosition: Vector3, weaponId: string)
+	local offset = targetPosition - origin
+	local distance = offset.Magnitude
+	if distance < 0.01 then
+		return
+	end
+
+	local direction = offset.Unit
+	local bullet = createShotBullet(parent)
+	local orientationOffset = CFrame.Angles(0, math.pi / 2, 0)
+	local function placeAt(distanceAlongPath: number)
+		local center = origin + direction * distanceAlongPath
+		bullet:PivotTo(CFrame.lookAt(center, center + direction) * orientationOffset)
+	end
+
+	local speed = BULLET_SPEEDS[weaponId] or BULLET_SPEEDS.TestRifle
+	local duration = distance / speed
+	local elapsed = 0
+	placeAt(0)
+	local connection: RBXScriptConnection?
+	connection = RunService.Heartbeat:Connect(function(deltaTime)
+		if not bullet.Parent then
+			if connection then
+				connection:Disconnect()
+			end
+			return
+		end
+
+		elapsed += deltaTime
+		local progress = math.min(elapsed / duration, 1)
+		placeAt(distance * progress)
+		if progress >= 1 and connection then
+			connection:Disconnect()
+		end
+	end)
+	Debris:AddItem(bullet, duration + 0.12)
+end
+
+local function spawnCasing(parent: Instance, position: Vector3, right: Vector3, up: Vector3, weaponId: string)
+	local casing = Instance.new("Part")
+	casing.Name = "LocalSpentCasing"
+	casing.Shape = Enum.PartType.Cylinder
+	casing.Size = Vector3.new(if weaponId == "ServicePistol" then 0.16 else 0.22, 0.055, 0.055)
+	casing.Color = Color3.fromRGB(174, 133, 62)
+	casing.Material = Enum.Material.Metal
+	casing.Anchored = false
+	casing.CanCollide = false
+	casing.CanTouch = false
+	casing.CanQuery = false
+	casing.CastShadow = false
+	casing.Massless = true
+	casing.CFrame = CFrame.lookAt(position, position + right) * CFrame.Angles(0, math.pi / 2, 0)
+	casing.AssemblyLinearVelocity = right * 7 + up * 5 + Vector3.new(0, 1.5, 0)
+	casing.AssemblyAngularVelocity = Vector3.new(8, 13, 5)
+	casing.Parent = parent
+	Debris:AddItem(casing, 2.5)
 end
 
 local function cleanupModel(self: Controller)
@@ -193,11 +375,14 @@ local function createViewmodel(self: Controller, character: Model)
 		return
 	end
 
-	local rifle = cloneRifle()
+	local rifle = cloneWeapon(self.weaponId)
 	rifle.Parent = viewmodel
 	self.rifle = rifle
 	local camera = workspace.CurrentCamera
 	viewmodel.Parent = camera
+	if camera then
+		rifle:PivotTo(camera.CFrame * getWeaponOffset(self.weaponId))
+	end
 	print(string.format(
 		"[Frontline][FL-015] viewmodel R15 pronto | braços=%d | rifle=%s",
 		#viewmodel:GetChildren() - 1,
@@ -205,11 +390,35 @@ local function createViewmodel(self: Controller, character: Model)
 	))
 end
 
+function ViewmodelController.SetWeapon(self: Controller, weaponId: string)
+	if self.destroyed or self.weaponId == weaponId then
+		return
+	end
+	self.weaponId = weaponId
+
+	local viewmodel = self.model
+	if not viewmodel then
+		return
+	end
+	if self.rifle then
+		self.rifle:Destroy()
+	end
+	local weaponModel = cloneWeapon(weaponId)
+	weaponModel.Parent = viewmodel
+	self.rifle = weaponModel
+	local camera = workspace.CurrentCamera
+	if camera then
+		weaponModel:PivotTo(camera.CFrame * getWeaponOffset(weaponId))
+	end
+end
+
 function ViewmodelController.new(player: Player): Controller
 	local self = setmetatable({
 		player = player,
 		model = nil,
 		rifle = nil,
+		weaponId = "TestRifle",
+		effectsFolder = nil,
 		arms = {},
 		started = false,
 		destroyed = false,
@@ -269,7 +478,7 @@ function ViewmodelController.Start(self: Controller)
 		local recoilPose = CFrame.new(0, 0, 0.12 * recoil) * CFrame.Angles(math.rad(-3.5 * recoil), 0, 0)
 		local reloadWeaponPose = CFrame.new(-0.18 * reload, -0.28 * reload, 0.08 * reload)
 			* CFrame.Angles(0, 0, math.rad(-12 * reload))
-		rifle:PivotTo(camera.CFrame * RIFLE_OFFSET * reloadWeaponPose * recoilPose)
+		rifle:PivotTo(camera.CFrame * getWeaponOffset(self.weaponId) * reloadWeaponPose * recoilPose)
 
 		local reloadHandPose = CFrame.new(0.13 * reload, -0.18 * reload, 0.40 * reload)
 		for _, arm in self.arms do
@@ -284,9 +493,34 @@ function ViewmodelController.Start(self: Controller)
 	end)
 end
 
-function ViewmodelController.PlayFireAnimation(self: Controller)
+function ViewmodelController.PlayFireAnimation(self: Controller, targetPosition: Vector3, fallbackOrigin: Vector3)
 	if not self.destroyed then
 		self.fireStartedAt = os.clock()
+		local camera = workspace.CurrentCamera
+		local effectsFolder = self.effectsFolder
+		if not effectsFolder then
+			effectsFolder = Instance.new("Folder")
+			effectsFolder.Name = "FrontlineLocalWeaponEffects"
+			effectsFolder.Parent = workspace
+			self.effectsFolder = effectsFolder
+		end
+
+		local muzzlePosition = fallbackOrigin
+		local ejectPosition = fallbackOrigin
+		local right = if camera then camera.CFrame.RightVector else Vector3.new(1, 0, 0)
+		local up = if camera then camera.CFrame.UpVector else Vector3.new(0, 1, 0)
+		local firstPerson = camera and (camera.CFrame.Position - fallbackOrigin).Magnitude <= 1.75
+		if firstPerson and self.model and self.model.Parent == camera and self.rifle then
+			muzzlePosition, ejectPosition = getWeaponPoints(self.rifle)
+			local weaponPivot = self.rifle:GetPivot()
+			right = weaponPivot.RightVector
+			up = weaponPivot.UpVector
+		else
+			ejectPosition = fallbackOrigin + right * 0.15 + up * 0.08
+		end
+
+		spawnBullet(effectsFolder, muzzlePosition, targetPosition, self.weaponId)
+		spawnCasing(effectsFolder, ejectPosition, right, up, self.weaponId)
 	end
 end
 
@@ -317,6 +551,10 @@ function ViewmodelController.Destroy(self: Controller)
 		self.characterRemovingConnection = nil
 	end
 	cleanupModel(self)
+	if self.effectsFolder then
+		self.effectsFolder:Destroy()
+		self.effectsFolder = nil
+	end
 end
 
 return ViewmodelController

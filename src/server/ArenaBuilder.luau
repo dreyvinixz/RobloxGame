@@ -4,8 +4,10 @@ local ServerStorage = game:GetService("ServerStorage")
 local Lighting = game:GetService("Lighting")
 
 local ARENA_NAME = "FrontlineArena"
-local ARENA_VERSION = 3
+local ARENA_VERSION = 5
 local GROUND_SIZE = Vector3.new(280, 2, 220)
+local ISLAND_NAME = "BR_Peninsula_Draft"
+local ISLAND_SPAWN_FOLDER = "SpawnPoints"
 
 local function makePart(
 	parent: Instance,
@@ -39,7 +41,7 @@ local function makeFolder(parent: Instance, name: string): Folder
 	return folder
 end
 
-local function makeSpawn(parent: Instance, name: string, position: Vector3, color: Color3)
+local function makeSpawn(parent: Instance, name: string, position: Vector3, color: Color3): SpawnLocation
 	local spawn = Instance.new("SpawnLocation")
 	spawn.Name = name
 	spawn.Size = Vector3.new(8, 1, 8)
@@ -57,6 +59,60 @@ local function makeSpawn(parent: Instance, name: string, position: Vector3, colo
 	spawn.Transparency = 0.65
 	spawn:SetAttribute("ArenaRole", "EntrySpawn")
 	spawn.Parent = parent
+	return spawn
+end
+
+local function ensureIslandSpawns(): Folder?
+	local island = Workspace:FindFirstChild(ISLAND_NAME)
+	if not island then return nil end
+	assert(island:IsA("Folder"), ISLAND_NAME .. " precisa ser Folder")
+
+	local spawnFolder = island:FindFirstChild(ISLAND_SPAWN_FOLDER)
+	if not spawnFolder then
+		spawnFolder = makeFolder(island, ISLAND_SPAWN_FOLDER)
+	end
+	assert(spawnFolder:IsA("Folder"), ISLAND_SPAWN_FOLDER .. " precisa ser Folder")
+
+	local spawnSpecs = {
+		{ name = "Spawn_WestEntry", x = -784, z = 448, color = Color3.fromRGB(64, 150, 225) },
+		{ name = "Spawn_EastEntry", x = 851, z = 437, color = Color3.fromRGB(225, 105, 74) },
+	}
+	local rayParams = RaycastParams.new()
+	rayParams.FilterType = Enum.RaycastFilterType.Include
+	rayParams.FilterDescendantsInstances = { Workspace.Terrain }
+	rayParams.IgnoreWater = true
+
+	for _, spec in spawnSpecs do
+		local hit = Workspace:Raycast(Vector3.new(spec.x, 500, spec.z), Vector3.new(0, -900, 0), rayParams)
+		assert(hit and hit.Material == Enum.Material.Grass, "ponto de equipe fora do gramado da ilha: " .. spec.name)
+
+		local spawn = spawnFolder:FindFirstChild(spec.name)
+		if spawn and not spawn:IsA("SpawnLocation") then
+			spawn:Destroy()
+			spawn = nil
+		end
+		if not spawn then
+			spawn = makeSpawn(spawnFolder, spec.name, Vector3.zero, spec.color)
+		end
+		spawn.Size = Vector3.new(8, 1, 8)
+		spawn.Position = Vector3.new(spec.x, hit.Position.Y + spawn.Size.Y / 2 + 0.5, spec.z)
+		spawn.Anchored = true
+		spawn.CanCollide = true
+		spawn.CanTouch = false
+		spawn.Enabled = true
+		spawn.Neutral = true
+		spawn.AllowTeamChangeOnTouch = false
+		spawn.Duration = 0
+		spawn.Color = spec.color
+		spawn:SetAttribute("MapRegion", ISLAND_NAME)
+		spawn:SetAttribute("TerrainMaterial", hit.Material.Name)
+	end
+
+	local oldNeutralSpawn = Workspace:FindFirstChild("SpawnLocation")
+	if oldNeutralSpawn and oldNeutralSpawn:IsA("SpawnLocation") then
+		oldNeutralSpawn:Destroy()
+	end
+	return spawnFolder
 end
 
 local function makePavement(
@@ -401,10 +457,17 @@ local function addApprovedUrbanProps(parent: Instance)
 end
 
 local function buildArena(): Model
+	ensureIslandSpawns()
 	local existing = Workspace:FindFirstChild(ARENA_NAME)
 	if existing then
 		if existing:IsA("Model") then
 			if existing:GetAttribute("ArenaVersion") == ARENA_VERSION then
+				local entries = existing:FindFirstChild("EntryPoints")
+				if entries then
+					for _, entry in entries:GetChildren() do
+						if entry:IsA("SpawnLocation") then entry:Destroy() end
+					end
+				end
 				return existing
 			end
 			existing:Destroy()
@@ -425,7 +488,7 @@ local function buildArena(): Model
 	arena:SetAttribute("ArenaSizeX", GROUND_SIZE.X)
 	arena:SetAttribute("ArenaSizeZ", GROUND_SIZE.Z)
 	arena:SetAttribute("RouteCount", 3)
-	arena:SetAttribute("EntryCount", 2)
+	arena:SetAttribute("EntryCount", 0)
 
 	local groundwork = makeFolder(arena, "Groundwork")
 	makePart(
@@ -488,8 +551,6 @@ local function buildArena(): Model
 	end
 
 	local entries = makeFolder(arena, "EntryPoints")
-	makeSpawn(entries, "Spawn_WestEntry", Vector3.new(-124, 0.5, 0), Color3.fromRGB(64, 150, 225))
-	makeSpawn(entries, "Spawn_EastEntry", Vector3.new(124, 0.5, 0), Color3.fromRGB(225, 105, 74))
 
 	local coverModules = makeFolder(arena, "CoverModules")
 	for _, cover in {

@@ -151,19 +151,25 @@ local function applyShot(shooter: Player, shot: ShotPayload)
 	if not model or model == character or not humanoid or humanoid.Health <= 0 then return end
 	local targetPlayer = Players:GetPlayerFromCharacter(model)
 	if targetPlayer and not matchService.CanDamage(shooter, targetPlayer) then return end
-	local damage = baseDamage * (if result.Instance.Name == "Head" then def.headshotMultiplier else 1)
+	local isHeadshot = result.Instance.Name == "Head"
+	local damage = baseDamage * (if isHeadshot then def.headshotMultiplier else 1)
 	local healthBefore = humanoid.Health
 	local ok, err = pcall(function() humanoid:TakeDamage(damage) end)
 	if not ok then
 		warn("[Frontline][FL-010] erro ao aplicar dano:", err)
 		return
 	end
+	local isKill = false
 	if targetPlayer and healthBefore > 0 and humanoid.Health <= 0 then
-		matchService.RecordElimination(shooter, targetPlayer)
+		matchService.RecordElimination(shooter, targetPlayer, shot.weaponId, isHeadshot)
+		isKill = true
+	elseif not targetPlayer and healthBefore > 0 and humanoid.Health <= 0 then
+		isKill = true
 	end
-	print(string.format("[Frontline][FL-010] HIT | %s -> %s | dmg=%.0f%s", shooter.Name, model.Name, damage,
-		if result.Instance.Name == "Head" then " [HEADSHOT]" else ""))
-	hitConfirmedEvent:FireClient(shooter, model.Name)
+	print(string.format("[Frontline][FL-010] HIT | %s -> %s | dmg=%.0f%s%s", shooter.Name, model.Name, damage,
+		if isHeadshot then " [HEADSHOT]" else "",
+		if isKill then " [KILL]" else ""))
+	hitConfirmedEvent:FireClient(shooter, model.Name, isHeadshot, isKill)
 end
 
 function DamageService.Start(combatRequestService: any, matchServiceArg: any, destructionServiceArg: any, vehicleServiceArg: any)

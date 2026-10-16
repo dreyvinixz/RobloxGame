@@ -39,89 +39,20 @@ local lastShotAt   = -math.huge              -- os.clock() do último disparo ac
 local isTriggerHeld = false                  -- para modo automático (mouse mantido)
 local startReload: () -> ()
 
--- ─── HUD temporário ──────────────────────────────────────────────────────────
--- UI mínima em texto enquanto FL-022 não cria o HUD definitivo.
-
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "WeaponHUD_FL010"
-screenGui.ResetOnSpawn = false
-screenGui.IgnoreGuiInset = false
-screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-screenGui.Parent = localPlayer.PlayerGui
-
-local ammoLabel = Instance.new("TextLabel")
-ammoLabel.Name = "AmmoLabel"
-ammoLabel.Size = UDim2.fromScale(0.36, 0.075)
-ammoLabel.Position = UDim2.fromScale(0.975, 0.69)
-ammoLabel.AnchorPoint = Vector2.new(1, 1)
-ammoLabel.BackgroundTransparency = 0.5
-ammoLabel.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-ammoLabel.TextColor3 = Color3.fromRGB(230, 230, 230)
-ammoLabel.TextScaled = true
-ammoLabel.TextWrapped = false
-ammoLabel.Font = Enum.Font.GothamBold
-ammoLabel.Text = ammo .. " / " .. weaponDef.magazineSize
-ammoLabel.Parent = screenGui
-local ammoTextConstraint = Instance.new("UITextSizeConstraint")
-ammoTextConstraint.MinTextSize = 14
-ammoTextConstraint.MaxTextSize = 22
-ammoTextConstraint.Parent = ammoLabel
-
--- Crosshair central
-local crosshair = Instance.new("Frame")
-crosshair.Name = "Crosshair"
-crosshair.Size = UDim2.new(0, 16, 0, 16)
-crosshair.Position = UDim2.new(0.5, -8, 0.5, -8)
-crosshair.BackgroundTransparency = 1
-crosshair.Parent = screenGui
-
-for _, axis in { {UDim2.new(0, 14, 0, 2), UDim2.new(0, 1, 0, 7)},
-                 {UDim2.new(0, 2, 0, 14), UDim2.new(0, 7, 0, 1)} } do
-	local bar = Instance.new("Frame")
-	bar.Size       = axis[1]
-	bar.Position   = axis[2]
-	bar.AnchorPoint = Vector2.new(0.5, 0.5)
-	bar.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	bar.BorderSizePixel  = 0
-	bar.Parent = crosshair
-end
-
-local statusLabel = Instance.new("TextLabel")
-statusLabel.Name = "StatusLabel"
-statusLabel.Size = UDim2.fromScale(0.36, 0.06)
-statusLabel.Position = UDim2.fromScale(0.975, 0.60)
-statusLabel.AnchorPoint = Vector2.new(1, 1)
-statusLabel.BackgroundTransparency = 1
-statusLabel.TextColor3 = Color3.fromRGB(255, 200, 60)
-statusLabel.TextScaled = true
-statusLabel.TextWrapped = false
-statusLabel.Font = Enum.Font.Gotham
-statusLabel.Text = ""
-statusLabel.Parent = screenGui
-local statusTextConstraint = Instance.new("UITextSizeConstraint")
-statusTextConstraint.MinTextSize = 14
-statusTextConstraint.MaxTextSize = 18
-statusTextConstraint.Parent = statusLabel
-
--- ─── Helpers ─────────────────────────────────────────────────────────────────
+-- ─── HUD integrado FL-022 ───────────────────────────────────────────────────
+-- Estados visuais repassados via atributos locais para o HudController definitivo.
 
 local function updateHUD()
-	if isReloading then
-		ammoLabel.Text = weaponId .. " | RECARREGANDO..."
-		ammoLabel.TextColor3 = Color3.fromRGB(255, 200, 60)
-	else
-		ammoLabel.Text = weaponId .. " | " .. ammo .. " / " .. weaponDef.magazineSize
-		ammoLabel.TextColor3 = if ammo == 0
-			then Color3.fromRGB(255, 80, 80)
-			else Color3.fromRGB(230, 230, 230)
-	end
+	localPlayer:SetAttribute("CurrentWeapon", weaponId)
+	localPlayer:SetAttribute("CurrentAmmo", ammo)
+	localPlayer:SetAttribute("IsReloading", isReloading)
 end
 
 local function showStatus(msg: string, duration: number?)
-	statusLabel.Text = msg
+	localPlayer:SetAttribute("StatusMessage", msg)
 	task.delay(duration or 1.5, function()
-		if statusLabel.Text == msg then
-			statusLabel.Text = ""
+		if localPlayer:GetAttribute("StatusMessage") == msg then
+			localPlayer:SetAttribute("StatusMessage", "")
 		end
 	end)
 end
@@ -176,7 +107,8 @@ local function tryFire()
 	local targetPosition = if localRayResult
 		then localRayResult.Position
 		else origin + direction * weaponDef.maxRange
-	viewmodel:PlayFireAnimation()
+	viewmodel:PlayFireAnimation(targetPosition, head.Position)
+	localPlayer:SetAttribute("LastShotAt", now)
 
 	-- Envia intenção ao servidor — servidor valida e aplica dano se aprovado
 	fireWeaponEvent:FireServer({
@@ -208,6 +140,7 @@ weaponStateEvent.OnClientEvent:Connect(function(serverWeaponId: string, serverAm
 	if not serverWeapon or typeof(serverAmmo) ~= "number" or typeof(serverReloading) ~= "boolean" then return end
 	weaponId = serverWeaponId
 	weaponDef = serverWeapon
+	viewmodel:SetWeapon(serverWeaponId)
 	local wasReloading = isReloading
 	ammo = math.clamp(math.floor(serverAmmo), 0, weaponDef.magazineSize)
 	isReloading = serverReloading

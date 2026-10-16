@@ -21,6 +21,7 @@
 | QA-09 | Reconectar após destruição | Novo cliente vê estado real |
 | QA-10 | Jogar sessão de 10 min | Sem bloqueador ou erros críticos repetidos |
 | QA-11 | Eliminar `TrainingDummy` e pressionar `T` | Servidor recria o alvo com 100 HP e atualiza o indicador |
+| QA-12 | Em primeira pessoa, disparar e alternar entre rifle e pistola | Cada arma exibe o projétil saindo do cano e ejeta um estojo; efeitos expiram e o raycast/dano continuam autoritativos no servidor |
 
 ## Evidência mínima por tarefa
 Data, hash commit/PR, versão Studio/Rojo, ambiente/hardware, passos, resultado, console relevante, captura/vídeo e issue. Guardar relatórios em `docs/TEST_REPORTS/` e arquivos de mídia em anexo do PR/Issue.

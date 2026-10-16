@@ -11,6 +11,12 @@ For a 100 HP body target at point-blank range and ideal cadence, rifle time-to-k
 
 Players start with `TestRifle`; keys **1** and **2** request rifle and pistol. The server accepts only IDs in `WeaponConfig`, rate-limits equip requests, validates shots against the server-held equipped weapon, and keeps ammunition/reload state per weapon. Switching does not refill a magazine. Reload uses the currently equipped weapon.
 
+## Modelos e efeitos visuais
+
+A inspeção no Studio encontrou **1 modelo visual de arma aprovado**: o rifle do FL-014. O arsenal tem **2 armas configuradas**; `ServicePistol` agora usa um modelo procedural próprio no viewmodel, sem importar assets externos. O kit oficial com três armas continua isolado em quarentena e não fornece a mecânica de tiro.
+
+Ao disparar, o cliente exibe um projétil metálico com ponta e rastro curto, partindo da boca do cano até o ponto de mira, e ejeta um estojo de latão pela lateral da arma. A velocidade visual é de 1.200 studs/s no rifle e 850 studs/s na pistola; projéteis e estojos são locais e removidos automaticamente. São efeitos cosméticos: o servidor continua decidindo o acerto e o dano pelo raycast hitscan validado.
+
 ## Verification status
 
 The config-derived time-to-kill values are documented above. Two-client Studio verification of equip, separate ammo/reload state, damage falloff, and measured kill times is required before calling these values balanced.
