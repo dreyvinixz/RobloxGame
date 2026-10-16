@@ -458,6 +458,8 @@ def feature_adaptive_mesh(field, land, water, coarse_step=8, fine_step=2,
         raise ValueError("Non-finite adaptive mesh vertices")
     return points, sampled_heights, faces, {
         "grid_resolution": list(f.shape),
+        "coarse_step_grid_cells": int(coarse_step),
+        "fine_step_complex_grid_cells": int(fine_step),
         "vertices": int(len(points)),
         "triangles": int(len(faces)),
         "triangles_retained_on_land": int(len(faces)),
@@ -950,7 +952,8 @@ def run(sources, v2_dir, v3_dir, v4_dir, output):
         if not cv2.imwrite(str(output / f"{name}.png"), mask.astype(np.uint8) * 255):
             raise OSError("Failed to write feature mask " + name)
     points, heights, faces, mesh_report = feature_adaptive_mesh(
-        selected_field, land, water, semantic_features=features)
+        selected_field, land, water, fine_step=1,
+        semantic_features=features)
     write_adaptive_obj(output / "terrain_adaptive_v5.obj", points, heights, faces,
                        grid_size=selected_field.shape[0])
     write_previews(output, reference, land, features, points, faces)
