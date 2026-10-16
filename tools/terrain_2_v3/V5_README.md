@@ -34,7 +34,7 @@ The V5 preview exports west/east mountain, cliff, plateau, central plain, and be
 
 An inventory of the extracted original reference package found no native terrain file (`.rbx*`, `.obj`, `.fbx`, `.glb`, `.gltf`, `.blend`, or `.stl`); `top_sparse_mesh.jpg` is a raster reference only. Recovering the original 3D shape therefore requires a new multi-view reconstruction or a separate source asset.
 
-`terrain_regions_v5.png`, `adaptive_mesh_preview_v5.png`, `multiview_comparison_v5.png`, `isometric_comparison_v5.png`, `side_render_training_v5.png`, and `atlas_isometric_holdout_v5.png` are the principal review artifacts. The latest original-reference run is under the temporary directory `repro_v5_profile_restored_regions`; its JSON report records hashes, candidate scores, holdouts, relative water scenarios, and mesh counts.
+`terrain_regions_v5.png`, `adaptive_mesh_preview_v5.png`, `multiview_comparison_v5.png`, `isometric_comparison_v5.png`, `side_render_training_v5.png`, and `atlas_isometric_holdout_v5.png` are the principal review artifacts. The latest original-reference reconstruction is [GitHub Actions run 38904150817](https://github.com/dreyvinixz/RobloxGame/actions/runs/38904150817); its JSON report records source hashes, candidate scores, holdouts, relative water scenarios, and the error-guided mesh counts.
 
 ## Roadmap after V4
 
