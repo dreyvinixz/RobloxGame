@@ -193,5 +193,5 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 ## Terrain 2 — spawn padrão opt-in para V7 — 2026-10-16
 
 - `MatchService` agora aceita o atributo `Workspace.Terrain2TestMode=true` no place isolado e usa `Workspace.V7_TestSpawn` de forma neutra para ambos os times. Sem a flag, continuam os spawns normais das equipes.
-- Com o atributo setado antes do fluxo normal de Play, o bootstrap registrou `Terrain 2 test spawn enabled`; o jogador surgiu em `(-5.59, 107.56, -4.14)`, com 100 de vida e `RespawnLocation=Workspace.V7_TestSpawn`. O spawn anterior fora do terreno foi substituído nesse modo explicitamente opt-in.
+- Com o atributo setado antes do fluxo normal de Play, o bootstrap registrou `Terrain 2 test spawn enabled`; o jogador surgiu em `(-5.59, 107.56, -4.14)`, com 100 de vida e `RespawnLocation=Workspace.V7_TestSpawn`. Controle sem atributo preservou `Workspace.FrontlineArena.EntryPoints.Spawn_WestEntry` e a posição `(-124, 5.56, 0)`, ambos com 100 de vida.
 - Atualizados os READMEs V5/V6/V7 e o atributo de evidência no modelo de teste. Teste de um cliente apenas; multiplayer e os gates de jogabilidade/desempenho seguem abertos. A sessão continua sem salvar/reabrir.
