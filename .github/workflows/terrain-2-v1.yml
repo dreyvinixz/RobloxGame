@@ -1,0 +1,38 @@
+name: Terrain 2 V1 source-image analysis
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - experiment/terrain-2-image-v1
+    paths:
+      - tools/terrain_2_v1/**
+      - tests/test_terrain_2_v1.py
+      - .github/workflows/terrain-2-v1.yml
+  pull_request:
+    paths:
+      - tools/terrain_2_v1/**
+      - tests/test_terrain_2_v1.py
+      - .github/workflows/terrain-2-v1.yml
+permissions:
+  contents: read
+jobs:
+  source-pixel-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Scientific image processing dependencies
+        run: python -m pip install -r tools/terrain_inverse/requirements.txt
+      - name: Pixel-input invariants on SYNTHETIC fixtures
+        run: python -m unittest discover -s tests -p 'test_terrain_2_v1.py' -v
+      - name: Sources cannot be hallucinated by CI
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          assert Path('tools/terrain_2_v1/extract_v1.py').exists()
+          assert not Path('terrain_2_references').exists(), 'Actual images require explicit user upload'
+          print('SYNTHETIC tests only — source images not in repository')
+          PY
