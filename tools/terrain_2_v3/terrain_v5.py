@@ -390,13 +390,67 @@ def feature_adaptive_mesh(field, land, water, coarse_step=8, fine_step=2,
     boundary_points = (feature_edge | semantic_edge) & land & ~water
     edge_points = np.column_stack(np.where(boundary_points)).astype(np.int32)
     points = np.unique(np.vstack((points, edge_points)), axis=0)
-    triangulation = Delaunay(points[:, ::-1].astype(np.float64))
-    faces = triangulation.simplices.astype(np.int32)
-    centroids = np.rint(points[faces].mean(axis=1)).astype(int)
-    valid = land[centroids[:, 0], centroids[:, 1]] & ~water[centroids[:, 0], centroids[:, 1]]
-    valid &= land[points[faces, 0], points[faces, 1]].all(axis=1)
-    valid &= ~water[points[faces, 0], points[faces, 1]].any(axis=1)
-    faces = faces[valid]
+    target_rows, target_cols = np.where(land & ~water)
+    target_points = np.column_stack((target_rows, target_cols))
+    query_xy = target_points[:, ::-1].astype(np.float64)
+    mesh_error_tolerance = 2.0  # relative height units, not studs or meters
+    max_refinement_rounds = 6
+    added_vertices = 0
+    refinement_rounds = 0
+
+    def triangulate_and_filter(vertex_points):
+        triangulation = Delaunay(vertex_points[:, ::-1].astype(np.float64))
+        raw_faces = triangulation.simplices.astype(np.int32)
+        centroids = np.rint(vertex_points[raw_faces].mean(axis=1)).astype(int)
+        valid_faces = (land[centroids[:, 0], centroids[:, 1]] &
+                       ~water[centroids[:, 0], centroids[:, 1]])
+        valid_faces &= land[vertex_points[raw_faces, 0],
+                            vertex_points[raw_faces, 1]].all(axis=1)
+        valid_faces &= ~water[vertex_points[raw_faces, 0],
+                              vertex_points[raw_faces, 1]].any(axis=1)
+        return triangulation, raw_faces[valid_faces], valid_faces
+
+    def interpolate_targets(triangulation, valid_faces, vertex_points):
+        from matplotlib.tri import LinearTriInterpolator, Triangulation
+
+        mesh_triangles = triangulation.simplices[valid_faces]
+        mesh = Triangulation(
+            vertex_points[:, 1].astype(np.float64),
+            vertex_points[:, 0].astype(np.float64),
+            triangles=mesh_triangles)
+        interpolator = LinearTriInterpolator(
+            mesh, field[vertex_points[:, 0], vertex_points[:, 1]])
+        predicted = np.asarray(interpolator(
+            query_xy[:, 0], query_xy[:, 1]).filled(np.nan), dtype=np.float32)
+        covered = np.isfinite(predicted)
+        errors = np.full(len(query_xy), np.nan, dtype=np.float32)
+        errors[covered] = np.abs(
+            predicted[covered] - field[target_rows[covered], target_cols[covered]])
+        return covered, errors
+
+    for iteration in range(max_refinement_rounds + 1):
+        triangulation, faces, valid_faces = triangulate_and_filter(points)
+        covered, interpolation_errors = interpolate_targets(
+            triangulation, valid_faces, points)
+        refine = (~covered) | (interpolation_errors > mesh_error_tolerance)
+        if not refine.any() or iteration == max_refinement_rounds:
+            break
+        refine_points = target_points[refine]
+        point_keys = points[:, 0] * field.shape[1] + points[:, 1]
+        refine_keys = refine_points[:, 0] * field.shape[1] + refine_points[:, 1]
+        refine_points = refine_points[~np.isin(refine_keys, point_keys)]
+        if not len(refine_points):
+            break
+        updated_points = np.unique(np.vstack((points, refine_points)), axis=0)
+        added_vertices += len(updated_points) - len(points)
+        points = updated_points
+        refinement_rounds += 1
+
+    # Rebuild after the final point update so exported faces and reported error
+    # metrics refer to the same exact mesh.
+    triangulation, faces, valid_faces = triangulate_and_filter(points)
+    covered, interpolation_errors = interpolate_targets(
+        triangulation, valid_faces, points)
     if not len(faces):
         raise ValueError("Adaptive V5 triangulation produced no land faces")
     sampled_heights = f[points[:, 0], points[:, 1]]
@@ -413,7 +467,18 @@ def feature_adaptive_mesh(field, land, water, coarse_step=8, fine_step=2,
         "curvature_threshold_relative": threshold,
         "feature_edge_vertices": int(len(edge_points)),
         "semantic_feature_boundary_vertices": int(semantic_edge.sum()),
-        "method": "Delaunay over coarse grid plus dense curvature/coast/water-edge samples",
+        "mesh_interpolation_refinement_rounds": refinement_rounds,
+        "mesh_interpolation_vertices_added": added_vertices,
+        "mesh_interpolation_error_tolerance_relative": mesh_error_tolerance,
+        "mesh_interpolation_sample_columns": int(covered.sum()),
+        "mesh_interpolation_uncovered_land_columns": int((~covered).sum()),
+        "mesh_interpolation_rmse_relative": float(
+            np.sqrt(np.mean(interpolation_errors[covered] ** 2))),
+        "mesh_interpolation_max_error_relative": float(
+            np.max(interpolation_errors[covered])),
+        "mesh_interpolation_error_semantics":
+            "piecewise-linear mesh versus source field at covered land-grid samples; relative units, not physical scale",
+        "method": "Delaunay over coarse grid plus dense curvature/coast/water-edge samples, iteratively inserting covered land samples with interpolation error above two relative height units",
         "physical_scale": False,
     }
 

@@ -176,3 +176,10 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - A primeira comparação usou toda a máscara terrestre e contou 993 células cobertas pela água do canal; nessas células, o topo de água foi incorretamente comparado ao terreno submerso. Essa estatística foi substituída.
 - Recalculei com a máscara `land_all_components` menos `water_width_1.0_depth_1.0.png`: 36,825 colunas secas, MAE 0.195 studs, RMSE 0.505, máximo 2.0; 99.4% dentro de 2 studs. Confirmada relação de coordenadas e fonte V5 com hash `ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`.
 - README atualizado; comparação direta com a malha adaptativa permanece aberta.
+
+## Terrain 2 — refinamento local da malha V5 — 2026-10-16
+
+- Acrescentei refinamento iterativo guiado pelo erro à exportação da malha adaptativa. O processo insere amostras terrestres onde a interpolação linear da triangulação excede 2 unidades relativas; não altera o campo de elevação escolhido, a seleção multivista, nem atribui escala física.
+- Reexportei diretamente o campo original V5 com SHA-256 `ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`: 19,070 vértices e 37,266 triângulos (145 vértices adicionais). Em 36,821 amostras terrestres cobertas, erro da malha contra o campo: RMSE 0.096 unidades relativas e máximo 1.994; quatro colunas secas não têm triângulo retido.
+- Contra o proxy de topo dos voxels lido do Studio, nos mesmos pontos cobertos: MAE 0.196 studs, RMSE 0.513, máximo 3.8; 99.1% até 2 studs. É comparação de amostras de grade, não uma auditoria integral da superfície de colisão. A malha refinada ainda não foi importada para o place.
+- Atualizados `tools/terrain_2_v3/V5_README.md` e `tools/terrain_2_v3/V6_V7_README.md`. O place permanece sem salvar e as validações visuais V5, persistência V6 e gates de jogabilidade/desempenho V7 continuam abertas. Nenhum teste automatizado local foi executado nesta atualização.
