@@ -273,3 +273,9 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - `SceneAnalysisService` reportou os mesmos 480,234 triângulos/923 draws com terreno presente e após leitura de terreno vazia no cliente; métrica descartada como não responsiva neste A/B.
 - O snapshot reversível restaurou no servidor e cliente 377,149 voxels (Water 146,120; Rock 202,290; Sand 3,485; Grass 25,254), removeu o snapshot temporário e restaurou o `HumanoidRootPart.Anchored=false`. Studio retornou a Edit; place segue sem salvar/reabrir.
 - Atualizado `tools/terrain_2_v3/V6_V7_README.md`; nenhuma alteração em `main` ou no place de produção. Nenhum teste automatizado executado nesta atualização documental.
+
+## Terrain 2 — triagem de footprint V7 — 2026-10-16
+
+- Analisei o artefato oficial da candidata V5 (`37cd79eb…`) sem mudar o campo. Sob a escala assumida (4 studs/célula horizontal, 1 stud/unidade relativa), examinei footprints quadrados de 32×32 e 64×64 studs, exigindo terreno seco, variação vertical ≤2 unidades relativas e inclinação derivada ≤20°. A hipótese da planície central tem 5,413/4,034 centros candidatos; são centros sobrepostos, não quantidades de posições distintas.
+- Validei um footprint 64×64 em `X/Z=(-102,26)`: 16×16 células horizontais, amplitude e inclinação derivadas zero; o `ReadVoxels` do Studio confirmou 256 colunas secas de Grass no mesmo nível de voxel, sem água. Partindo do spawn, `PathfindingService` sem salto alcançou `(-102,102,26)` em 27 waypoints / 98.97 studs.
+- Não inseri assets nem alterei terreno. O resultado é uma triagem geométrica sob escala não calibrada; colisões/modelos de assets reais, cover, combate e balanceamento continuam sem validação. Atualizados os READMEs V5/V6/V7. Nenhum teste automatizado foi executado.

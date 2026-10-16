@@ -46,7 +46,13 @@ The uncalibrated vertical scale materially changes the result: all-land P90 is 2
 
 ### Combat-zone sightlines
 
-Five terrain anchors were raycast at eye level (5 studs above the surface): central plain `(-2, 2)` Grass Y=102; north beach `(-10, -110)` Sand Y=102; south beach `(-54, -326)` Sand Y=100.40; west ridge `(-294, 10)` Rock Y=152.21; east ridge `(258, -30)` Rock Y=192.11. All 10 pairwise terrain rays were unobstructed, at ranges from 112.28 to 554.88 studs. This is a placement study only; it indicates that terrain alone offers limited hard cover. No combat assets were placed, and weapon ranges, cover standards, and future asset footprints remain unreviewed.
+Five terrain anchors were raycast at eye level (5 studs above the surface): central plain `(-2, 2)` Grass Y=102; north beach `(-10, -110)` Sand Y=102; south beach `(-54, -326)` Sand Y=100.40; west ridge `(-294, 10)` Rock Y=152.21; east ridge `(258, -30)` Rock Y=192.11. All 10 pairwise terrain rays were unobstructed, at ranges from 112.28 to 554.88 studs. This is a placement study only; it indicates that terrain alone offers limited hard cover. No combat assets were placed, and weapon ranges, cover standards, and actual asset footprints remain unreviewed.
+
+### Future asset footprint screen
+
+An exploratory flat-pad screen used the current field hash `37cd79eb4c0bbeb35e6b52a3803a5bcef9ba5279402ce4117107185297e24948`, the V5 water mask `width=1.0/depth=1.0/bank=0.10`, and the current assumed scale (4 studs per horizontal cell, 1 stud per relative height unit). It searched square footprints of 32×32 and 64×64 studs, requiring every cell to be dry, height range no more than 2 relative units, and maximum derived slope no more than 20°. The central-plain hypothesis contains 5,413 and 4,034 candidate centers respectively; these centers overlap heavily and are not counts of distinct, non-overlapping placements.
+
+One 64×64 candidate at `X/Z=(-102, 26)` passed the screen with zero relative-height range and zero derived slope. Studio `ReadVoxels` over its aligned 16×16 horizontal cells confirmed 256 dry Grass tops at the same voxel layer and no water. From the test spawn, PathfindingService reached the center at `(-102,102,26)` with `AgentCanJump=false` in 27 waypoints / 98.97 studs. No asset or terrain edit was made. This validates one generic flat pad under the current assumed scale; final asset bounds, collision, lines of sight, combat balance, and calibrated scale still require object-specific review.
 
 ### CPU capture
 
