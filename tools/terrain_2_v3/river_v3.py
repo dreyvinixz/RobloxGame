@@ -69,7 +69,7 @@ def model_river(flat, field, previous, config=None):
         raise ValueError("Invalid relative depth multiplier")
     # Scenario assumption, not recovered bathymetry.
     depth = (3. + 2.5 * np.clip(widths / 30, .3, 2.2) ** .7 + 1.2 * progress) * multiplier
-    surface = 5. * (1 - progress)
+    surface = np.zeros_like(progress, dtype=float)  # both ends open to sea, no invented river slope
     if np.any(np.diff(surface) > 1e-9):
         raise ValueError("Water surface is not monotone downstream")
     scale = np.asarray([(n - 1) / (w - 1), (n - 1) / (h - 1)])
@@ -91,7 +91,7 @@ def model_river(flat, field, previous, config=None):
     connected = bool(components[start[1], start[0]] and
                      components[start[1], start[0]] == components[end[1], end[0]])
     if not connected:
-        raise ValueError("Lake-to-harbor corridor disconnected")
+        raise ValueError("North-to-south marine corridor disconnected")
     water = surface[near]
     section_depth = depth[near] * (1 - np.clip(distance / half_width, 0, 1) ** 2)
     carved = field.astype(np.float32).copy()
@@ -103,8 +103,8 @@ def model_river(flat, field, previous, config=None):
     volume = float(np.trapezoid(cross_area, s))
     summary = {
         "length_source_pixels": float(s[-1]),
-        "water_surface_upstream_relative": float(surface[0]),
-        "water_surface_seaward_relative": float(surface[-1]),
+        "water_surface_north_relative": float(surface[0]),
+        "water_surface_south_relative": float(surface[-1]),
         "center_depth_min_relative": float(depth.min()),
         "center_depth_median_relative": float(np.median(depth)),
         "center_depth_max_relative": float(depth.max()),
@@ -115,11 +115,11 @@ def model_river(flat, field, previous, config=None):
         "volume_scenario_basis": "same source-pixel widths, half to one-and-half assumed depths",
         "geometry_scale": "source horizontal pixels and arbitrary relative vertical units",
         "ABSOLUTE_CUBIC_METERS_AVAILABLE": False,
-        "wet_mask_lake_to_harbor_8connected": connected,
+        "north_to_south_sea_channel_connected": connected,
         "raster_wet_pixels": int(wet.sum()),
         "bank_pixels": int(margin.sum()),
-        "monotonic_downstream_surface": True,
-        "no_original_bathymetry": True
+        "equal_sea_surface_elevation_at_both_ends": True,
+        "no_original_bathymetry": True,\n        "both_ends_ocean_connected_hypothesis": True
     }
     k = max(1, len(s) // 100)
     hydro = {
