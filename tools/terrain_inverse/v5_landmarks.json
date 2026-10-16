@@ -1,0 +1,311 @@
+{
+  "description": "Manually interpreted paired landmarks across independently AI-generated atlas and cleaned isometric. Hypotheses, NOT surveyed 3D.",
+  "atlas_top_crop_xyxy": [
+    14,
+    34,
+    618,
+    518
+  ],
+  "landmarks_coordinate_system": "Top pixel coordinates at resized 906x726 top panel; oblique in original 1619x971 screenshot",
+  "coast": [
+    {
+      "id": "north_mid_west",
+      "top": [
+        400,
+        109
+      ],
+      "oblique": [
+        688,
+        291
+      ]
+    },
+    {
+      "id": "north_center",
+      "top": [
+        535,
+        84
+      ],
+      "oblique": [
+        908,
+        256
+      ]
+    },
+    {
+      "id": "north_cape",
+      "top": [
+        681,
+        40
+      ],
+      "oblique": [
+        1094,
+        196
+      ]
+    },
+    {
+      "id": "north_east",
+      "top": [
+        807,
+        173
+      ],
+      "oblique": [
+        1531,
+        373
+      ]
+    },
+    {
+      "id": "east_middle",
+      "top": [
+        864,
+        398
+      ],
+      "oblique": [
+        1557,
+        600
+      ]
+    },
+    {
+      "id": "east_south",
+      "top": [
+        757,
+        579
+      ],
+      "oblique": [
+        1380,
+        742
+      ]
+    },
+    {
+      "id": "south_east",
+      "top": [
+        624,
+        680
+      ],
+      "oblique": [
+        1180,
+        858
+      ]
+    },
+    {
+      "id": "south_west",
+      "top": [
+        158,
+        618
+      ],
+      "oblique": [
+        292,
+        857
+      ]
+    },
+    {
+      "id": "west_middle",
+      "top": [
+        50,
+        419
+      ],
+      "oblique": [
+        151,
+        723
+      ]
+    },
+    {
+      "id": "west_north",
+      "top": [
+        58,
+        290
+      ],
+      "oblique": [
+        168,
+        501
+      ]
+    },
+    {
+      "id": "north_west",
+      "top": [
+        250,
+        58
+      ],
+      "oblique": [
+        504,
+        269
+      ]
+    },
+    {
+      "id": "harbor_inner_left",
+      "top": [
+        380,
+        461
+      ],
+      "oblique": [
+        742,
+        607
+      ]
+    },
+    {
+      "id": "harbor_inner_right",
+      "top": [
+        470,
+        474
+      ],
+      "oblique": [
+        963,
+        635
+      ]
+    }
+  ],
+  "peaks": [
+    {
+      "id": "west_high_north",
+      "top": [
+        157,
+        101
+      ],
+      "oblique": [
+        263,
+        194
+      ]
+    },
+    {
+      "id": "west_ridge_2",
+      "top": [
+        261,
+        126
+      ],
+      "oblique": [
+        453,
+        247
+      ]
+    },
+    {
+      "id": "west_inner_1",
+      "top": [
+        205,
+        250
+      ],
+      "oblique": [
+        307,
+        345
+      ]
+    },
+    {
+      "id": "west_inner_2",
+      "top": [
+        300,
+        273
+      ],
+      "oblique": [
+        436,
+        458
+      ]
+    },
+    {
+      "id": "west_south_1",
+      "top": [
+        211,
+        395
+      ],
+      "oblique": [
+        446,
+        492
+      ]
+    },
+    {
+      "id": "west_south_2",
+      "top": [
+        234,
+        520
+      ],
+      "oblique": [
+        511,
+        663
+      ]
+    },
+    {
+      "id": "east_north_1",
+      "top": [
+        676,
+        82
+      ],
+      "oblique": [
+        1134,
+        224
+      ]
+    },
+    {
+      "id": "east_north_2",
+      "top": [
+        784,
+        126
+      ],
+      "oblique": [
+        1283,
+        236
+      ]
+    },
+    {
+      "id": "east_middle_1",
+      "top": [
+        791,
+        264
+      ],
+      "oblique": [
+        1327,
+        317
+      ]
+    },
+    {
+      "id": "east_middle_2",
+      "top": [
+        745,
+        402
+      ],
+      "oblique": [
+        1281,
+        473
+      ]
+    },
+    {
+      "id": "east_south_1",
+      "top": [
+        754,
+        554
+      ],
+      "oblique": [
+        1265,
+        603
+      ]
+    },
+    {
+      "id": "center_north",
+      "top": [
+        412,
+        151
+      ],
+      "oblique": [
+        768,
+        311
+      ]
+    },
+    {
+      "id": "center_middle",
+      "top": [
+        376,
+        288
+      ],
+      "oblique": [
+        762,
+        410
+      ]
+    },
+    {
+      "id": "center_south",
+      "top": [
+        425,
+        413
+      ],
+      "oblique": [
+        934,
+        534
+      ]
+    }
+  ]
+}
