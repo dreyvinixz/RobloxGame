@@ -144,7 +144,7 @@ class TerrainV3(unittest.TestCase):
             self.assertEqual(result["status"],"V3_IMAGE_CONSTRAINED_2_5D_HYPOTHESIS")
             self.assertEqual(result["vertices"],1089)
             self.assertEqual(result["triangles"],2048)
-            self.assertTrue(result["river"]["wet_mask_lake_to_harbor_8connected"])
+            self.assertTrue(result["river"]["north_to_south_sea_channel_connected"])
             self.assertTrue(result["river"]["equal_sea_surface_elevation_at_both_ends"])
             self.assertEqual(result["source_sha256"]["top_flat_semantic.jpg"],
                 hashlib.sha256((src/"top_flat_semantic.jpg").read_bytes()).hexdigest())
