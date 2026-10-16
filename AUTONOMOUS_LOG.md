@@ -279,3 +279,10 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - Analisei o artefato oficial da candidata V5 (`37cd79eb…`) sem mudar o campo. Sob a escala assumida (4 studs/célula horizontal, 1 stud/unidade relativa), examinei footprints quadrados de 32×32 e 64×64 studs, exigindo terreno seco, variação vertical ≤2 unidades relativas e inclinação derivada ≤20°. A hipótese da planície central tem 5,413/4,034 centros candidatos; são centros sobrepostos, não quantidades de posições distintas.
 - Validei um footprint 64×64 em `X/Z=(-102,26)`: 16×16 células horizontais, amplitude e inclinação derivadas zero; o `ReadVoxels` do Studio confirmou 256 colunas secas de Grass no mesmo nível de voxel, sem água. Partindo do spawn, `PathfindingService` sem salto alcançou `(-102,102,26)` em 27 waypoints / 98.97 studs.
 - Não inseri assets nem alterei terreno. O resultado é uma triagem geométrica sob escala não calibrada; colisões/modelos de assets reais, cover, combate e balanceamento continuam sem validação. Atualizados os READMEs V5/V6/V7. Nenhum teste automatizado foi executado.
+
+## Terrain 2 — LibMP A/B estendido — 2026-10-16
+
+- Solicitei 27 s de captura por condição, com câmera fixa `(-6,113,12)` → `(-6,106,-95)`, limite de 256 frames e personagem ancorado. O buffer LibMP retornou 109 frames em cada lado: candidata IDs 936881–936989 e terreno vazio 939924–940032. CPU mediana/p95/máximo: 16.601/18.028/18.578 ms com terreno; 16.652/17.377/17.955 ms vazio. Como o buffer contém apenas 109 frames, não prova desempenho sustentado.
+- Thread GPU 1: 12,754 entradas/2,834 scopes completos em cada condição; soma inclusiva 22.524/22.596 ms, ou 0.2066/0.2073 ms por frame. `Scene`, `Scene2D` e `Id_Screen` quase iguais. São scopes aninhados, não latência fim-a-fim; nenhum delta mensurável apareceu nesta amostra. Memória específica do terreno continua sem atribuição.
+- Snapshot restaurou servidor e cliente para 377,149 voxels (Water 146,120; Rock 202,290; Sand 3,485; Grass 25,254), removeu-se, e o HRP voltou a `Anchored=false`. Studio retornou a Edit.
+- Atualizados READMEs V5/V6/V7. Nenhum teste automatizado foi executado.
