@@ -1,0 +1,84 @@
+name: Experimental AI island inverse-fit v2
+on:
+  workflow_dispatch:
+    inputs:
+      fit_grid:
+        description: 'Optimization grid size, 33..257'
+        required: false
+        default: '129'
+        type: string
+      export_grid:
+        description: 'Export grid size, 33..1025'
+        required: false
+        default: '257'
+        type: string
+  push:
+    branches:
+      - 'experiment/ai-island-inverse-terrain'
+    paths:
+      - 'tools/terrain_inverse/**'
+      - 'tests/test_terrain_inverse_fit.py'
+      - '.github/workflows/terrain-inverse-v2.yml'
+  pull_request:
+    paths:
+      - 'tools/terrain_inverse/**'
+      - 'tests/test_terrain_inverse_fit.py'
+      - '.github/workflows/terrain-inverse-v2.yml'
+permissions:
+  contents: read
+jobs:
+  fit-four-views:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      FIT_GRID: ${{ inputs.fit_grid || '129' }}
+      EXPORT_GRID: ${{ inputs.export_grid || '257' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: 'tools/terrain_inverse/requirements.txt'
+      - name: Install CPU image-analysis and optimization packages
+        run: python -m pip install -r tools/terrain_inverse/requirements.txt
+      - name: Existing terrain and new inverse-fit tests
+        run: python -m unittest discover -s tests -p 'test_terrain_inverse*.py' -v
+      - name: Fit digitized AI image profiles and export 3D mesh
+        run: |
+          python -m tools.terrain_inverse.inverse_fit \
+            --grid "$FIT_GRID" \
+            --export-grid "$EXPORT_GRID" \
+            --seed 20261015 \
+            --output terrain-v2-output | tee reconstruction.log
+      - name: Verify report and no clipped 16-bit elevations
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from PIL import Image
+          import numpy as np
+          p=Path('terrain-v2-output')
+          a=np.load(p/'height_m.npy')
+          fit=json.loads((p/'inverse_fit_report.json').read_text())
+          assert np.isfinite(a).all()
+          assert -24 <= float(a.min()) and float(a.max()) <= 260
+          assert fit['optimized']['holdout_rmse'] < fit['baseline']['holdout_rmse'],fit
+          png=Image.open(p/'heightmap_16bit.png')
+          assert png.size == (a.shape[1],a.shape[0])
+          assert (p/'terrain.obj').stat().st_size>10000
+          assert (p/'silhouette_comparison.png').is_file()
+          assert (p/'terrain_3d.html').is_file()
+          print('FIT verified:',fit['baseline'],fit['optimized'])
+          print('HEIGHT verified:',a.shape,a.min(),a.max())
+          PY
+      - name: Upload interactive 3D, mesh, 16-bit heightmap and diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: inverse-terrain-v2-${{ github.run_id }}
+          path: |
+            terrain-v2-output/
+            reconstruction.log
+          retention-days: 30

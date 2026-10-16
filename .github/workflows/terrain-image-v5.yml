@@ -1,0 +1,81 @@
+name: V5 image-anchored experimental 2.5D reconstruction
+on:
+  workflow_dispatch:
+  push:
+    branches: [experiment/ai-island-inverse-terrain]
+    paths:
+      - tools/terrain_inverse/reconstruct_v5.py
+      - tools/terrain_inverse/v5_landmarks.json
+      - tests/test_reconstruct_v5.py
+      - .github/workflows/terrain-image-v5.yml
+  pull_request:
+    paths:
+      - tools/terrain_inverse/reconstruct_v5.py
+      - tools/terrain_inverse/v5_landmarks.json
+      - tests/test_reconstruct_v5.py
+      - .github/workflows/terrain-image-v5.yml
+permissions:
+  contents: read
+jobs:
+  verify-image-first-v5:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: tools/terrain_inverse/requirements.txt
+      - run: python -m pip install -r tools/terrain_inverse/requirements.txt
+      - name: Run source-provenance and 2.5D export tests on SYNTHETIC images
+        run: python -m unittest discover -s tests -p 'test_reconstruct_v5.py' -v
+      - name: Explain real-image input limitations
+        run: |
+          echo "User-supplied source images are not checked into the repository."
+          echo "This workflow validates synthetic image fixtures, not the user's 3D reconstruction."
+          echo "For the real images: python -m tools.terrain_inverse.reconstruct_v5 --top-atlas atlas.png --clean-oblique cleaned.png --original-wireframe reference.png --output v5-real"
+      - name: Generate quick synthetic diagnostic report
+        run: |
+          python - <<'PY'
+          import cv2,numpy as np,json
+          from pathlib import Path
+          p=Path('v5-synthetic-input');p.mkdir(exist_ok=True)
+          a=np.full((1024,1536,3),(140,81,5),np.uint8)
+          cv2.ellipse(a,(316,276),(245,180),0,0,360,(120,160,130),-1)
+          b=np.full((971,1619,3),125,np.uint8)
+          for x in range(0,1619,30):cv2.line(b,(x,0),(x,970),(70,70,70),1)
+          for name,img in [('atlas',a),('clean',b),('wireframe',b)]:cv2.imwrite(str(p/(name+'.png')),img)
+          src=np.array([[175,170],[325,135],[510,120],[700,165],[775,385],[580,570],[300,550],[140,330]],float)
+          M=np.array([[1.45,.07,75],[-.09,.72,215]],float)
+          def proj(v):return np.rint(M[:,:2]@np.asarray(v,float)+M[:,2]).astype(int).tolist()
+          coast=[{'id':str(i),'top':v.tolist(),'oblique':proj(v)} for i,v in enumerate(src)]
+          pts=[[190,240],[300,270],[650,200],[720,310],[620,485],[300,480]]
+          peaks=[{'id':str(i),'top':v,'oblique':(np.asarray(proj(v))-[0,60+5*i]).tolist()} for i,v in enumerate(pts)]
+          (p/'landmarks.json').write_text(json.dumps({'atlas_top_crop_xyxy':[14,34,618,518],'coast':coast,'peaks':peaks}))
+          PY
+          python -m tools.terrain_inverse.reconstruct_v5 \
+            --top-atlas v5-synthetic-input/atlas.png \
+            --clean-oblique v5-synthetic-input/clean.png \
+            --original-wireframe v5-synthetic-input/wireframe.png \
+            --landmarks v5-synthetic-input/landmarks.json \
+            --grid 65 --no-viewer --output v5-synthetic-output
+      - name: Verify output intentionally remains hypothesis
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('v5-synthetic-output/v5_report.json').read_text())
+          assert r['status']=='EXPERIMENTAL_2_5D_HYPOTHESIS_NOT_VALIDATED'
+          assert r['camera']['intrinsics_extrinsics']=='UNKNOWN'
+          assert r['triangles']==8192
+          print('V5 numerical and image-input contracts validated; no original 3D claim.')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v5-SYNTHETIC-reconstruction-${{ github.run_id }}
+          path: v5-synthetic-output/
+          retention-days: 14

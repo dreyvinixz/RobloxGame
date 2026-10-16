@@ -1,0 +1,65 @@
+name: Pixel-constrained 2D topology V4
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - experiment/ai-island-inverse-terrain
+    paths:
+      - tools/terrain_inverse/topology_v4.py
+      - tools/terrain_inverse/extract_wireframe.py
+      - tools/terrain_inverse/requirements.txt
+      - tests/test_topology_v4.py
+      - .github/workflows/terrain-topology-v4.yml
+  pull_request:
+    paths:
+      - tools/terrain_inverse/topology_v4.py
+      - tools/terrain_inverse/extract_wireframe.py
+      - tools/terrain_inverse/requirements.txt
+      - tests/test_topology_v4.py
+      - .github/workflows/terrain-topology-v4.yml
+permissions:
+  contents: read
+jobs:
+  topology:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: tools/terrain_inverse/requirements.txt
+      - run: python -m pip install -r tools/terrain_inverse/requirements.txt
+      - name: Unit tests
+        run: python -m unittest discover -s tests -p 'test_topology_v4.py' -v
+      - name: Generate deterministic SYNTHETIC 2D fixture
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import cv2
+          import numpy as np
+          image=np.full((160,160,3),220,np.uint8)
+          cv2.rectangle(image,(30,30),(55,55),(75,75,75),1)
+          cv2.rectangle(image,(55,30),(80,55),(75,75,75),1)
+          Path('synthetic-topology-fixture.png').write_bytes(cv2.imencode('.png',image)[1].tobytes())
+          PY
+          python -m tools.terrain_inverse.topology_v4 --image synthetic-topology-fixture.png --output topology-v4-synthetic/
+      - name: Assert source pixel provenance, not 3D
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          p=Path('topology-v4-synthetic')
+          r=json.loads((p/'topology_report.json').read_text())
+          assert r['source_sha256']==hashlib.sha256(Path('synthetic-topology-fixture.png').read_bytes()).hexdigest()
+          assert r['3d_status']=='NOT_RECONSTRUCTED'
+          assert json.loads((p/'camera.json').read_text())['status']=='not_estimated'
+          assert (p/'segment_graph.json').is_file()
+          print('Verified synthetic image input, graph files and uncertainty markers')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: topology-v4-SYNTHETIC-${{ github.run_id }}
+          path: topology-v4-synthetic/
+          retention-days: 14

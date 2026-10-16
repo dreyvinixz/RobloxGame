@@ -1,0 +1,48 @@
+name: Experimental inverse terrain reconstruction
+on:
+  workflow_dispatch:
+    inputs:
+      grid:
+        description: 'Resolution: integer 33..1025'
+        required: false
+        default: '257'
+        type: string
+  pull_request:
+    paths:
+      - 'tools/terrain_inverse/**'
+      - 'tests/test_terrain_inverse.py'
+      - '.github/workflows/terrain-inverse.yml'
+  push:
+    branches:
+      - 'experiment/ai-island-inverse-terrain'
+    paths:
+      - 'tools/terrain_inverse/**'
+      - 'tests/test_terrain_inverse.py'
+      - '.github/workflows/terrain-inverse.yml'
+permissions:
+  contents: read
+jobs:
+  reconstruct:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+          cache-dependency-path: tools/terrain_inverse/requirements.txt
+      - name: Install scientific Python dependencies
+        run: python -m pip install -r tools/terrain_inverse/requirements.txt
+      - name: Validate unit tests
+        run: python -m unittest discover -s tests -p 'test_terrain_inverse.py' -v
+      - name: Reconstruct and export terrain
+        env:
+          GRID: ${{ inputs.grid || '257' }}
+        run: python -m tools.terrain_inverse.island --grid "$GRID" --output terrain-output
+      - name: Upload downloadable heightmap, mesh, previews, 3D HTML and metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: inverse-terrain-${{ github.run_id }}
+          path: terrain-output/
+          retention-days: 30
