@@ -183,3 +183,9 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - Reexportei diretamente o campo original V5 com SHA-256 `ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`: 19,070 vértices e 37,266 triângulos (145 vértices adicionais). Em 36,821 amostras terrestres cobertas, erro da malha contra o campo: RMSE 0.096 unidades relativas e máximo 1.994; quatro colunas secas não têm triângulo retido.
 - Contra o proxy de topo dos voxels lido do Studio, nos mesmos pontos cobertos: MAE 0.196 studs, RMSE 0.513, máximo 3.8; 99.1% até 2 studs. É comparação de amostras de grade, não uma auditoria integral da superfície de colisão. A malha refinada ainda não foi importada para o place.
 - Atualizados `tools/terrain_2_v3/V5_README.md` e `tools/terrain_2_v3/V6_V7_README.md`. O place permanece sem salvar e as validações visuais V5, persistência V6 e gates de jogabilidade/desempenho V7 continuam abertas. Nenhum teste automatizado local foi executado nesta atualização.
+
+## Terrain 2 — reconstrução original após refinamento V5 — 2026-10-16
+
+- Executei novamente o workflow com o URL e SHA-256 fornecidos para o ZIP. A verificação do arquivo passou, as 16 referências foram extraídas e as etapas V2, V3, V4 e V5 finalizaram com sucesso: [run 38904150817](https://github.com/dreyvinixz/RobloxGame/actions/runs/38904150817).
+- O artefato confirmou o mesmo heightfield selecionado (`ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`) e a malha refinada de 19,070 vértices / 37,266 triângulos; interpolação RMSE 0.096 relativo, máximo 1.994, quatro amostras secas sem triângulo. O status de fidelidade visual absoluta continua NO-GO.
+- Os checks de planejamento, V3, V4 e V5 passaram no commit `b17e1a0`. O place de Studio não foi salvo nem reaberto nesta etapa.
