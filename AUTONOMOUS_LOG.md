@@ -286,3 +286,9 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - Thread GPU 1: 12,754 entradas/2,834 scopes completos em cada condição; soma inclusiva 22.524/22.596 ms, ou 0.2066/0.2073 ms por frame. `Scene`, `Scene2D` e `Id_Screen` quase iguais. São scopes aninhados, não latência fim-a-fim; nenhum delta mensurável apareceu nesta amostra. Memória específica do terreno continua sem atribuição.
 - Snapshot restaurou servidor e cliente para 377,149 voxels (Water 146,120; Rock 202,290; Sand 3,485; Grass 25,254), removeu-se, e o HRP voltou a `Anchored=false`. Studio retornou a Edit.
 - Atualizados READMEs V5/V6/V7. Nenhum teste automatizado foi executado.
+
+## Terrain 2 — auditoria de persistência V6 — 2026-10-16
+
+- Readback atual em Edit confirmou 377,149 voxels (Water 146,120; Rock 202,290; Sand 3,485; Grass 25,254).
+- Busquei `devtest3.rbxl*` no worktree, pasta do artefato temporário, Documents e caminhos do cache do Roblox Studio; nenhum arquivo de place foi encontrado. A lista do Studio MCP não tem ação de salvar e a documentação oficial de DataModel marca `SavePlace` como depreciada: https://create.roblox.com/docs/reference/engine/classes/DataModel#SavePlace.
+- A tentativa anterior de inicializar o controle de desktop falhou com `failed to write kernel assets: The system cannot find the path specified`. O place permanece apenas na sessão em memória; não há como comprovar save/reopen pelas ferramentas atuais. Atualizados os registros, sem alteração no terreno ou em `main`.

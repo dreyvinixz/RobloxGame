@@ -11,7 +11,7 @@
 - Current terrain raycasts hit all four test anchors: north beach `(-10, -110)` Sand at Y=102; south beach `(-54, -326)` Sand at Y=100.40; west ridge `(-294, 10)` Rock at Y=152.21; east ridge `(258, -30)` Rock at Y=192.11.
 - The adaptive mesh was not imported. Direct latest-mesh-to-voxel/collision comparison remains open.
 - The test bounds were cleared only for a matched CPU baseline capture, then restored from an in-memory TerrainRegion snapshot and re-imported from the hash-verified V5 artifact. Final Edit and Server readbacks agreed on the 377,149 cells and material counts above.
-- The Studio session is unsaved. Persisting and reopening the isolated place with the same readback is still required for V6 completion.
+- The Studio session is unsaved. A filename search found no `devtest3.rbxl*` on disk in the repository, temporary artifact folder, user Documents, or Roblox Studio cache paths checked. Studio MCP exposes no save action; the only engine method found is the deprecated [DataModel:SavePlace](https://create.roblox.com/docs/reference/engine/classes/DataModel#SavePlace). The desktop-control helper failed to initialize (`failed to write kernel assets: The system cannot find the path specified`), so save/reopen remains a concrete V6 blocker. Persisting and reopening the isolated place with the same readback is still required for V6 completion.
 
 ## V7 — navigation, sightlines, and performance
 
