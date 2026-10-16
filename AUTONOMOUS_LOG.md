@@ -151,3 +151,10 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 
 - README atualizado para refletir o protótipo local e o gate de release NO-GO. PR draft [#64](https://github.com/dreyvinixz/RobloxGame/pull/64) agrupa o sumário do stack e docs/TEST_REPORTS/INTEGRATION.md; sem push em main e sem publicação Roblox.
 
+
+## Terrain 2 — pós-V5/V6/V7 evidência de perfil — 2026-10-16
+
+- Captura LibMP adicional apenas no candidato: 109 frames completos; CPU mediana 16.688 ms, p95 18.114 ms, máximo 18.760 ms. A captura vazia correspondente não foi concluída/obtida; resultado A/B e gate de desempenho continuam inconclusivos.
+- Para preparar baseline, os limites de teste foram limpos reversivelmente com `CopyRegion`; leitura do servidor confirmou 0 voxels e backup em memória presente. Após `PasteRegion`, leitura no servidor e no Edit confirmou 370,626 voxels (Water 146,120; Rock 195,768; Sand 3,485; Grass 25,253). A sessão Studio continua não salva.
+- `tools/terrain_2_v3/V6_V7_README.md` e atributos do modelo isolado registram a captura parcial e a restauração. Sem mudanças em `main` ou no lugar de produção; gates visuais V5, persistência V6 e aceitação V7 continuam abertos.
+- Alteração documental; nenhum teste automatizado executado nesta atualização.
