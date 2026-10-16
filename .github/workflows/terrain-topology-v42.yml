@@ -1,0 +1,76 @@
+name: V4.2 pixel-constrained topology
+on:
+  workflow_dispatch:
+  push:
+    branches: [experiment/ai-island-inverse-terrain]
+    paths:
+      - tools/terrain_inverse/topology_refinement_v42.py
+      - tests/test_topology_refinement_v42.py
+      - .github/workflows/terrain-topology-v42.yml
+  pull_request:
+    paths:
+      - tools/terrain_inverse/topology_refinement_v42.py
+      - tests/test_topology_refinement_v42.py
+      - .github/workflows/terrain-topology-v42.yml
+permissions:
+  contents: read
+jobs:
+  verify-v42:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: tools/terrain_inverse/requirements.txt
+      - name: Install scientific Python
+        run: python -m pip install -r tools/terrain_inverse/requirements.txt
+      - name: Run V4.2 unit tests
+        run: python -m unittest discover -s tests -p 'test_topology_refinement_v42.py' -v
+      - name: Make reproducible synthetic original and clean pair
+        run: |
+          python - <<'PY'
+          import cv2
+          import numpy as np
+          from pathlib import Path
+          image=np.full((400,480,3),(75,75,75),dtype=np.uint8)
+          image[180:380,45:435]=(204,204,204)
+          for x in range(65,426,28):cv2.line(image,(x,190),(x,370),(87,87,87),1)
+          for y in range(195,370,24):cv2.line(image,(65,y),(420,y),(87,87,87),1)
+          clean=image.copy()
+          cv2.rectangle(image,(180,265),(192,302),(26,26,26),-1)
+          cv2.imwrite('v42-original-SYNTHETIC.png',image)
+          cv2.imwrite('v42-clean-SYNTHETIC.png',clean)
+          PY
+      - name: Generate V4.1 inputs from those images
+        run: |
+          python -m tools.terrain_inverse.reference_fusion_v41 \
+            --original v42-original-SYNTHETIC.png \
+            --clean v42-clean-SYNTHETIC.png \
+            --output v41-synthetic
+      - name: Generate V4.2 faces and compare original pixel masks
+        run: |
+          python -m tools.terrain_inverse.topology_refinement_v42 \
+            --original v42-original-SYNTHETIC.png \
+            --clean v42-clean-SYNTHETIC.png \
+            --v41 v41-synthetic \
+            --output v42-synthetic
+      - name: Verify no fake 3D data
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,hashlib
+          r=json.loads(Path('v42-synthetic/v42_report.json').read_text())
+          assert r['stage']=='V4.2_2D_ONLY'
+          assert r['original_sha256']==hashlib.sha256(Path('v42-original-SYNTHETIC.png').read_bytes()).hexdigest()
+          assert r['independent_evaluation']['status']=='not_available'
+          assert Path('v42-synthetic/v42_faces_overlay.png').is_file()
+          print('V4.2 synthetic pixel source, audit and artifacts verified')
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v42-synthetic-${{ github.run_id }}
+          path: v42-synthetic/
+          retention-days: 14
