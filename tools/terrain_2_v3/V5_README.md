@@ -42,7 +42,7 @@ The V5 hydrology run now also exports proportional bank-margin masks and compare
 
 An inventory of the extracted original reference package found no native terrain file (`.rbx*`, `.obj`, `.fbx`, `.glb`, `.gltf`, `.blend`, or `.stl`); `top_sparse_mesh.jpg` is a raster reference only. Recovering the original 3D shape therefore requires a new multi-view reconstruction or a separate source asset.
 
-`terrain_regions_v5.png`, `adaptive_mesh_preview_v5.png`, `multiview_comparison_v5.png`, `isometric_comparison_v5.png`, `side_render_training_v5.png`, and `atlas_isometric_holdout_v5.png` are the principal review artifacts. The latest original-reference reconstruction is [GitHub Actions run 38906611785](https://github.com/dreyvinixz/RobloxGame/actions/runs/38906611785); its JSON report records source hashes, candidate scores, holdouts, relative water scenarios, and the error-guided mesh counts.
+`terrain_regions_v5.png`, `adaptive_mesh_preview_v5.png`, `multiview_comparison_v5.png`, `isometric_comparison_v5.png`, `side_render_training_v5.png`, and `atlas_isometric_holdout_v5.png` are the principal review artifacts. The latest original-reference reconstruction is [GitHub Actions run 38911594227](https://github.com/dreyvinixz/RobloxGame/actions/runs/38911594227); the downloaded artifact confirms the selected field hash, 27 relative hydrology scenarios, and updated 20,923-vertex error-guided mesh.
 
 ## Roadmap after V4
 
