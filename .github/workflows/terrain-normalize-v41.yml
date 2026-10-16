@@ -1,0 +1,71 @@
+name: V4.1 dual-reference pixel normalization
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - experiment/ai-island-inverse-terrain
+    paths:
+      - tools/terrain_inverse/reference_fusion_v41.py
+      - tests/test_reference_fusion_v41.py
+      - .github/workflows/terrain-normalize-v41.yml
+  pull_request:
+    paths:
+      - tools/terrain_inverse/reference_fusion_v41.py
+      - tests/test_reference_fusion_v41.py
+      - .github/workflows/terrain-normalize-v41.yml
+permissions:
+  contents: read
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: tools/terrain_inverse/requirements.txt
+      - run: python -m pip install -r tools/terrain_inverse/requirements.txt
+      - name: Test source-first normalization and connectivity (synthetic images)
+        run: python -m unittest discover -s tests -p 'test_reference_fusion_v41.py' -v
+      - name: Create reproducible synthetic test pair
+        run: |
+          python - <<'PY'
+          import cv2,numpy as np
+          from pathlib import Path
+          a=np.full((400,480,3),(75,75,75),np.uint8)
+          a[180:380,45:435]=(204,204,204)
+          for x in range(65,426,28):cv2.line(a,(x,190),(x,370),(87,87,87),1)
+          for y in range(195,370,24):cv2.line(a,(65,y),(420,y),(87,87,87),1)
+          clean=a.copy()
+          cv2.rectangle(a,(180,265),(192,302),(26,26,26),-1)
+          Path('input_original_SYNTHETIC.png').write_bytes(cv2.imencode('.png',a)[1].tobytes())
+          Path('input_clean_SYNTHETIC.png').write_bytes(cv2.imencode('.png',clean)[1].tobytes())
+          PY
+          python -m tools.terrain_inverse.reference_fusion_v41 \
+            --original input_original_SYNTHETIC.png \
+            --clean input_clean_SYNTHETIC.png \
+            --output terrain-v41-synthetic
+      - name: Confirm original input is mandatory and exports remain 2D
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import hashlib,json
+          src=Path('input_original_SYNTHETIC.png')
+          p=Path('terrain-v41-synthetic')
+          r=json.loads((p/'v41_report.json').read_text())
+          assert r['source_original_sha256']==hashlib.sha256(src.read_bytes()).hexdigest()
+          assert r['status']=='2D_LINE_HYPOTHESES_ONLY'
+          assert (p/'v41_edges.json').is_file()
+          assert (p/'v41_vertices.json').is_file()
+          assert (p/'grid_families_light.json').is_file()
+          assert (p/'grid_families_cliff.json').is_file()
+          print('Validated SYNTHETIC source-provenance 2D artifact')
+          PY
+      - name: Archive reproducible synthetic diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: terrain-v41-SYNTHETIC-${{ github.run_id }}
+          path: terrain-v41-synthetic/
+          retention-days: 14

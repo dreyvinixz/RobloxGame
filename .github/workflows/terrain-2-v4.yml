@@ -1,0 +1,43 @@
+name: Terrain 2 V4 ridge and marine corridor QA
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - experiment/terrain-2-image-v3-v4
+    paths:
+      - tools/terrain_2_v3/**
+      - tests/test_terrain2_v4.py
+      - .github/workflows/terrain-2-v4.yml
+  pull_request:
+    paths:
+      - tools/terrain_2_v3/**
+      - tests/test_terrain2_v4.py
+      - .github/workflows/terrain-2-v4.yml
+permissions:
+  contents: read
+jobs:
+  validate-v4:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: tools/terrain_inverse/requirements.txt
+      - run: python -m pip install -r tools/terrain_inverse/requirements.txt
+      - name: Verify V4 coastline support, uncertainty and full synthetic refinement
+        run: python -m unittest discover -s tests -p 'test_terrain2_v4.py' -v
+      - name: Affirm no original user imagery on CI
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          assert Path('tools/terrain_2_v3/refine_v4.py').is_file()
+          assert not Path('references/top_flat_semantic.jpg').exists()
+          print('All tests use synthetic pixels, no claim of true terrain 3D fidelity')
+          PY

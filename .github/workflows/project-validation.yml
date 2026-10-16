@@ -7,11 +7,18 @@ on:
 jobs:
   verify-planning:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: pip
+          cache-dependency-path: tools/terrain_inverse/requirements.txt
+      # This job runs ALL tests. The image-analysis tests were added after the
+      # original stdlib-only CI and must be installed rather than silently skipped.
+      - name: Install dependencies for full Python test suite
+        run: python -m pip install -r tools/terrain_inverse/requirements.txt
       - name: Verify issues, dependencies, Rojo paths and asset registry
         run: python scripts/validate_project.py
       - name: Unit tests
