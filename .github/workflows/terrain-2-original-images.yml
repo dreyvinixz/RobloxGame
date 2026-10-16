@@ -1,0 +1,105 @@
+name: Terrain 2 original-reference reconstruction and artifacts
+on:
+  workflow_dispatch:
+    inputs:
+      reference_zip_url:
+        description: 'Direct HTTPS URL to the original Terreno2 V2 ZIP (GitHub release asset or other authorized storage)'
+        required: true
+        type: string
+      reference_zip_sha256:
+        description: 'SHA-256 of the original ZIP; leave blank only for initial manual investigation'
+        required: false
+        type: string
+permissions:
+  contents: read
+jobs:
+  original-image-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      OPENBLAS_NUM_THREADS: '1'
+      OMP_NUM_THREADS: '1'
+      MPLBACKEND: Agg
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+          cache-dependency-path: tools/terrain_inverse/requirements.txt
+      - run: python -m pip install -r tools/terrain_inverse/requirements.txt
+      - name: Download original source archive
+        env:
+          SOURCE_URL: ${{ inputs.reference_zip_url }}
+          SOURCE_SHA: ${{ inputs.reference_zip_sha256 }}
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p work
+          case "$SOURCE_URL" in https://*) ;; *) echo 'Only HTTPS URLs allowed'; exit 1;; esac
+          # GitHub release asset downloads may require repository access.
+          if [[ "$SOURCE_URL" == https://github.com/*/releases/download/* ]]; then
+            gh release download "${SOURCE_URL##*/download/}" --repo "${GITHUB_REPOSITORY}" --pattern '*.zip' --dir work
+            find work -maxdepth 1 -name '*.zip' -print -quit | xargs -r -I{} mv '{}' work/references.zip
+          else
+            curl --fail --location --retry 3 --max-time 300 "$SOURCE_URL" --output work/references.zip
+          fi
+          test -s work/references.zip
+          if [[ -n "$SOURCE_SHA" ]]; then echo "$SOURCE_SHA  work/references.zip" | sha256sum --check; fi
+      - name: Extract and verify all sixteen original reference images
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile, hashlib
+          archive=Path('work/references.zip')
+          names=['top_render.png','top_sparse_mesh.jpg','orthographic_atlas.jpg','top_flat_semantic.jpg','oblique_side_render.jpg','oblique_wireframe_1.jpg','oblique_wireframe_2.jpg','bottom_wireframe.png','front_wireframe.png','front_render.png','back_wireframe.png','back_render.png','left_wireframe.png','left_render.png','right_wireframe.png','right_render.png']
+          target=Path('work/references');target.mkdir(parents=True,exist_ok=True)
+          with zipfile.ZipFile(archive) as z:
+              for name in names:
+                  matches=[p for p in z.namelist() if p.endswith('/references/'+name)]
+                  if len(matches)!=1:raise ValueError(f'Expected one original {name}; got {matches}')
+                  raw=z.read(matches[0]);(target/name).write_bytes(raw)
+                  print(name,hashlib.sha256(raw).hexdigest())
+          PY
+      - name: Reconstruct V2 source-pixel observations
+        run: python -m tools.terrain_2_v2.reconstruct_v2 --sources work/references --output work/output_v2
+      - name: Reconstruct V3 multiview heightfield
+        run: python -m tools.terrain_2_v3.terrain_v3 --sources work/references --v2 work/output_v2 --grid 257 --output work/output_v3
+      - name: Refine V4 geometry and coastline
+        run: python -m tools.terrain_2_v3.refine_v4 --sources work/references --v2 work/output_v2 --v3 work/output_v3 --output work/output_v4
+      - name: Evaluate original-reference V5 audit
+        run: python -m tools.terrain_2_v3.audit_v5 --sources work/references --v2 work/output_v2 --v3 work/output_v3 --v4 work/output_v4 --output work/output_v5
+      - name: Publish V2 original-source constraints
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terrain2-original-v2
+          path: work/output_v2/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publish V3 mesh and comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terrain2-original-v3
+          path: work/output_v3/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publish V4 mesh and comparison
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terrain2-original-v4
+          path: work/output_v4/
+          if-no-files-found: warn
+          retention-days: 30
+      - name: Publish V5 audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: terrain2-original-v5-audit
+          path: work/output_v5/
+          if-no-files-found: warn
+          retention-days: 30
