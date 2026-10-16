@@ -824,8 +824,12 @@ def run(sources, v2_dir, v3_dir, v4_dir, output):
                 land, base_positive + blend*regional_weight*
                 (envelope-base_positive), base).astype(np.float32)
             blended[base < 0] = base[base < 0]
-            for spread in (4., 5., 6.):
-                for rounds in (2, 4, 6):
+            # Broader supports test whether the source's connected mountain
+            # shoulders can be recovered without tuning to either isometric
+            # holdout. The held-out views are still evaluated only after the
+            # training/cardinal selection below.
+            for spread in (4., 5., 6., 8., 10., 12., 16.):
+                for rounds in (1, 2, 4, 6):
                     restored = restore_profile_peaks(
                         blended, envelope, land, rock_weight,
                         target_x, target_y, spread=spread, rounds=rounds)
