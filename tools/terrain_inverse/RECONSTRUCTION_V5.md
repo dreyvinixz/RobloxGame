@@ -1,4 +1,4 @@
-# V5 — First source-image anchored 2.5D terrain reconstruction
+> **Current status after PR #69 (2026-10-16):** The V5 **lake–river–harbor continuity correction** was implemented and merged into `dev` (see [RIVER_FIX_V5.md](RIVER_FIX_V5.md)). It exports a connected riverbed, masks and separate water-surface OBJ with tests. The remaining V5.1 priorities below concern **photogrammetric camera/landmark accuracy, original mesh fidelity and Roblox Studio QA**; they have **not** been completed. The three original AI-rendered images are **not stored in this repository**, so Codex/workspaces must receive them explicitly. See [CODEX_HANDOFF_V5_1.md](CODEX_HANDOFF_V5_1.md).\n\n# V5 — First source-image anchored 2.5D terrain reconstruction
 
 **Status: initial experimental estimate, not an accepted 3D reconstruction.**
 
