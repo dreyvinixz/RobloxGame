@@ -170,3 +170,9 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - Confirmei o hash da fonte V5 (`ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`) e comparei o heightfield Y=100+relief com o topo estimado por coluna do `ReadVoxels`, nas 37,818 colunas da máscara terrestre V2, respeitando o eixo Z invertido.
 - MAE 0.307 studs, RMSE 0.943 studs, máximo 9.3 studs; 97.2% das colunas ficaram dentro de 2 studs e 1.6% tiveram erro de 4 studs ou mais. O método é proxy de quantização/alinhamento; a revisão espacial dos outliers e a comparação direta da malha com os voxels seguem abertas.
 - Atualizei `tools/terrain_2_v3/V6_V7_README.md`. Sem alteração de terreno neste passo; sem testes automatizados.
+
+## Terrain 2 — correção da métrica proxy V6 — 2026-10-16
+
+- A primeira comparação usou toda a máscara terrestre e contou 993 células cobertas pela água do canal; nessas células, o topo de água foi incorretamente comparado ao terreno submerso. Essa estatística foi substituída.
+- Recalculei com a máscara `land_all_components` menos `water_width_1.0_depth_1.0.png`: 36,825 colunas secas, MAE 0.195 studs, RMSE 0.505, máximo 2.0; 99.4% dentro de 2 studs. Confirmada relação de coordenadas e fonte V5 com hash `ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`.
+- README atualizado; comparação direta com a malha adaptativa permanece aberta.
