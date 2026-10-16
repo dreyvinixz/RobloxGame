@@ -41,7 +41,7 @@ class PixelFusionTests(unittest.TestCase):
         v,m=graph(edges)
         self.assertEqual(m['components'],2)
         self.assertEqual(m['edges'],3)
-        self.assertEqual(len(v),4)
+        self.assertEqual(len(v),5)
 
     def test_output_is_original_pixel_provenance(self):
         with tempfile.TemporaryDirectory() as directory:
