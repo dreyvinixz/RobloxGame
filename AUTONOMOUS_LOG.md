@@ -164,3 +164,9 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - Reexecutei V3/V4/V5 com grade 513 usando as referências originais cujos hashes estão no relatório. A malha adaptativa selecionada produziu 75,248 vértices e 148,797 triângulos; o V4 da mesma grade produziu baseline consistente.
 - A V5 513 reduziu a média dos perfis cardinais de 13.41 para 12.96 px-equivalentes e melhorou o score do atlas, mas o holdout wireframe-2 regrediu de 0.87909 para 0.89932 (limite 0.88409). Resultado `V5_NO_GO_MULTIVIEW_GEOMETRY`; candidato não promovido. A V5 257 previamente selecionada permanece a candidata relativa.
 - O resultado e a razão da rejeição foram registrados em `tools/terrain_2_v3/V5_README.md`. Escala maior sozinha não resolve a discrepância multivista; fidelidade absoluta continua NO-GO.
+
+## Terrain 2 — métrica proxy de V6 field→voxel — 2026-10-16
+
+- Confirmei o hash da fonte V5 (`ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`) e comparei o heightfield Y=100+relief com o topo estimado por coluna do `ReadVoxels`, nas 37,818 colunas da máscara terrestre V2, respeitando o eixo Z invertido.
+- MAE 0.307 studs, RMSE 0.943 studs, máximo 9.3 studs; 97.2% das colunas ficaram dentro de 2 studs e 1.6% tiveram erro de 4 studs ou mais. O método é proxy de quantização/alinhamento; a revisão espacial dos outliers e a comparação direta da malha com os voxels seguem abertas.
+- Atualizei `tools/terrain_2_v3/V6_V7_README.md`. Sem alteração de terreno neste passo; sem testes automatizados.
