@@ -93,7 +93,7 @@ class TerrainV3(unittest.TestCase):
             {"centerline_xy":route.tolist()},{"depth_multiplier":1.5})
         self.assertAlmostEqual(high["summary"]["water_volume_relative_cubic_units"]/
                                low["summary"]["water_volume_relative_cubic_units"],3)
-        self.assertTrue(high["summary"]["wet_mask_lake_to_harbor_8connected"])
+        self.assertTrue(high["summary"]["north_to_south_sea_channel_connected"])
         self.assertTrue((np.diff(geometry["surface_levels"])<=1e-7).all())
         self.assertTrue(np.isfinite(shallow).all())
         self.assertTrue(np.isfinite(deep).all())
@@ -145,7 +145,7 @@ class TerrainV3(unittest.TestCase):
             self.assertEqual(result["vertices"],1089)
             self.assertEqual(result["triangles"],2048)
             self.assertTrue(result["river"]["wet_mask_lake_to_harbor_8connected"])
-            self.assertTrue(result["river"]["monotonic_downstream_surface"])
+            self.assertTrue(result["river"]["equal_sea_surface_elevation_at_both_ends"])
             self.assertEqual(result["source_sha256"]["top_flat_semantic.jpg"],
                 hashlib.sha256((src/"top_flat_semantic.jpg").read_bytes()).hexdigest())
             for path in ["mesh_v3.obj","river_water_surface_v3.obj",
