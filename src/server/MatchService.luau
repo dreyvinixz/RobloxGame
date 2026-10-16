@@ -53,6 +53,18 @@ local function configureSpawn(spawn: SpawnLocation, team: Team)
 	spawn.Duration = Config.Match.SpawnProtectionSeconds
 end
 
+local function getTerrain2TestSpawn(): SpawnLocation?
+	if Workspace:GetAttribute("Terrain2TestMode") ~= true then return nil end
+	local instance = Workspace:FindFirstChild("V7_TestSpawn", true)
+	assert(instance and instance:IsA("SpawnLocation"),
+		"Terrain2TestMode exige um Workspace.V7_TestSpawn")
+	instance.Neutral = true
+	instance.Enabled = true
+	instance.AllowTeamChangeOnTouch = false
+	instance.Duration = Config.Match.SpawnProtectionSeconds
+	return instance
+end
+
 local function setState()
 	state:SetAttribute("Phase", phase)
 	state:SetAttribute("Round", roundNumber)
@@ -175,10 +187,18 @@ function MatchService.Start(arena: Model)
 	if started then return end
 	blueTeam = getOrCreateTeam("Azul", BrickColor.new("Bright blue"))
 	orangeTeam = getOrCreateTeam("Laranja", BrickColor.new("Bright orange"))
-	blueSpawn = requireSpawn(arena, "Spawn_WestEntry")
-	orangeSpawn = requireSpawn(arena, "Spawn_EastEntry")
-	configureSpawn(blueSpawn, blueTeam)
-	configureSpawn(orangeSpawn, orangeTeam)
+	local terrain2TestSpawn = getTerrain2TestSpawn()
+	if terrain2TestSpawn then
+		-- Opt-in only in the isolated Terrain 2 test place; production keeps team entries.
+		blueSpawn = terrain2TestSpawn
+		orangeSpawn = terrain2TestSpawn
+		print("[Frontline][FL-018] Terrain 2 test spawn enabled")
+	else
+		blueSpawn = requireSpawn(arena, "Spawn_WestEntry")
+		orangeSpawn = requireSpawn(arena, "Spawn_EastEntry")
+		configureSpawn(blueSpawn, blueTeam)
+		configureSpawn(orangeSpawn, orangeTeam)
+	end
 	Players.RespawnTime = Config.Match.RespawnSeconds
 	local existing = ReplicatedStorage:FindFirstChild("MatchState")
 	if existing then

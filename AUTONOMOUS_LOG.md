@@ -189,3 +189,9 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - Executei novamente o workflow com o URL e SHA-256 fornecidos para o ZIP. A verificação do arquivo passou, as 16 referências foram extraídas e as etapas V2, V3, V4 e V5 finalizaram com sucesso: [run 38904150817](https://github.com/dreyvinixz/RobloxGame/actions/runs/38904150817).
 - O artefato confirmou o mesmo heightfield selecionado (`ba77bef36d7815c564c4ed5c71df746d81235eef2b51630fc7e1001c1ac20a89`) e a malha refinada de 19,070 vértices / 37,266 triângulos; interpolação RMSE 0.096 relativo, máximo 1.994, quatro amostras secas sem triângulo. O status de fidelidade visual absoluta continua NO-GO.
 - Os checks de planejamento, V3, V4 e V5 passaram no commit `b17e1a0`. O place de Studio não foi salvo nem reaberto nesta etapa.
+
+## Terrain 2 — spawn padrão opt-in para V7 — 2026-10-16
+
+- `MatchService` agora aceita o atributo `Workspace.Terrain2TestMode=true` no place isolado e usa `Workspace.V7_TestSpawn` de forma neutra para ambos os times. Sem a flag, continuam os spawns normais das equipes.
+- Com o atributo setado antes do fluxo normal de Play, o bootstrap registrou `Terrain 2 test spawn enabled`; o jogador surgiu em `(-5.59, 107.56, -4.14)`, com 100 de vida e `RespawnLocation=Workspace.V7_TestSpawn`. O spawn anterior fora do terreno foi substituído nesse modo explicitamente opt-in.
+- Atualizados os READMEs V5/V6/V7 e o atributo de evidência no modelo de teste. Teste de um cliente apenas; multiplayer e os gates de jogabilidade/desempenho seguem abertos. A sessão continua sem salvar/reabrir.
