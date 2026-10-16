@@ -827,8 +827,9 @@ def run(sources, v2_dir, v3_dir, v4_dir, output):
     if acceptable:
         near_optimal = [c for c in acceptable if c["training_fit_mean_normalized_rmse"]
                         <= training_min + training_selection_slack]
-        selected = min(near_optimal,
-                       key=lambda c: c["field_deviation_rmse_from_v4"])
+        selected = min(near_optimal, key=lambda c: (
+            float(np.mean(list(c["cardinal_rmse_px_equivalent"].values()))),
+            c["field_deviation_rmse_from_v4"]))
         selected_field = selected["field"]
         relative_geometry_gate = True
     else:
@@ -923,7 +924,7 @@ def run(sources, v2_dir, v3_dir, v4_dir, output):
         "training_fit_near_optimal_slack": training_selection_slack,
         "selected_field_deviation_rmse_from_v4": float(
             selected["field_deviation_rmse_from_v4"]),
-        "selection_rule": "cardinal constraints plus training-view fit; source-weighted candidates may restore missing profile maxima locally near rock evidence; among candidates within 0.005 mean normalized RMSE of the best training score, select the smallest field deviation from V4; wireframe-2 and the right atlas isometric panel are independent holdouts",
+        "selection_rule": "cardinal constraints plus training-view fit; source-weighted candidates may restore missing profile maxima locally near rock evidence; among candidates within 0.005 mean normalized RMSE of the best training score, select the lowest mean cardinal profile RMSE, breaking ties by smallest field deviation from V4; wireframe-2 and the right atlas isometric panel are independent holdouts evaluated only after selection",
         "water_connected": water_connected,
         "source_scale_bar": {
             "per_view": scale_bars,
