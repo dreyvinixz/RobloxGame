@@ -158,3 +158,9 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - Para preparar baseline, os limites de teste foram limpos reversivelmente com `CopyRegion`; leitura do servidor confirmou 0 voxels e backup em memória presente. Após `PasteRegion`, leitura no servidor e no Edit confirmou 370,626 voxels (Water 146,120; Rock 195,768; Sand 3,485; Grass 25,253). A sessão Studio continua não salva.
 - `tools/terrain_2_v3/V6_V7_README.md` e atributos do modelo isolado registram a captura parcial e a restauração. Sem mudanças em `main` ou no lugar de produção; gates visuais V5, persistência V6 e aceitação V7 continuam abertos.
 - Alteração documental; nenhum teste automatizado executado nesta atualização.
+
+## Terrain 2 — experimento de resolução V5 513×513 — 2026-10-16
+
+- Reexecutei V3/V4/V5 com grade 513 usando as referências originais cujos hashes estão no relatório. A malha adaptativa selecionada produziu 75,248 vértices e 148,797 triângulos; o V4 da mesma grade produziu baseline consistente.
+- A V5 513 reduziu a média dos perfis cardinais de 13.41 para 12.96 px-equivalentes e melhorou o score do atlas, mas o holdout wireframe-2 regrediu de 0.87909 para 0.89932 (limite 0.88409). Resultado `V5_NO_GO_MULTIVIEW_GEOMETRY`; candidato não promovido. A V5 257 previamente selecionada permanece a candidata relativa.
+- O resultado e a razão da rejeição foram registrados em `tools/terrain_2_v3/V5_README.md`. Escala maior sozinha não resolve a discrepância multivista; fidelidade absoluta continua NO-GO.
