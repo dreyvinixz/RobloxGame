@@ -210,6 +210,12 @@ def run(original_path,clean_path,output,baseline_report=None):
         cv2.line(overlay,tuple(ln['p0']),tuple(ln['p1']),color,1,cv2.LINE_AA)
         cv2.line(predicted,tuple(ln['p0']),tuple(ln['p1']),255,1)
     image('v41_topology_overlay.png',overlay)
+    for zone, color in [('light',(40,235,240)),('cliff',(255,100,45))]:
+        layer=original.copy()
+        for line in lines:
+            if line['zone']==zone:
+                cv2.line(layer,tuple(line['p0']),tuple(line['p1']),color,1,cv2.LINE_AA)
+        image('grid_'+zone+'_overlay.png',layer)
     triple=np.concatenate([original,aligned,overlay],axis=1)
     image('comparison_original_clean_v41.png',cv2.resize(triple,(int(triple.shape[1]*.5),int(triple.shape[0]*.5))))
     baseline={}
