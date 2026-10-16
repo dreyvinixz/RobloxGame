@@ -7,12 +7,16 @@ on:
       - tools/terrain_inverse/reconstruct_v5.py
       - tools/terrain_inverse/v5_landmarks.json
       - tests/test_reconstruct_v5.py
+      - tests/test_hydrology_v5.py
+      - tools/terrain_inverse/hydrology_v5.py
       - .github/workflows/terrain-image-v5.yml
   pull_request:
     paths:
       - tools/terrain_inverse/reconstruct_v5.py
       - tools/terrain_inverse/v5_landmarks.json
       - tests/test_reconstruct_v5.py
+      - tests/test_hydrology_v5.py
+      - tools/terrain_inverse/hydrology_v5.py
       - .github/workflows/terrain-image-v5.yml
 permissions:
   contents: read
@@ -32,7 +36,7 @@ jobs:
           cache-dependency-path: tools/terrain_inverse/requirements.txt
       - run: python -m pip install -r tools/terrain_inverse/requirements.txt
       - name: Run source-provenance and 2.5D export tests on SYNTHETIC images
-        run: python -m unittest discover -s tests -p 'test_reconstruct_v5.py' -v
+        run: python -m unittest discover -s tests -p 'test_*v5.py' -v
       - name: Explain real-image input limitations
         run: |
           echo "User-supplied source images are not checked into the repository."
