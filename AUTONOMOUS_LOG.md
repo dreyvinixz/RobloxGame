@@ -265,3 +265,11 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - A sensibilidade à escala vertical é material: P90 global vai de 26.57° (0.5 stud/unidade relativa) a 63.43° (2 studs/unidade); praia vai de 35.26° a 70.53°. Esses são proxies do heightfield, não inclinações medidas na superfície de colisão nem aprovação de Humanoid/Pathfinding.
 - Não defini critérios de inclinação sem calibração de escala ou requisito de gameplay. Rotas runtime continuam a evidência de jogabilidade: praias Success sem salto, cumes NoPath sem salto e quatro destinos Success com salto em uma sessão/um cliente.
 - Atualizei `tools/terrain_2_v3/V6_V7_README.md` com os percentuais por região e corrigi no `V5_README.md` as contagens heurísticas de região para o relatório atual do run 38911594227.
+
+## Terrain 2 — A/B LibMP com personagem ancorado — 2026-10-16
+
+- Repeti o perfil de 9 s em cliente único com câmera fixa (`(-6,113,12)` → `(-6,106,-95)`), limite 256 frames, 2 s de settle e `HumanoidRootPart.Anchored=true` nas duas condições. Candidata: 110 frames, IDs absolutos 899421–899530, CPU mediana/p95/máximo 16.699/17.474/18.189 ms. Bounds vazios: 109 frames, IDs 900987–901095, 16.680/17.308/17.707 ms. Diferenças candidato menos vazio: +0.019/+0.166/+0.482 ms; amostra curta não demonstra custo sustentado.
+- Thread GPU 1 presente nas duas condições: 12,871/12,754 entradas e 2,860/2,834 scopes completos; soma inclusiva 22.809/22.597 ms (aprox. 0.207 ms por frame em cada). `Scene`, `Scene2D` e `Id_Screen` dominam ambos de forma equivalente. Soma de scopes aninhados não é latência fim-a-fim da GPU; não se observou delta atribuível ao terreno. Memória LibMP não isolou a região.
+- `SceneAnalysisService` reportou os mesmos 480,234 triângulos/923 draws com terreno presente e após leitura de terreno vazia no cliente; métrica descartada como não responsiva neste A/B.
+- O snapshot reversível restaurou no servidor e cliente 377,149 voxels (Water 146,120; Rock 202,290; Sand 3,485; Grass 25,254), removeu o snapshot temporário e restaurou o `HumanoidRootPart.Anchored=false`. Studio retornou a Edit; place segue sem salvar/reabrir.
+- Atualizado `tools/terrain_2_v3/V6_V7_README.md`; nenhuma alteração em `main` ou no place de produção. Nenhum teste automatizado executado nesta atualização documental.
