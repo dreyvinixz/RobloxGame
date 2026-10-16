@@ -195,3 +195,8 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - `MatchService` agora aceita o atributo `Workspace.Terrain2TestMode=true` no place isolado e usa `Workspace.V7_TestSpawn` de forma neutra para ambos os times. Sem a flag, continuam os spawns normais das equipes.
 - Com o atributo setado antes do fluxo normal de Play, o bootstrap registrou `Terrain 2 test spawn enabled`; o jogador surgiu em `(-5.59, 107.56, -4.14)`, com 100 de vida e `RespawnLocation=Workspace.V7_TestSpawn`. Controle sem atributo preservou `Workspace.FrontlineArena.EntryPoints.Spawn_WestEntry` e a posição `(-124, 5.56, 0)`, ambos com 100 de vida.
 - Atualizados os READMEs V5/V6/V7 e o atributo de evidência no modelo de teste. Teste de um cliente apenas; multiplayer e os gates de jogabilidade/desempenho seguem abertos. A sessão continua sem salvar/reabrir.
+
+## Terrain 2 — rotas V7 desde o spawn padrão de teste — 2026-10-16
+
+- Com `Workspace.Terrain2TestMode=true`, executei Play pelo bootstrap normal e naveguei o personagem desde `Workspace.V7_TestSpawn` até os quatro marcadores do campo V5: praia norte (2.63 studs), praia sul (2.27), cume oeste (2.27) e cume leste (2.78). O servidor registrou 100 de vida em cada chegada.
+- Os resultados confirmam navegação individual a partir do spawn de teste, não aprovação multiplayer, critério completo de inclinação, cobertura de combate ou desempenho sustentado. Atualizados os atributos de evidência no modelo e os READMEs V5/V6/V7. A sessão permanece sem salvar/reabrir.
