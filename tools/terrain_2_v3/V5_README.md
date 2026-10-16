@@ -52,7 +52,7 @@ Reproduce the supplemental check against an already selected field with:
 python -m tools.terrain_2_v3.audit_v5_extra_view --sources references --v2 output_v2 --v4 output_v4 --v5 output_v5 --output output_v5/extra_view_audit
 ```
 
-`terrain_regions_v5.png`, `adaptive_mesh_preview_v5.png`, `multiview_comparison_v5.png`, `isometric_comparison_v5.png`, `side_render_training_v5.png`, and `atlas_isometric_holdout_v5.png` are the principal review artifacts. The latest original-reference reconstruction is [GitHub Actions run 38911594227](https://github.com/dreyvinixz/RobloxGame/actions/runs/38911594227); the downloaded artifact confirms the selected field hash, 27 relative hydrology scenarios, and updated 20,923-vertex error-guided mesh.
+`terrain_regions_v5.png`, `adaptive_mesh_preview_v5.png`, `multiview_comparison_v5.png`, `isometric_comparison_v5.png`, `side_render_training_v5.png`, `atlas_isometric_holdout_v5.png`, and `extra_view_audit/v5_extra_view_skyline.png` are the principal review artifacts. The latest original-reference reconstruction is [GitHub Actions run 38918407230](https://github.com/dreyvinixz/RobloxGame/actions/runs/38918407230); its V5 artifact contains the post-selection sparse-mesh report and curve, confirms the same selected field hash, and retains the relative-holdout pass / absolute-visual NO-GO status.
 
 ## Roadmap after V4
 
