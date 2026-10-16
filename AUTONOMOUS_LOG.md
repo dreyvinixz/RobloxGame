@@ -209,3 +209,9 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - Malha adaptativa: 19,136 vértices / 37,399 triângulos; 77 vértices adicionados em três rodadas. Em 36,821 amostras secas cobertas, erro malha→campo RMSE 0.095 relativo, máximo 1.991; quatro amostras secas sem triângulo.
 - A nova candidata difere do campo importado anteriormente em Studio (`ba77bef3…`) em todos os 66,049 pontos: diferença absoluta média 0.1967 e máxima 28.2119 unidades relativas. Portanto, o readback V6 e as rotas V7 existentes estão obsoletos para esta candidata. Studio permanece sem importação da nova altura e sem salvar/reabrir; reimportar e repetir readback/rotas é o próximo passo técnico. Nenhuma alteração em `main` ou no place de produção.
 - Atualizei os READMEs V5/V6 para identificar a candidata atual e separar evidência recente de evidência ainda válida apenas para o campo anterior. `git diff --check` validado; nenhum teste automatizado foi executado nesta atualização documental.
+
+## Terrain 2 — sincronização do handoff V6/V7 — 2026-10-16
+
+- Corrigi o handoff no README V6/V7 para deixar claro que todo readback, rotas e capturas de desempenho do Studio são da candidata anterior (`ba77bef3…`). A candidata atual (`37cd79eb…`) ainda requer importação e repetição de V6/V7; persistência/reabertura segue sem evidência.
+- Checks do PR #78 passaram no commit `17d47e0`: planejamento, V3, V4 e ambas as validações V5.
+- Atualização documental; sem teste automatizado nesta mudança.
