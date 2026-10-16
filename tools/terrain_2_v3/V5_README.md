@@ -44,6 +44,14 @@ The V5 hydrology run now also exports proportional bank-margin masks and compare
 
 An inventory of the extracted original reference package found no native terrain file (`.rbx*`, `.obj`, `.fbx`, `.glb`, `.gltf`, `.blend`, or `.stl`); `top_sparse_mesh.jpg` is a raster reference only. Recovering the original 3D shape therefore requires a new multi-view reconstruction or a separate source asset.
 
+The selected V5 field also has a supplemental **post-selection** skyline audit against `top_sparse_mesh.jpg`, a raster not used by the V2/V3/V4/V5 selection pipeline. The audit fits the relative camera once on V4 and fixes it for both fields; V4 scores 0.60833 and selected V5 scores 0.54535 (delta −0.06298). Source SHA-256 is `41abb8789a1472cf16a96ff2169569f48c4cb99dc959af0297e3cc568b73f1f6`. The image is a raster from nearly the same top-oblique view as `top_render.png`, so this is a correlated consistency check rather than an independent camera or proof of absolute fidelity. It did not affect candidate selection; the absolute-visual gate remains NO-GO.
+
+Reproduce the supplemental check against an already selected field with:
+
+```bash
+python -m tools.terrain_2_v3.audit_v5_extra_view --sources references --v2 output_v2 --v4 output_v4 --v5 output_v5 --output output_v5/extra_view_audit
+```
+
 `terrain_regions_v5.png`, `adaptive_mesh_preview_v5.png`, `multiview_comparison_v5.png`, `isometric_comparison_v5.png`, `side_render_training_v5.png`, and `atlas_isometric_holdout_v5.png` are the principal review artifacts. The latest original-reference reconstruction is [GitHub Actions run 38911594227](https://github.com/dreyvinixz/RobloxGame/actions/runs/38911594227); the downloaded artifact confirms the selected field hash, 27 relative hydrology scenarios, and updated 20,923-vertex error-guided mesh.
 
 ## Roadmap after V4

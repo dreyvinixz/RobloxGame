@@ -76,6 +76,8 @@ jobs:
         run: python -m tools.terrain_2_v3.audit_v5 --sources work/references --v2 work/output_v2 --v3 work/output_v3 --v4 work/output_v4 --output work/output_v5
       - name: Reconstruct V5 adaptive geometry, hydrology and multiview candidate
         run: python -m tools.terrain_2_v3.terrain_v5 --sources work/references --v2 work/output_v2 --v3 work/output_v3 --v4 work/output_v4 --output work/output_v5
+      - name: Post-selection skyline diagnostic for the sparse-mesh reference
+        run: python -m tools.terrain_2_v3.audit_v5_extra_view --sources work/references --v2 work/output_v2 --v4 work/output_v4 --v5 work/output_v5 --output work/output_v5/extra_view_audit
       - name: Publish V2 original-source constraints
         if: always()
         uses: actions/upload-artifact@v4
