@@ -240,3 +240,9 @@ Revisar primeiro procedência e permissões dos assets escolhidos, depois o seto
 - Comparei as três larguras com `channel_corridor_observed` reamostrada para 257×257. IoU 0.4244/0.4812/0.5126 para multiplicadores 0.8/1.0/1.2; precisão 0.7238/0.6969/0.6634; recall 0.5064/0.6085/0.6928. Como a máscara observada vem do mesmo artwork usado pela estimativa de larguras, isso é diagnóstico de consistência interna, não holdout; nenhum cenário foi escolhido por essa comparação.
 - Sob a máscara-fonte, há dois componentes de mar antes da união com o canal e um depois; os endpoints norte/sul compartilham o componente final. Isso verifica conectividade raster relativa à segmentação, não hidrologia física ou bathimetria observada.
 - Atualizados `tools/terrain_2_v3/river_v3.py`, `tools/terrain_2_v3/terrain_v5.py` e `tools/terrain_2_v3/V5_README.md`. A geometria V5 hash-verificada permanece inalterada; Studio, `main` e place de produção não foram modificados nesta etapa.
+
+## Terrain 2 — busca exploratória de suavização local das cristas — 2026-10-16
+
+- Com os artefatos exatos do run 38906611785, explorei 144 combinações de limiar de evidência rochosa (.35/.50/.65), dilatação da região (3/7/11/15 células), raio Gaussiano (1/2/3) e blend (.25/.50/.75/1.0). Avaliei somente as duas vistas de treino (`oblique_wireframe_1` e `oblique_side_render`) e os quatro perfis cardinais; não usei métricas de holdout para escolher.
+- Apenas uma combinação satisfez as restrições cardinais e melhorou ambas as vistas de treino: limiar .65, dilatação 3, sigma 1.0 e blend .25. Ela obteve média cardinal 12.58 px-equivalentes e treino 0.58036, contra 12.55 e 0.58096 do campo selecionado.
+- Pela regra declarada, o pequeno ganho de treino não supera a média cardinal pior. Mantive o campo `37cd79eb…`; nenhum parâmetro ou artefato de geometria foi promovido. A discrepância visual de encostas/picos continua aberta e requer novas evidências ou um método melhor.
